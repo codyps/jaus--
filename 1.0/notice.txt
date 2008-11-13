@@ -1,0 +1,6 @@
+The following libraries are part of the complete JAUS library and are included in ext folder.
+
+zlib
+libpng
+libjpeg
+tinyxml
