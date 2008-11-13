@@ -1,0 +1,20 @@
+<?xml version="1.0" standalone="yes" ?>
+<Jaus>
+  <VisualSensorComponent>
+    <InstanceID>1</InstanceID>
+    <!-- Source is the name of the camera or video file you wish to 
+             be the source for the visual sensor.  Use numbers if you want
+             to enumerage cameras.-->
+    <Source>Logitech QuickCam Pro 9000</Source>
+    <!-- If maxWidth and maxHeight are not 0, then 
+             image data will be scaled. -->
+    <Settings width="640" height="480" interlaced="false" show="true"></Settings>
+    <!-- If maxWidth and maxHeight are not 0, then 
+               image data will be scaled. -->
+    <!--<ScaledResolution maxWidth="640" maxHeight="480"></ScaledResolution>-->
+    <!-- MessageBoxSize is how much of a buffer to use for
+             video streaming-->
+    <MessageBoxSize>2097152</MessageBoxSize>
+
+  </VisualSensorComponent>
+</Jaus>

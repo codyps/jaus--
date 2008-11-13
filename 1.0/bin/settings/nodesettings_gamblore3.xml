@@ -1,0 +1,42 @@
+<?xml version="1.0" standalone="yes" ?>
+<Jaus>
+    <!-- The broadcast attribute indicates that the Node should broadcast
+         hearbeat messages to 255.255.1.1 when the value is true.  Otherwise
+         it only broadcasts to SubsystemID.255.1.1 which is used for Node
+         disocvery.  See Dynamic Discovery in the JAUS RA for more info about
+         discovery procedures.-->
+    <NodeManagerComponent broadcast="false">
+        <NetHeader>JAUS01.0</NetHeader>
+        <NetPort>3794</NetPort>
+        <SubsystemID>51</SubsystemID>
+        <NodeID>3</NodeID>
+        <!-- Option Subsystem Identification data if available.  Authority
+             is the lowest level of authority to gain control of parts of
+             subsystem, identification is the name of the subsystem and
+             type is the type of subsystem, however the values are 
+             not defined as of this writing (JAUS RA 3.3)-->
+        <SubsystemIdentification authority="0"
+                                 identification="Gamblore"
+                                 type="10001"/>
+        <!-- Enable or disable logging at startup by setting the
+             logdata attribute to true, use false to not have logging at startup. -->
+        <NodeLogger logdata="false" />
+        <!-- This value represents how large a block of shared memory you
+             want to use for storing messages coming in to the Node Manager
+             for routing.  The value is in bytes. Default size is
+             4 MB -->
+        <MessageBoxSize>4194304</MessageBoxSize>
+        <!-- Transport indicates that the default
+             transport medium for inter-node communication
+             should be.  Supported values are UDP or TCP-->
+        <Transport>UDP</Transport>
+        <!-- Set the multicast address to use for multicast transmissions. If
+             field is not present, a value of 224.1.0.1 is used by default.-->
+        <MulticastAddress>224.1.0.1</MulticastAddress>
+        <NodeConnections>
+            <!-- Example default node connections. -->
+            <!--<Connection subsystem="1" node="2" host="128.185.3.1" />
+            <Connection subsystem="1" node="3" port="com2" baud="9600" bits="8" parity="0" stop="1"/>-->
+        </NodeConnections>
+    </NodeManagerComponent>
+</Jaus>

@@ -1,0 +1,68 @@
+<?xml version="1.0" standalone="yes" ?>
+<Jaus>
+    <JoystickDriverComponent>
+        <!-- Component Authority Level [0,255]-->
+        <ComponentAuthority>127</ComponentAuthority>
+        <!-- This is the subsystem number of the platform to drive. [1,254]-->
+        <PlatformSubsystemID>52</PlatformSubsystemID>
+        <!-- ID of camera to use.  Not Visual Sensor ID, but Camera ID -->
+        <CameraID>1</CameraID>
+        <!-- Number of Joystick to Connect To. (Joystick ID)-->
+        <JoystickID>1</JoystickID>
+        <!-- Joystick Axis Mapping Information-->
+        <Axes>
+            <!-- Set the attributes for the control axis.  The
+             attributes are as follows:
+             
+             axis = X, Y, Z, R, U, V, PovX, PovY
+             deadzone = percentage of a deadzone to use with joystick [0,100] 
+             invert = true/false  (Invert the Axis) 
+             wrench = Wrench effort to map axis to.  Values are:
+                 Propulsive Linear Effort X = 0,
+                 Propulsive Linear Effort Y = 1,
+                 Propulsive Linear Effort Z = 2,
+                 Propulsive Rotational Effort X = 3,
+                 Propulsive Rotational Effort Y = 4,
+                 Propulsive Rotational Effort Z = 5,
+                 Resistive Linear Effort X = 6,
+                 Resistive Linear Effort Y = 7,
+                 Resistive Linear Effort Z = 8,
+                 Resistive Rotational Effort X = 9,
+                 Resistive Rotational Effort Y = 10,
+                 Resistive Rotational Effort Z = 11,
+             Delete any axis you don't wish to use. -->
+            <WrenchEffort wrench="5" axis="X" deadzone="2" invert="false"></WrenchEffort>
+            <WrenchEffort wrench="0" axis="Y" deadzone="2" invert="true"></WrenchEffort>
+            <!-- Set the attributes for the control axis.  The
+             attributes are as follows:
+             
+             axis = X, Y, Z, R, U, V, PovX, PovY
+             deadzone = percentage of a deadzone to use with joystick [0,100] 
+             rate = Rate value if 1, if 0 position displacement wrench
+             invert = true/false  (Invert the Axis) 
+             wrench = Camera Pose wrench effort to map axis to.  Values are:
+                XDisplacementOrLinearRate = 0,
+                YDisplacementOrLinearRate = 1,
+                ZDisplacementOrLinearRate = 2,
+                XAngleOrAngularRotationRate = 3,
+                YAngleOrAngularRotationRate = 4,
+                ZAngleOrAngularRotationRate = 5,
+             Delete any axis you don't wish to use. -->
+            <!-- This example does pan and tilt using the POV hat on a joystick. -->
+            <CameraWrench wrench="4" axis="PovX" rate="1" deadzone="0" invert="false"></CameraWrench>
+            <CameraWrench wrench="3" axis="PovY" rate="1" deadzone="0" invert="false"></CameraWrench>
+        </Axes>
+        <Buttons>
+            <!--  Takes control of driver component. -->
+            <RequestDriveControlButton>7</RequestDriveControlButton>
+            <!--  Releases control of driver component. -->
+            <ReleaseDriveControlButton>8</ReleaseDriveControlButton>
+            <!--  Takes control of visual sensor component. -->
+            <RequestCameraControlButton>9</RequestCameraControlButton>
+            <!--  Releases control of visual sensor component. -->
+            <ReleaseCameraControlButton>10</ReleaseCameraControlButton>
+            <!-- Button to set Camera Postion to 0 -->
+            <ResetCameraPose>1</ResetCameraPose>
+        </Buttons>
+    </JoystickDriverComponent>
+</Jaus>
