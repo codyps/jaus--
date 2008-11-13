@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="example_nodemanager" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="../../../../bin/example_nodemanager_d" prefix_auto="0" extension_auto="0" />
+				<Option working_dir="../../../../bin/" />
+				<Option object_output="../../../../obj/example_nodemanager_d/" />
+				<Option external_deps="../../../../../../../cxutils/trunk/1.0/lib/libcxutils_1.0_d.a;../../../../lib/libjmsg_1.0_d.a;../../../../lib/libjcmp_1.0_d.a;" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+				</Compiler>
+				<Linker>
+					<Add library="../../../../lib/libjcmp_1.0_d.a" />
+					<Add library="../../../../lib/libjmsg_1.0_d.a" />
+					<Add library="../../../../../../../cxutils/trunk/1.0/lib/libcxutils_1.0_d.a" />
+					<Add library="../../../../ext/lib/libtinyxml.a" />
+					<Add library="pthread" />
+				</Linker>
+			</Target>
+			<Target title="Release">
+				<Option output="../../../../bin/example_nodemanager" prefix_auto="0" extension_auto="0" />
+				<Option working_dir="../../../../bin/" />
+				<Option object_output="../../../../obj/example_nodemanager/" />
+				<Option external_deps="../../../../lib/libjmsg_1.0.a;../../../../lib/libjcmp_1.0.a;../../../../../../../cxutils/trunk/1.0/lib/libcxutils_1.0.a;" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add library="../../../../lib/libjcmp_1.0.a" />
+					<Add library="../../../../lib/libjmsg_1.0.a" />
+					<Add library="../../../../../../../cxutils/trunk/1.0/lib/libcxutils_1.0.a" />
+					<Add library="../../../../ext/lib/libtinyxml.a" />
+					<Add library="pthread" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+			<Add option="-fexceptions" />
+			<Add directory="../../../../ext/include/tinyxml" />
+			<Add directory="../../../../include" />
+			<Add directory="../../../../../../../cxutils/trunk/1.0/include" />
+			<Add directory="../../../../ext/include/vld" />
+		</Compiler>
+		<Linker>
+			<Add library="../../../../ext/lib/libtinyxml.a" />
+		</Linker>
+		<Unit filename="../../../../src/examples/example_nodemanager.cpp" />
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<lib_finder disable_auto="1" />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

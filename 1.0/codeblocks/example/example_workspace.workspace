@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_workspace_file>
+	<Workspace title="Workspace">
+		<Project filename="example_component/example_component.cbp" />
+		<Project filename="example_messages/example_messages.cbp" />
+		<Project filename="example_nodemanager/example_nodemanager.cbp" />
+		<Project filename="example_controltransfer/example_controltransfer.cbp" />
+		<Project filename="example_discovery/example_discovery.cbp" />
+		<Project filename="example_eventsubscriber/example_eventsubscriber.cbp" />
+		<Project filename="example_images/example_images.cbp" />
+		<Project filename="example_imagesubscriber/example_imagesubscriber.cbp" />
+		<Project filename="example_joystick/example_joystick.cbp" />
+		<Project filename="example_pdcontroller/example_pdcontroller.cbp" />
+		<Project filename="example_posesensor/example_posesensor.cbp" />
+		<Project filename="example_primitivedriver/example_primitivedriver.cbp" />
+		<Project filename="example_scsubscriber/example_scsubscriber.cbp" />
+		<Project filename="example_visualsensor/example_visualsensor.cbp" active="1" />
+	</Workspace>
+</CodeBlocks_workspace_file>

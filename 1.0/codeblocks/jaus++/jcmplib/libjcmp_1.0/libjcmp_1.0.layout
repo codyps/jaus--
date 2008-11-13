@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_layout_file>
+	<ActiveTarget name="Release" />
+	<File name="../../../../../include/jaus/components/node/communicator.h" open="0" top="0" tabpos="1">
+		<Cursor position="0" topLine="0" />
+	</File>
+	<File name="../../../../../include/jaus/components/transport/jsharedmemory.h" open="0" top="0" tabpos="3">
+		<Cursor position="4409" topLine="79" />
+	</File>
+	<File name="../../../../../src/jaus/components/commandcomponent.cpp" open="0" top="0" tabpos="9">
+		<Cursor position="953" topLine="0" />
+	</File>
+	<File name="../../../../../src/jaus/components/component.cpp" open="0" top="0" tabpos="4">
+		<Cursor position="68666" topLine="1868" />
+	</File>
+	<File name="../../../../../src/jaus/components/eventmanager.cpp" open="0" top="0" tabpos="3">
+		<Cursor position="14773" topLine="484" />
+	</File>
+	<File name="../../../../../src/jaus/components/informcomponent.cpp" open="0" top="0" tabpos="3">
+		<Cursor position="1843" topLine="21" />
+	</File>
+	<File name="../../../../../src/jaus/components/messagehandler.cpp" open="1" top="0" tabpos="3">
+		<Cursor position="30904" topLine="903" />
+	</File>
+	<File name="../../../../../src/jaus/components/node/communicator.cpp" open="1" top="0" tabpos="2">
+		<Cursor position="12137" topLine="432" />
+	</File>
+	<File name="../../../../../src/jaus/components/node/nodeconnection.cpp" open="0" top="0" tabpos="5">
+		<Cursor position="2792" topLine="73" />
+	</File>
+	<File name="../../../../../src/jaus/components/node/nodeconnectionhandler.cpp" open="1" top="0" tabpos="1">
+		<Cursor position="10969" topLine="215" />
+	</File>
+	<File name="../../../../../src/jaus/components/node/nodelogger.cpp" open="0" top="0" tabpos="2">
+		<Cursor position="5298" topLine="148" />
+	</File>
+	<File name="../../../../../src/jaus/components/node/nodemanager.cpp" open="0" top="0" tabpos="1">
+		<Cursor position="71911" topLine="1870" />
+	</File>
+	<File name="../../../../../src/jaus/components/node/serviceconnectionmanager.cpp" open="0" top="0" tabpos="4">
+		<Cursor position="3091" topLine="69" />
+	</File>
+	<File name="../../../../../src/jaus/components/serviceconnection.cpp" open="0" top="0" tabpos="8">
+		<Cursor position="18134" topLine="552" />
+	</File>
+	<File name="../../../../../src/jaus/components/transport/jsharedmemory.cpp" open="1" top="0" tabpos="4">
+		<Cursor position="37045" topLine="1110" />
+	</File>
+	<File name="../../../../../src/jaus/components/transport/judpserver.cpp" open="0" top="0" tabpos="0">
+		<Cursor position="6610" topLine="184" />
+	</File>
+</CodeBlocks_layout_file>

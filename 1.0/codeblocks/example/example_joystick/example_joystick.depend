@@ -1,0 +1,1022 @@
+# depslib dependency file v1.0
+1217266725 source:/home/active/Repository/libraries/jaus++/trunk/1.0/src/examples/example_component.cpp
+	<iostream>
+	<algorithm>
+	<vld.h>
+	"jaus/components/cmplib.h"
+	<conio.h>
+
+1217266723 /home/active/Repository/libraries/jaus++/trunk/1.0/ext/include/vld/vld.h
+
+1215635015 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/components/cmplib.h
+	"jaus/messages/msglib.h"
+	"jaus/components/transport/transport.h"
+	"jaus/components/component.h"
+	"jaus/components/subscribercomponent.h"
+	"jaus/components/informcomponent.h"
+	"jaus/components/commandcomponent.h"
+	"jaus/components/node/nodemanager.h"
+
+1215635016 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/msglib.h
+	"jaus/messages/types.h"
+	"jaus/messages/time.h"
+	"jaus/messages/date.h"
+	"jaus/messages/stream.h"
+	"jaus/messages/message.h"
+	"jaus/messages/bitvector.h"
+	"jaus/messages/largedataset.h"
+	"jaus/messages/messagecreator.h"
+	"jaus/messages/command/commandmessages.h"
+	"jaus/messages/query/querymessages.h"
+	"jaus/messages/inform/informmessages.h"
+	"jaus/messages/experimental/experimentalmessages.h"
+
+1218036286 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/types.h
+	<limits.h>
+	"msglibdll.h"
+	<unistd.h>
+
+1215635016 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/msglibdll.h
+
+1215635016 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/time.h
+	"jaus/messages/types.h"
+	"bitvector.h"
+
+1215635016 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/bitvector.h
+	"jaus/messages/types.h"
+
+1215635016 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/date.h
+	"jaus/messages/types.h"
+	"errorhistory.h"
+	"bitvector.h"
+
+1215635016 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/errorhistory.h
+	"jaus/messages/errorcodes.h"
+	<string>
+
+1215635016 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/errorcodes.h
+	"jaus/messages/types.h"
+
+1219068897 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/stream.h
+	"header.h"
+	"errorhistory.h"
+	"bitvector.h"
+	"scaledinteger.h"
+	"vartype.h"
+	<cxutils/packet.h>
+	<vector>
+
+1215635016 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/header.h
+	"jaus/messages/types.h"
+	"address.h"
+
+1215635016 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/address.h
+	"jaus/messages/types.h"
+	<string>
+	<set>
+	<vector>
+
+1218724204 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/scaledinteger.h
+	"jaus/messages/types.h"
+
+1215635016 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/vartype.h
+	"jaus/messages/types.h"
+	<string>
+
+1219068898 /home/active/Repository/libraries/cxutils/trunk/1.0/include/cxutils/packet.h
+	<limits.h>
+	<string>
+	"cxtypes.h"
+
+1217266727 /home/active/Repository/libraries/cxutils/trunk/1.0/include/cxutils/cxtypes.h
+
+1215635016 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/message.h
+	"header.h"
+	"stream.h"
+	"time.h"
+	"errorhistory.h"
+	"bitvector.h"
+
+1215635016 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/largedataset.h
+	"stream.h"
+	<set>
+	<map>
+
+1215635016 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/messagecreator.h
+	"jaus/messages/message.h"
+	"jaus/messages/command/commandcodes.h"
+	"jaus/messages/query/querycodes.h"
+	"jaus/messages/inform/informcodes.h"
+	"jaus/messages/experimental/experimentalcodes.h"
+	<set>
+	<string>
+
+1215635016 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/command/commandcodes.h
+	<string>
+	"jaus/messages/types.h"
+
+1215635016 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/query/querycodes.h
+	"jaus/messages/types.h"
+
+1215635015 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/inform/informcodes.h
+	"jaus/messages/types.h"
+
+1215635015 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/experimental/experimentalcodes.h
+	"jaus/messages/types.h"
+
+1219932956 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/command/commandmessages.h
+	"jaus/messages/command/core/activateserviceconnection.h"
+	"jaus/messages/command/core/clearemergency.h"
+	"jaus/messages/command/core/confirmcomponentcontrol.h"
+	"jaus/messages/command/core/confirmserviceconnection.h"
+	"jaus/messages/command/core/createserviceconnection.h"
+	"jaus/messages/command/core/rejectcomponentcontrol.h"
+	"jaus/messages/command/core/releasecomponentcontrol.h"
+	"jaus/messages/command/core/requestcomponentcontrol.h"
+	"jaus/messages/command/core/reset.h"
+	"jaus/messages/command/core/resume.h"
+	"jaus/messages/command/core/setcomponentauthority.h"
+	"jaus/messages/command/core/setemergency.h"
+	"jaus/messages/command/core/settime.h"
+	"jaus/messages/command/core/shutdown.h"
+	"jaus/messages/command/core/standby.h"
+	"jaus/messages/command/core/suspendserviceconnection.h"
+	"jaus/messages/command/core/terminateserviceconnection.h"
+	"jaus/messages/command/communications/setdatalinkselect.h"
+	"jaus/messages/command/communications/setdatalinkstate.h"
+	"jaus/messages/command/communications/setselecteddatalinkstate.h"
+	"jaus/messages/command/environment/setcamerapose.h"
+	"jaus/messages/command/environment/selectcamera.h"
+	"jaus/messages/command/environment/setcameracapabilities.h"
+	"jaus/messages/command/environment/setcameraformatoptions.h"
+	"jaus/messages/command/events/createeventrequest.h"
+	"jaus/messages/command/events/updateevent.h"
+	"jaus/messages/command/events/cancelevent.h"
+	"jaus/messages/command/events/confirmeventrequest.h"
+	"jaus/messages/command/events/rejecteventrequest.h"
+	"jaus/messages/command/platform/setwrencheffort.h"
+	"jaus/messages/command/platform/setglobalvector.h"
+	"jaus/messages/command/platform/settravelspeed.h"
+	"jaus/messages/command/platform/setdiscretedevices.h"
+	"jaus/messages/command/platform/setlocalvector.h"
+	"jaus/messages/command/platform/setglobalwaypoint.h"
+	"jaus/messages/command/platform/setlocalwaypoint.h"
+	"jaus/messages/command/platform/setglobalpathsegment.h"
+	"jaus/messages/command/platform/setlocalpathsegment.h"
+	"jaus/messages/command/world/createvectorknowledgestoreobjects.h"
+
+1215635016 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/command/core/activateserviceconnection.h
+	"jaus/messages/message.h"
+
+1215635016 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/command/core/clearemergency.h
+	"jaus/messages/message.h"
+
+1215635016 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/command/core/confirmcomponentcontrol.h
+	"jaus/messages/message.h"
+
+1215635016 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/command/core/confirmserviceconnection.h
+	"jaus/messages/message.h"
+
+1215635016 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/command/core/createserviceconnection.h
+	"jaus/messages/message.h"
+
+1215635016 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/command/core/rejectcomponentcontrol.h
+	"jaus/messages/message.h"
+
+1215635016 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/command/core/releasecomponentcontrol.h
+	"jaus/messages/message.h"
+
+1215635016 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/command/core/requestcomponentcontrol.h
+	"jaus/messages/message.h"
+
+1215635016 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/command/core/reset.h
+	"jaus/messages/message.h"
+
+1215635016 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/command/core/resume.h
+	"jaus/messages/message.h"
+
+1215635016 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/command/core/setcomponentauthority.h
+	"jaus/messages/message.h"
+
+1215635016 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/command/core/setemergency.h
+	"jaus/messages/message.h"
+
+1215635016 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/command/core/settime.h
+	"jaus/messages/message.h"
+	"jaus/messages/time.h"
+	"jaus/messages/date.h"
+
+1215635016 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/command/core/shutdown.h
+	"jaus/messages/message.h"
+
+1215635016 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/command/core/standby.h
+	"jaus/messages/message.h"
+
+1215635016 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/command/core/suspendserviceconnection.h
+	"jaus/messages/message.h"
+
+1215635016 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/command/core/terminateserviceconnection.h
+	"jaus/messages/message.h"
+
+1215635016 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/command/events/createeventrequest.h
+	"jaus/messages/message.h"
+
+1215635016 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/command/events/updateevent.h
+	"jaus/messages/message.h"
+
+1215635016 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/command/events/cancelevent.h
+	"jaus/messages/message.h"
+
+1215635016 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/command/events/confirmeventrequest.h
+	"jaus/messages/message.h"
+
+1215635016 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/command/events/rejecteventrequest.h
+	"jaus/messages/message.h"
+	<string>
+
+1215635016 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/command/platform/setwrencheffort.h
+	"jaus/messages/message.h"
+
+1215635016 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/command/platform/setglobalvector.h
+	"jaus/messages/message.h"
+
+1215635016 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/command/platform/settravelspeed.h
+	"jaus/messages/message.h"
+
+1217266724 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/command/platform/setdiscretedevices.h
+	"jaus/messages/message.h"
+
+1217343429 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/command/world/createvectorknowledgestoreobjects.h
+	"jaus/messages/message.h"
+	"jaus/messages/common/world/object.h"
+
+1217343429 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/common/world/object.h
+	"jaus/messages/types.h"
+	"jaus/messages/vartype.h"
+	<vector>
+
+1218747010 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/query/querymessages.h
+	"jaus/messages/query/core/querycomponentauthority.h"
+	"jaus/messages/query/core/querycomponentcontrol.h"
+	"jaus/messages/query/core/querycomponentstatus.h"
+	"jaus/messages/query/core/querytime.h"
+	"jaus/messages/query/configuration/queryconfiguration.h"
+	"jaus/messages/query/configuration/queryidentification.h"
+	"jaus/messages/query/configuration/queryservices.h"
+	"jaus/messages/query/configuration/querysubsystemlist.h"
+	"jaus/messages/query/communications/queryheartbeatpulse.h"
+	"jaus/messages/query/communications/querydatalinkstatus.h"
+	"jaus/messages/query/communications/queryselecteddatalinkstatus.h"
+	"jaus/messages/query/events/queryevents.h"
+	"jaus/messages/query/platform/queryglobalpose.h"
+	"jaus/messages/query/platform/querylocalpose.h"
+	"jaus/messages/query/platform/queryglobalvector.h"
+	"jaus/messages/query/platform/querywrencheffort.h"
+	"jaus/messages/query/platform/queryplatformspecifications.h"
+	"jaus/messages/query/platform/queryvelocitystate.h"
+	"jaus/messages/query/platform/querytravelspeed.h"
+	"jaus/messages/query/platform/queryplatformoperationaldata.h"
+	"jaus/messages/query/platform/querylocalvector.h"
+	"jaus/messages/query/platform/querydiscretedevices.h"
+	"jaus/messages/query/platform/querywaypointcount.h"
+	"jaus/messages/query/platform/queryglobalwaypoint.h"
+	"jaus/messages/query/platform/querylocalwaypoint.h"
+	"jaus/messages/query/platform/querypathsegmentcount.h"
+	"jaus/messages/query/platform/queryglobalpathsegment.h"
+	"jaus/messages/query/platform/querylocalpathsegment.h"
+	"jaus/messages/query/environment/queryimage.h"
+	"jaus/messages/query/environment/querycameraformatoptions.h"
+	"jaus/messages/query/environment/querycamerapose.h"
+	"jaus/messages/query/environment/querycameracount.h"
+	"jaus/messages/query/environment/queryrelativeobjectposition.h"
+	"jaus/messages/query/environment/queryselectedcamera.h"
+	"jaus/messages/query/environment/querycameracapabilities.h"
+
+1215635016 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/query/core/querycomponentauthority.h
+	"jaus/messages/message.h"
+
+1215635016 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/query/core/querycomponentcontrol.h
+	"jaus/messages/message.h"
+
+1215635016 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/query/core/querycomponentstatus.h
+	"jaus/messages/message.h"
+
+1215635016 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/query/core/querytime.h
+	"jaus/messages/message.h"
+
+1215635016 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/query/configuration/queryconfiguration.h
+	"jaus/messages/message.h"
+
+1215635016 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/query/configuration/queryidentification.h
+	"jaus/messages/message.h"
+
+1215635016 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/query/configuration/queryservices.h
+	"jaus/messages/message.h"
+
+1215635016 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/query/configuration/querysubsystemlist.h
+	"jaus/messages/message.h"
+
+1215635016 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/query/communications/queryheartbeatpulse.h
+	"jaus/messages/message.h"
+
+1215635016 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/query/events/queryevents.h
+	"jaus/messages/message.h"
+
+1215635016 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/query/platform/queryglobalpose.h
+	"jaus/messages/message.h"
+
+1217266724 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/query/platform/querylocalpose.h
+	"jaus/messages/message.h"
+
+1215635016 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/query/platform/queryglobalvector.h
+	"jaus/messages/message.h"
+
+1215635016 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/query/platform/querywrencheffort.h
+	"jaus/messages/message.h"
+
+1215635016 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/query/platform/queryplatformspecifications.h
+	"jaus/messages/message.h"
+
+1215635016 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/query/platform/queryvelocitystate.h
+	"jaus/messages/message.h"
+
+1215635016 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/query/platform/querytravelspeed.h
+	"jaus/messages/message.h"
+
+1215635016 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/query/platform/queryplatformoperationaldata.h
+	"jaus/messages/message.h"
+
+1215635016 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/query/platform/querylocalvector.h
+	"jaus/messages/message.h"
+
+1215635016 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/query/platform/querydiscretedevices.h
+	"jaus/messages/message.h"
+
+1215635016 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/query/platform/querywaypointcount.h
+	"jaus/messages/message.h"
+
+1217266724 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/query/platform/queryglobalwaypoint.h
+	"jaus/messages/message.h"
+
+1217266724 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/query/platform/querylocalwaypoint.h
+	"jaus/messages/message.h"
+
+1215635016 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/query/platform/querypathsegmentcount.h
+	"jaus/messages/message.h"
+
+1217266724 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/query/platform/queryglobalpathsegment.h
+	"jaus/messages/message.h"
+
+1217266724 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/query/platform/querylocalpathsegment.h
+	"jaus/messages/message.h"
+
+1215635016 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/query/environment/queryimage.h
+	"jaus/messages/message.h"
+
+1215635016 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/query/environment/querycameraformatoptions.h
+	"jaus/messages/message.h"
+
+1219415645 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/inform/informmessages.h
+	"jaus/messages/inform/acknackmessage.h"
+	"jaus/messages/inform/core/reportcomponentauthority.h"
+	"jaus/messages/inform/core/reportcomponentcontrol.h"
+	"jaus/messages/inform/core/reportcomponentstatus.h"
+	"jaus/messages/inform/core/reporttime.h"
+	"jaus/messages/inform/communications/reportheartbeatpulse.h"
+	"jaus/messages/inform/communications/reportdatalinkstatus.h"
+	"jaus/messages/inform/communications/reportselecteddatalinkstatus.h"
+	"jaus/messages/inform/configuration/reportconfiguration.h"
+	"jaus/messages/inform/configuration/reportservices.h"
+	"jaus/messages/inform/configuration/reportidentification.h"
+	"jaus/messages/inform/configuration/reportsubsystemlist.h"
+	"jaus/messages/inform/events/eventmessage.h"
+	"jaus/messages/inform/events/reportevents.h"
+	"jaus/messages/inform/platform/reportglobalpose.h"
+	"jaus/messages/inform/platform/reportlocalpose.h"
+	"jaus/messages/inform/platform/reportglobalvector.h"
+	"jaus/messages/inform/platform/reportwrencheffort.h"
+	"jaus/messages/inform/platform/reportplatformspecifications.h"
+	"jaus/messages/inform/platform/reportvelocitystate.h"
+	"jaus/messages/inform/platform/reporttravelspeed.h"
+	"jaus/messages/inform/platform/reportplatformoperationaldata.h"
+	"jaus/messages/inform/platform/reportdiscretedevices.h"
+	"jaus/messages/inform/platform/reportlocalvector.h"
+	"jaus/messages/inform/platform/reportwaypointcount.h"
+	"jaus/messages/inform/platform/reportglobalwaypoint.h"
+	"jaus/messages/inform/platform/reportlocalwaypoint.h"
+	"jaus/messages/inform/platform/reportpathsegmentcount.h"
+	"jaus/messages/inform/platform/reportglobalpathsegment.h"
+	"jaus/messages/inform/platform/reportlocalpathsegment.h"
+	"jaus/messages/inform/environment/reportimage.h"
+	"jaus/messages/inform/environment/reportcameraformatoptions.h"
+	"jaus/messages/inform/environment/reportcamerapose.h"
+	"jaus/messages/inform/environment/reportcameracount.h"
+	"jaus/messages/inform/environment/reportselectedcamera.h"
+	"jaus/messages/inform/environment/reportrelativeobjectposition.h"
+	"jaus/messages/inform/environment/reportcameracapabilities.h"
+
+1215635015 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/inform/acknackmessage.h
+	"informcodes.h"
+	"jaus/messages/message.h"
+
+1215635015 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/inform/core/reportcomponentauthority.h
+	"jaus/messages/message.h"
+
+1215635015 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/inform/core/reportcomponentcontrol.h
+	"jaus/messages/message.h"
+
+1215635015 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/inform/core/reportcomponentstatus.h
+	"jaus/messages/message.h"
+
+1215635015 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/inform/core/reporttime.h
+	"jaus/messages/message.h"
+	"jaus/messages/time.h"
+	"jaus/messages/date.h"
+
+1215635015 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/inform/communications/reportheartbeatpulse.h
+	"jaus/messages/message.h"
+
+1215635015 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/inform/configuration/reportconfiguration.h
+	"jaus/messages/message.h"
+	"jaus/messages/common/configuration/configuration.h"
+
+1215635015 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/common/configuration/configuration.h
+	"jaus/messages/address.h"
+	"jaus/messages/common/configuration/service.h"
+	"jaus/messages/common/configuration/identification.h"
+	<vector>
+	<map>
+
+1215635015 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/common/configuration/service.h
+	"jaus/messages/types.h"
+	<set>
+	<map>
+	<vector>
+
+1215635015 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/common/configuration/identification.h
+	<string>
+	"jaus/messages/types.h"
+
+1215635015 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/inform/configuration/reportservices.h
+	"jaus/messages/message.h"
+	"jaus/messages/common/configuration/service.h"
+
+1215635015 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/inform/configuration/reportidentification.h
+	"jaus/messages/message.h"
+	"jaus/messages/common/configuration/identification.h"
+
+1215635015 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/inform/configuration/reportsubsystemlist.h
+	"jaus/messages/message.h"
+	<vector>
+
+1215635015 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/inform/events/eventmessage.h
+	"jaus/messages/message.h"
+
+1215635015 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/inform/events/reportevents.h
+	"jaus/messages/message.h"
+	"jaus/messages/common/events/event.h"
+
+1215635015 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/common/events/event.h
+	<map>
+	"jaus/messages/command/events/createeventrequest.h"
+	"jaus/messages/command/events/updateevent.h"
+
+1215635015 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/inform/platform/reportglobalpose.h
+	"jaus/messages/message.h"
+	"jaus/messages/common/platform/globalpose.h"
+
+1215635015 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/common/platform/globalpose.h
+	"jaus/messages/time.h"
+	"jaus/messages/date.h"
+	"jaus/messages/bitvector.h"
+	"jaus/messages/common/platform/globalposition.h"
+	"jaus/messages/common/platform/attitude.h"
+
+1215635015 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/common/platform/globalposition.h
+	"jaus/messages/types.h"
+
+1215635015 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/common/platform/attitude.h
+	"jaus/messages/types.h"
+
+1217266724 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/inform/platform/reportlocalpose.h
+	"jaus/messages/message.h"
+
+1215635015 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/inform/platform/reportglobalvector.h
+	"jaus/messages/message.h"
+
+1215635015 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/inform/platform/reportwrencheffort.h
+	"jaus/messages/message.h"
+
+1215635015 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/inform/platform/reportplatformspecifications.h
+	"jaus/messages/message.h"
+
+1215635015 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/inform/platform/reportvelocitystate.h
+	"jaus/messages/message.h"
+	"jaus/messages/time.h"
+
+1215635015 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/inform/platform/reporttravelspeed.h
+	"jaus/messages/message.h"
+
+1215635015 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/inform/platform/reportplatformoperationaldata.h
+	"jaus/messages/message.h"
+
+1217266724 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/inform/platform/reportdiscretedevices.h
+	"jaus/messages/message.h"
+
+1217266724 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/inform/platform/reportlocalvector.h
+	"jaus/messages/message.h"
+
+1215635015 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/inform/platform/reportwaypointcount.h
+	"jaus/messages/message.h"
+
+1215635015 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/inform/platform/reportglobalwaypoint.h
+	"jaus/messages/message.h"
+
+1215635015 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/inform/platform/reportlocalwaypoint.h
+	"jaus/messages/message.h"
+
+1217266724 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/inform/platform/reportpathsegmentcount.h
+	"jaus/messages/message.h"
+
+1217266724 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/inform/platform/reportglobalpathsegment.h
+	"jaus/messages/message.h"
+
+1217266724 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/inform/platform/reportlocalpathsegment.h
+	"jaus/messages/message.h"
+
+1215635015 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/inform/environment/reportimage.h
+	"jaus/messages/message.h"
+	<vector>
+
+1215635015 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/inform/environment/reportcameraformatoptions.h
+	"jaus/messages/message.h"
+
+1215635015 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/experimental/experimentalmessages.h
+
+1215635014 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/components/transport/transport.h
+	"jaus/components/cmplibdll.h"
+	"jaus/components/transport/jsharedmemory.h"
+	"jaus/components/transport/judpclient.h"
+	"jaus/components/transport/judpserver.h"
+	"jaus/components/transport/jtcpclient.h"
+	"jaus/components/transport/jtcpserver.h"
+	"jaus/components/transport/jserial.h"
+
+1215635015 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/components/cmplibdll.h
+
+1215635014 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/components/transport/jsharedmemory.h
+	"jaus/components/streamcallback.h"
+	"jaus/messages/largedataset.h"
+	"jaus/messages/time.h"
+	<cxutils/thread.h>
+	<cxutils/mutex.h>
+	<cxutils/mappedmemory.h>
+
+1219953586 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/components/streamcallback.h
+	"jaus/components/callback.h"
+	"jaus/messages/stream.h"
+	<map>
+
+1215635015 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/components/callback.h
+	"jaus/messages/types.h"
+	"jaus/components/cmplibdll.h"
+
+1215635054 /home/active/Repository/libraries/cxutils/trunk/1.0/include/cxutils/thread.h
+	<stdlib.h>
+	<unistd.h>
+	<signal.h>
+	<pthread.h>
+	"cxtypes.h"
+	"mutex.h"
+
+1215635054 /home/active/Repository/libraries/cxutils/trunk/1.0/include/cxutils/mutex.h
+	<sys/sem.h>
+	<sys/types.h>
+	<sys/stat.h>
+	<unistd.h>
+	<pthread.h>
+	<string>
+	"cxtypes.h"
+
+1218809074 /home/active/Repository/libraries/cxutils/trunk/1.0/include/cxutils/mappedmemory.h
+	<limits.h>
+	<assert.h>
+	"cxtypes.h"
+	"packet.h"
+
+1218638273 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/components/transport/judpclient.h
+	<cxutils/udpclient.h>
+	<cxutils/mutex.h>
+	<string>
+	"jaus/components/cmplibdll.h"
+	"jaus/messages/stream.h"
+
+1218129886 /home/active/Repository/libraries/cxutils/trunk/1.0/include/cxutils/udpclient.h
+	"cxtypes.h"
+	"socket.h"
+	<string>
+
+1215635054 /home/active/Repository/libraries/cxutils/trunk/1.0/include/cxutils/socket.h
+	<stdio.h>
+	<stdlib.h>
+	<string>
+	<vector>
+	<winsock.h>
+	<errno.h>
+	<sys/ioctl.h>
+	<sys/types.h>
+	<unistd.h>
+	<netinet/in.h>
+	<sys/socket.h>
+	<netdb.h>
+	<arpa/inet.h>
+	"cxtypes.h"
+	"packet.h"
+
+1217266724 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/components/transport/judpserver.h
+	<cxutils/udpserver.h>
+	<cxutils/thread.h>
+	<cxutils/mutex.h>
+	<string>
+	<map>
+	"jaus/messages/stream.h"
+	"jaus/components/streamcallback.h"
+
+1217266727 /home/active/Repository/libraries/cxutils/trunk/1.0/include/cxutils/udpserver.h
+	"socket.h"
+	<string>
+
+1215635014 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/components/transport/jtcpclient.h
+	<cxutils/tcpclient.h>
+	<cxutils/thread.h>
+	"jaus/components/streamcallback.h"
+	"jaus/messages/stream.h"
+
+1215635054 /home/active/Repository/libraries/cxutils/trunk/1.0/include/cxutils/tcpclient.h
+	"socket.h"
+	<netinet/tcp.h>
+
+1215635014 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/components/transport/jtcpserver.h
+	<cxutils/tcplistensocket.h>
+	<cxutils/tcpserver.h>
+	<cxutils/thread.h>
+	"jaus/messages/stream.h"
+	"jaus/components/streamcallback.h"
+
+1215635054 /home/active/Repository/libraries/cxutils/trunk/1.0/include/cxutils/tcplistensocket.h
+	"socket.h"
+
+1215635054 /home/active/Repository/libraries/cxutils/trunk/1.0/include/cxutils/tcpserver.h
+	"socket.h"
+	"tcplistensocket.h"
+
+1215635014 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/components/transport/jserial.h
+	<cxutils/serial.h>
+	<cxutils/thread.h>
+	"jaus/components/streamcallback.h"
+	"jaus/messages/stream.h"
+
+1215635054 /home/active/Repository/libraries/cxutils/trunk/1.0/include/cxutils/serial.h
+	<string>
+	"packet.h"
+	"mutex.h"
+
+1215635015 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/components/component.h
+	"connectionhandler.h"
+	"messagehandler.h"
+	"transport/jsharedmemory.h"
+	"jaus/messages/messagecreator.h"
+	"jaus/messages/inform/acknackmessage.h"
+	"jaus/messages/common/configuration/service.h"
+	<cxutils/mutex.h>
+	<string>
+
+1219953586 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/components/connectionhandler.h
+	"jaus/messages/message.h"
+	"jaus/messages/largedataset.h"
+	"jaus/components/cmplibdll.h"
+	"jaus/components/receipt.h"
+	"jaus/components/streamcallback.h"
+	<cxutils/mutex.h>
+
+1215635015 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/components/receipt.h
+	"jaus/messages/time.h"
+	"jaus/messages/message.h"
+	"jaus/components/cmplibdll.h"
+
+1217266724 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/components/messagehandler.h
+	"jaus/messages/types.h"
+	"jaus/messages/stream.h"
+	"jaus/messages/largedataset.h"
+	"jaus/components/streamcallback.h"
+	"jaus/components/messagecallback.h"
+	<cxutils/thread.h>
+	<cxutils/mutex.h>
+	<list>
+	<map>
+
+1215635015 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/components/messagecallback.h
+	"jaus/components/callback.h"
+	"jaus/messages/message.h"
+	<map>
+
+1217266724 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/components/subscribercomponent.h
+	"jaus/components/eventmanager.h"
+	"jaus/components/component.h"
+	"jaus/components/serviceconnection.h"
+	"jaus/messages/common/platform/platform.h"
+	"jaus/messages/command/core/createserviceconnection.h"
+	"jaus/messages/command/core/suspendserviceconnection.h"
+	"jaus/messages/command/core/activateserviceconnection.h"
+	"jaus/messages/command/core/terminateserviceconnection.h"
+	"jaus/messages/command/core/confirmserviceconnection.h"
+	"jaus/messages/inform/configuration/reportsubsystemlist.h"
+	<cxutils/thread.h>
+
+1217266724 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/components/eventmanager.h
+	<map>
+	<set>
+	<cxutils/mutex.h>
+	"jaus/components/callback.h"
+	"jaus/messages/errorhistory.h"
+	"jaus/messages/query/events/queryevents.h"
+	"jaus/messages/inform/events/reportevents.h"
+	"jaus/messages/common/events/event.h"
+	"jaus/messages/command/events/cancelevent.h"
+	"jaus/messages/command/events/createeventrequest.h"
+	"jaus/messages/command/events/updateevent.h"
+
+1215635015 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/components/serviceconnection.h
+	"jaus/messages/address.h"
+	"jaus/messages/stream.h"
+	"jaus/components/cmplibdll.h"
+	<map>
+
+1215635015 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/common/platform/platform.h
+	"jaus/messages/common/platform/globalpose.h"
+	"jaus/messages/common/configuration/configuration.h"
+
+1215635015 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/components/informcomponent.h
+	"jaus/components/eventmanager.h"
+	"jaus/components/subscribercomponent.h"
+	"jaus/components/serviceconnection.h"
+	"jaus/messages/command/core/createserviceconnection.h"
+	"jaus/messages/command/core/suspendserviceconnection.h"
+	"jaus/messages/command/core/activateserviceconnection.h"
+	"jaus/messages/command/core/terminateserviceconnection.h"
+	"jaus/messages/command/core/confirmserviceconnection.h"
+	<cxutils/thread.h>
+	<cxutils/timer.h>
+
+1215635054 /home/active/Repository/libraries/cxutils/trunk/1.0/include/cxutils/timer.h
+	<windows.h>
+	<mmsystem.h>
+	<unistd.h>
+	"cxutils/thread.h"
+
+1217266724 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/components/commandcomponent.h
+	"jaus/components/informcomponent.h"
+
+1219257691 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/components/node/nodemanager.h
+	"jaus/messages/common/configuration/service.h"
+	"jaus/messages/common/configuration/configuration.h"
+	"jaus/components/eventmanager.h"
+	"jaus/components/node/nodeconnectionhandler.h"
+
+1219953586 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/components/node/nodeconnectionhandler.h
+	"jaus/components/messagehandler.h"
+	"jaus/components/connectionhandler.h"
+	"jaus/components/node/nodeconnection.h"
+	"jaus/components/node/nodelogger.h"
+	"jaus/components/node/communicator.h"
+	<cxutils/mutex.h>
+	<map>
+
+1215635014 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/components/node/nodeconnection.h
+	<string>
+	"jaus/components/transport/transport.h"
+
+1219953586 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/components/node/nodelogger.h
+	"jaus/messages/types.h"
+	"jaus/messages/stream.h"
+	"jaus/messages/largedataset.h"
+	"jaus/components/streamcallback.h"
+	<cxutils/mutex.h>
+	<string>
+	<map>
+
+1220366565 source:/home/active/Repository/libraries/jaus++/trunk/1.0/src/examples/example_joystick.cpp
+	<iostream>
+	<iomanip>
+	"jaus/services/srvclib.h"
+	<cxutils/cxutils.h>
+	<vector>
+	<conio.h>
+
+1215635014 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/services/srvclib.h
+	"jaus/messages/msglib.h"
+	"jaus/components/cmplib.h"
+	"jaus/messages/common/configuration/service.h"
+	"jaus/services/globalposesensor.h"
+	"jaus/services/primitivedriver.h"
+	"jaus/services/joystickdriver.h"
+	"jaus/services/velocitystatesensor.h"
+	"jaus/services/globalvectordriver.h"
+
+1215635014 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/services/globalposesensor.h
+	"jaus/components/informcomponent.h"
+	"jaus/services/srvclibdll.h"
+	<cxutils/mutex.h>
+
+1215635014 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/services/srvclibdll.h
+	"jaus/messages/command/commandmessages.h"
+	"jaus/messages/command/commandcodes.h"
+	"jaus/messages/query/querymessages.h"
+	"jaus/messages/query/querycodes.h"
+	"jaus/messages/inform/informmessages.h"
+	"jaus/messages/inform/informcodes.h"
+	"jaus/messages/experimental/experimentalmessages.h"
+	"jaus/messages/experimental/experimentalcodes.h"
+	"jaus/messages/inform/acknackmessage.h"
+
+1215635014 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/services/primitivedriver.h
+	"jaus/services/srvclibdll.h"
+	"jaus/components/commandcomponent.h"
+	"jaus/messages/command/platform/setwrencheffort.h"
+	"jaus/messages/query/platform/querywrencheffort.h"
+	"jaus/messages/inform/platform/reportwrencheffort.h"
+
+1219068896 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/services/joystickdriver.h
+	"jaus/services/srvclibdll.h"
+	"jaus/messages/command/platform/setwrencheffort.h"
+	"jaus/components/commandcomponent.h"
+	<cxutils/joystick.h>
+
+1217427264 /home/active/Repository/libraries/cxutils/trunk/1.0/include/cxutils/joystick.h
+	<windows.h>
+	<mmsystem.h>
+	<sys/types.h>
+	<fcntl.h>
+	<string.h>
+	<unistd.h>
+	<linux/joystick.h>
+	<limits.h>
+	"thread.h"
+	"mutex.h"
+	"timer.h"
+	"cxutils/math/cxmath.h"
+
+1215635054 /home/active/Repository/libraries/cxutils/trunk/1.0/include/cxutils/math/cxmath.h
+	<math.h>
+	"vector3d.h"
+	"point3d.h"
+	"matrix.h"
+	"quaternion.h"
+	"coordinates.h"
+
+1215635054 /home/active/Repository/libraries/cxutils/trunk/1.0/include/cxutils/math/vector3d.h
+	<vector>
+	"cxutils/cxtypes.h"
+
+1215635054 /home/active/Repository/libraries/cxutils/trunk/1.0/include/cxutils/math/point3d.h
+	"cxutils/cxtypes.h"
+
+1215635054 /home/active/Repository/libraries/cxutils/trunk/1.0/include/cxutils/math/matrix.h
+	"cxutils/cxtypes.h"
+
+1215635054 /home/active/Repository/libraries/cxutils/trunk/1.0/include/cxutils/math/quaternion.h
+	"cxutils/cxtypes.h"
+
+1215635054 /home/active/Repository/libraries/cxutils/trunk/1.0/include/cxutils/math/coordinates.h
+	"point3d.h"
+	"quaternion.h"
+
+1215635014 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/services/velocitystatesensor.h
+	"jaus/components/informcomponent.h"
+	"jaus/services/srvclibdll.h"
+	<cxutils/mutex.h>
+
+1215635014 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/services/globalvectordriver.h
+	"jaus/services/srvclibdll.h"
+	"jaus/components/commandcomponent.h"
+	"jaus/messages/command/platform/setglobalvector.h"
+	"jaus/messages/query/platform/queryglobalvector.h"
+	"jaus/messages/inform/platform/reportglobalvector.h"
+	"jaus/messages/common/platform/globalpose.h"
+
+1215635054 /home/active/Repository/libraries/cxutils/trunk/1.0/include/cxutils/cxutils.h
+	"thread.h"
+	"mutex.h"
+	"packet.h"
+	"mappedmemory.h"
+	"serial.h"
+	"socket.h"
+	"udpclient.h"
+	"udpserver.h"
+	"tcplistensocket.h"
+	"tcpserver.h"
+	"tcpclient.h"
+	"fileio.h"
+	"timer.h"
+	"virtualfile.h"
+	"joystick.h"
+	"math/cxmath.h"
+	"cxtypes.h"
+
+1215635054 /home/active/Repository/libraries/cxutils/trunk/1.0/include/cxutils/fileio.h
+	<vector>
+	<string>
+	"cxtypes.h"
+
+1219068898 /home/active/Repository/libraries/cxutils/trunk/1.0/include/cxutils/virtualfile.h
+	<stdio.h>
+	<string>
+	"cxtypes.h"
+
+1218118604 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/command/communications/setdatalinkselect.h
+	"jaus/messages/message.h"
+
+1218118604 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/command/communications/setdatalinkstate.h
+	"jaus/messages/message.h"
+
+1218118604 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/command/communications/setselecteddatalinkstate.h
+	"jaus/messages/message.h"
+
+1218724204 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/command/environment/setcamerapose.h
+	"jaus/messages/message.h"
+
+1218724204 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/command/environment/selectcamera.h
+	"jaus/messages/message.h"
+
+1218733959 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/command/environment/setcameracapabilities.h
+	"jaus/messages/message.h"
+
+1219068897 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/command/environment/setcameraformatoptions.h
+	"jaus/messages/message.h"
+
+1218118604 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/query/communications/querydatalinkstatus.h
+	"jaus/messages/message.h"
+
+1218118604 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/query/communications/queryselecteddatalinkstatus.h
+	"jaus/messages/message.h"
+
+1218118604 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/inform/communications/reportdatalinkstatus.h
+	"jaus/messages/message.h"
+
+1218118604 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/inform/communications/reportselecteddatalinkstatus.h
+	"jaus/messages/message.h"
+
+1220021374 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/components/node/communicator.h
+	"jaus/components/component.h"
+	"jaus/components/streamcallback.h"
+	<cxutils/udpclient.h>
+	<cxutils/udpserver.h>
+	<map>
+
+1219068897 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/query/environment/querycamerapose.h
+	"jaus/messages/message.h"
+
+1218747010 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/query/environment/querycameracount.h
+	"jaus/messages/message.h"
+
+1218747010 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/query/environment/queryrelativeobjectposition.h
+	"jaus/messages/message.h"
+
+1218747010 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/query/environment/queryselectedcamera.h
+	"jaus/messages/message.h"
+
+1218747010 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/query/environment/querycameracapabilities.h
+	"jaus/messages/message.h"
+
+1219415645 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/command/platform/setlocalvector.h
+	"jaus/messages/message.h"
+
+1219932956 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/command/platform/setglobalwaypoint.h
+	"jaus/messages/message.h"
+
+1219932956 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/command/platform/setlocalwaypoint.h
+	"jaus/messages/message.h"
+
+1219932956 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/command/platform/setglobalpathsegment.h
+	"jaus/messages/message.h"
+
+1219932956 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/command/platform/setlocalpathsegment.h
+	"jaus/messages/message.h"
+
+1219415645 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/inform/environment/reportcamerapose.h
+	<string>
+	"jaus/messages/message.h"
+
+1219068897 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/inform/environment/reportcameracount.h
+	"jaus/messages/message.h"
+
+1219068897 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/inform/environment/reportselectedcamera.h
+	"jaus/messages/message.h"
+
+1219415645 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/inform/environment/reportrelativeobjectposition.h
+	"jaus/messages/message.h"
+
+1219415645 /home/active/Repository/libraries/jaus++/trunk/1.0/include/jaus/messages/inform/environment/reportcameracapabilities.h
+	<string>
+	"jaus/messages/message.h"
+

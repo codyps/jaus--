@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_workspace_file>
+	<Workspace title="Workspace">
+		<Project filename="jmsglib/libjmsg_1.0/libjmsg_1.0.cbp" active="1" />
+		<Project filename="jcmplib/libjcmp_1.0/libjcmp_1.0.cbp" />
+		<Project filename="jsrvclib/libjsrv_1.0/libjsrv_1.0.cbp" />
+		<Project filename="jvideolib/libjvid_1.0/libjvid_1.0.cbp" />
+	</Workspace>
+</CodeBlocks_workspace_file>
