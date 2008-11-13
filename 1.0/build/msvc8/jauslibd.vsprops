@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<VisualStudioPropertySheet
+	ProjectType="Visual C++"
+	Version="8.00"
+	Name="jauslibd"
+	OutputDirectory="../../../../lib/"
+	IntermediateDirectory="../../../../lib/$(ProjectName)_1.0_d/"
+	InheritedPropertySheets=".\jausbase.vsprops"
+	>
+	<Tool
+		Name="VCCLCompilerTool"
+		PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE"
+		ProgramDataBaseFileName="$(OutDir)/$(ProjectName)d"
+	/>
+	<Tool
+		Name="VCLibrarianTool"
+		OutputFile="$(OutDir)\$(ProjectName)_1.0_d.lib"
+		AdditionalLibraryDirectories=""
+	/>
+	<Tool
+		Name="VCLinkerTool"
+		OutputFile="$(OutDir)\$(ProjectName)_2008.exe"
+	/>
+</VisualStudioPropertySheet>

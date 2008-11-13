@@ -1,0 +1,68 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 9.00
+# Visual Studio 2005
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "jmsglib", "..\jaus++\jmsglib\jmsglib.vcproj", "{CBF455D5-BF7F-41C7-9F88-F70899AFEDC5}"
+	ProjectSection(ProjectDependencies) = postProject
+		{765B6CA6-51AB-4757-839F-993EBD50D0AB} = {765B6CA6-51AB-4757-839F-993EBD50D0AB}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "jcmplib", "..\jaus++\jcmplib\jcmplib.vcproj", "{050FDEF7-000C-488B-B444-71018BC7D1C7}"
+	ProjectSection(ProjectDependencies) = postProject
+		{CBF455D5-BF7F-41C7-9F88-F70899AFEDC5} = {CBF455D5-BF7F-41C7-9F88-F70899AFEDC5}
+		{765B6CA6-51AB-4757-839F-993EBD50D0AB} = {765B6CA6-51AB-4757-839F-993EBD50D0AB}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wxnodemanager", "wxnodemanager\wxnodemanager.vcproj", "{9E488BE7-2748-4C0A-9F3D-F9719F0887FC}"
+	ProjectSection(ProjectDependencies) = postProject
+		{765B6CA6-51AB-4757-839F-993EBD50D0AB} = {765B6CA6-51AB-4757-839F-993EBD50D0AB}
+		{CBF455D5-BF7F-41C7-9F88-F70899AFEDC5} = {CBF455D5-BF7F-41C7-9F88-F70899AFEDC5}
+		{050FDEF7-000C-488B-B444-71018BC7D1C7} = {050FDEF7-000C-488B-B444-71018BC7D1C7}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cxutils", "..\..\..\..\..\..\cxutils\trunk\1.0\build\msvc8\cxutils\cxutils.vcproj", "{765B6CA6-51AB-4757-839F-993EBD50D0AB}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug DLL|Win32 = Debug DLL|Win32
+		Debug|Win32 = Debug|Win32
+		Release DLL|Win32 = Release DLL|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CBF455D5-BF7F-41C7-9F88-F70899AFEDC5}.Debug DLL|Win32.ActiveCfg = Debug DLL|Win32
+		{CBF455D5-BF7F-41C7-9F88-F70899AFEDC5}.Debug DLL|Win32.Build.0 = Debug DLL|Win32
+		{CBF455D5-BF7F-41C7-9F88-F70899AFEDC5}.Debug|Win32.ActiveCfg = Debug DLL|Win32
+		{CBF455D5-BF7F-41C7-9F88-F70899AFEDC5}.Debug|Win32.Build.0 = Debug DLL|Win32
+		{CBF455D5-BF7F-41C7-9F88-F70899AFEDC5}.Release DLL|Win32.ActiveCfg = Release DLL|Win32
+		{CBF455D5-BF7F-41C7-9F88-F70899AFEDC5}.Release DLL|Win32.Build.0 = Release DLL|Win32
+		{CBF455D5-BF7F-41C7-9F88-F70899AFEDC5}.Release|Win32.ActiveCfg = Release DLL|Win32
+		{CBF455D5-BF7F-41C7-9F88-F70899AFEDC5}.Release|Win32.Build.0 = Release DLL|Win32
+		{050FDEF7-000C-488B-B444-71018BC7D1C7}.Debug DLL|Win32.ActiveCfg = Debug DLL|Win32
+		{050FDEF7-000C-488B-B444-71018BC7D1C7}.Debug DLL|Win32.Build.0 = Debug DLL|Win32
+		{050FDEF7-000C-488B-B444-71018BC7D1C7}.Debug|Win32.ActiveCfg = Debug DLL|Win32
+		{050FDEF7-000C-488B-B444-71018BC7D1C7}.Debug|Win32.Build.0 = Debug DLL|Win32
+		{050FDEF7-000C-488B-B444-71018BC7D1C7}.Release DLL|Win32.ActiveCfg = Release DLL|Win32
+		{050FDEF7-000C-488B-B444-71018BC7D1C7}.Release DLL|Win32.Build.0 = Release DLL|Win32
+		{050FDEF7-000C-488B-B444-71018BC7D1C7}.Release|Win32.ActiveCfg = Release DLL|Win32
+		{050FDEF7-000C-488B-B444-71018BC7D1C7}.Release|Win32.Build.0 = Release DLL|Win32
+		{9E488BE7-2748-4C0A-9F3D-F9719F0887FC}.Debug DLL|Win32.ActiveCfg = Debug|Win32
+		{9E488BE7-2748-4C0A-9F3D-F9719F0887FC}.Debug DLL|Win32.Build.0 = Debug|Win32
+		{9E488BE7-2748-4C0A-9F3D-F9719F0887FC}.Debug|Win32.ActiveCfg = Debug|Win32
+		{9E488BE7-2748-4C0A-9F3D-F9719F0887FC}.Debug|Win32.Build.0 = Debug|Win32
+		{9E488BE7-2748-4C0A-9F3D-F9719F0887FC}.Release DLL|Win32.ActiveCfg = Release|Win32
+		{9E488BE7-2748-4C0A-9F3D-F9719F0887FC}.Release DLL|Win32.Build.0 = Release|Win32
+		{9E488BE7-2748-4C0A-9F3D-F9719F0887FC}.Release|Win32.ActiveCfg = Release|Win32
+		{9E488BE7-2748-4C0A-9F3D-F9719F0887FC}.Release|Win32.Build.0 = Release|Win32
+		{765B6CA6-51AB-4757-839F-993EBD50D0AB}.Debug DLL|Win32.ActiveCfg = Debug DLL|Win32
+		{765B6CA6-51AB-4757-839F-993EBD50D0AB}.Debug DLL|Win32.Build.0 = Debug DLL|Win32
+		{765B6CA6-51AB-4757-839F-993EBD50D0AB}.Debug|Win32.ActiveCfg = Debug DLL|Win32
+		{765B6CA6-51AB-4757-839F-993EBD50D0AB}.Debug|Win32.Build.0 = Debug DLL|Win32
+		{765B6CA6-51AB-4757-839F-993EBD50D0AB}.Release DLL|Win32.ActiveCfg = Release DLL|Win32
+		{765B6CA6-51AB-4757-839F-993EBD50D0AB}.Release DLL|Win32.Build.0 = Release DLL|Win32
+		{765B6CA6-51AB-4757-839F-993EBD50D0AB}.Release|Win32.ActiveCfg = Release DLL|Win32
+		{765B6CA6-51AB-4757-839F-993EBD50D0AB}.Release|Win32.Build.0 = Release DLL|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

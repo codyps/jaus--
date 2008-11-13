@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<VisualStudioPropertySheet
+	ProjectType="Visual C++"
+	Version="8.00"
+	Name="jausexe"
+	OutputDirectory="../../../../bin"
+	IntermediateDirectory="../../../../lib/$(ProjectName)"
+	InheritedPropertySheets=".\jausbase.vsprops"
+	>
+	<Tool
+		Name="VCCLCompilerTool"
+		PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;JAUS_DLL_IMPORTS;CX_UTILS_DLL_IMPORTS"
+	/>
+</VisualStudioPropertySheet>
