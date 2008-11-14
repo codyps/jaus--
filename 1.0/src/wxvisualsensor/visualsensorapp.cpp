@@ -76,7 +76,7 @@ bool VisualSensorApp::OnInit()
                                                       wxSize(640, 480),
                                                       wxDEFAULT_FRAME_STYLE);
     
-    if(this->argc > 0)
+    if(this->argc > 1)
     {
         sensor->Initialize(wxString(this->argv[1]).ToAscii().data());
     }

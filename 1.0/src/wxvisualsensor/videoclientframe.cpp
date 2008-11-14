@@ -168,7 +168,7 @@ bool VideoClientFrame::Initialize()
     SetStatusText(wxString(id.c_str(), wxConvUTF8), 1);
     mClient.RegisterCallback(Jaus::JAUS_REPORT_IMAGE, VideoClientFrame::ProcessMessageCallback, this);
     
-    mpTimer->Start(100);
+    mpTimer->Start(10);
 
     return true;
 }
@@ -309,7 +309,9 @@ void VideoClientFrame::OnSelectVisualSensor(wxCommandEvent& event)
             {
                 id.mInstance = (Jaus::Byte)instanceDialog.GetValue();
                 id.mComponent = (Jaus::Byte)Jaus::Service::VisualSensor;
-                SetVisualSensor(id);
+                mMutex.Enter();
+                mVisualSensorID = id;
+                mMutex.Leave();
                 return;
             }
         }
@@ -355,10 +357,8 @@ bool VideoClientFrame::SetVisualSensor(const Jaus::Address& id)
             createEvent.SetEventType(Jaus::CreateEventRequest::EveryChange);
             if(mClient.RequestEvent(createEvent) == Jaus::JAUS_OK)
             {
-                mMutex.Enter();
                 mImageFormat = (Jaus::Image::Format)formats->GetImageFormat1();
                 mVisualSensorID = id;
-                mMutex.Leave();
                 // Enable discovery for the subsystem so we know when bad things happen.
                 std::set<Jaus::Byte> toDiscover;
                 toDiscover.insert(id.mSubsystem);
@@ -387,11 +387,9 @@ void VideoClientFrame::ProcessMessageCallback(const Jaus::Message* message, void
         report && report->GetImageData() && 
         report->GetSourceID() == client->mVisualSensorID)
     {
-        client->mMutex.Enter();
         client->mCurrentImage.Decompress(report->GetImageData(),
                                          report->GetDataSize(),
-                                         client->mImageFormat);
-        client->mpMainPanel->Update();
+                                         client->mImageFormat);        
         if(!client->mShutdownFlag &&
             client->mCurrentImage.Width() > 0 &&
             client->mCurrentImage.Height() > 0 &&
@@ -405,7 +403,9 @@ void VideoClientFrame::ProcessMessageCallback(const Jaus::Message* message, void
             client->mpImagePanel->SetClientSize(windowSize);
             client->SetClientSize(client->mpImagePanel->GetBestSize());
         }
-        client->mMutex.Leave();
+
+        client->mpMainPanel->Update();
+
         if(!client->mShutdownFlag)
         {
             char buffer[256];
@@ -424,6 +424,7 @@ void VideoClientFrame::ProcessMessageCallback(const Jaus::Message* message, void
         cancelEvent.SetRequestID(Jaus::EventManager::GenerateRequestID());
         client->mClient.Send(&cancelEvent);
     }
+    
 }
 
 
@@ -440,7 +441,7 @@ void VideoClientFrame::ProcessMessageCallback(const Jaus::Message* message, void
 void VideoClientFrame::OnTimer(wxTimerEvent& event)
 {
     if( mVisualSensorID.IsValid() &&
-        Jaus::Time::GetUtcTimeMs() - mFrameUpdateTimeMs > 2000 )
+        Jaus::Time::GetUtcTimeMs() - mFrameUpdateTimeMs > 500 )
     {
         SetVisualSensor(mVisualSensorID);
     }
