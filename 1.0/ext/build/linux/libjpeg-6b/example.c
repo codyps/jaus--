@@ -58,9 +58,9 @@
  * RGB color and is described by:
  */
 
-extern JSAMPLE * image_buffer;	/* Points to large array of R,G,B-order data */
-extern int image_height;	/* Number of rows in image */
-extern int image_width;		/* Number of columns in image */
+ JSAMPLE * image_buffer;	/* Points to large array of R,G,B-order data */
+ int image_height;	/* Number of rows in image */
+ int image_width;		/* Number of columns in image */
 
 
 /*
@@ -309,7 +309,7 @@ read_JPEG_file (char * filename)
   }
 
   /* Step 1: allocate and initialize JPEG decompression object */
-
+ printf("Step 1\n");
   /* We set up the normal JPEG error routines, then override error_exit. */
   cinfo.err = jpeg_std_error(&jerr.pub);
   jerr.pub.error_exit = my_error_exit;
@@ -324,13 +324,13 @@ read_JPEG_file (char * filename)
   }
   /* Now we can initialize the JPEG decompression object. */
   jpeg_create_decompress(&cinfo);
-
+ printf("Step 2\n");
   /* Step 2: specify data source (eg, a file) */
 
   jpeg_stdio_src(&cinfo, infile);
 
   /* Step 3: read file parameters with jpeg_read_header() */
-
+ printf("Step 3\n");
   (void) jpeg_read_header(&cinfo, TRUE);
   /* We can ignore the return value from jpeg_read_header since
    *   (a) suspension is not possible with the stdio data source, and
@@ -339,7 +339,7 @@ read_JPEG_file (char * filename)
    */
 
   /* Step 4: set parameters for decompression */
-
+ printf("Step 4\n");
   /* In this example, we don't need to change any of the defaults set by
    * jpeg_read_header(), so we do nothing here.
    */
@@ -347,6 +347,7 @@ read_JPEG_file (char * filename)
   /* Step 5: Start decompressor */
 
   (void) jpeg_start_decompress(&cinfo);
+ printf("Step 5\n");
   /* We can ignore the return value since suspension is not possible
    * with the stdio data source.
    */
@@ -369,6 +370,7 @@ read_JPEG_file (char * filename)
   /* Here we use the library's state variable cinfo.output_scanline as the
    * loop counter, so that we don't have to keep track ourselves.
    */
+ printf("Step 6\n");
   while (cinfo.output_scanline < cinfo.output_height) {
     /* jpeg_read_scanlines expects an array of pointers to scanlines.
      * Here the array is only one element long, but you could ask for
@@ -376,7 +378,7 @@ read_JPEG_file (char * filename)
      */
     (void) jpeg_read_scanlines(&cinfo, buffer, 1);
     /* Assume put_scanline_someplace wants a pointer and sample count. */
-    put_scanline_someplace(buffer[0], row_stride);
+    //put_scanline_someplace(buffer[0], row_stride);
   }
 
   /* Step 7: Finish decompression */
@@ -431,3 +433,11 @@ read_JPEG_file (char * filename)
  * On some systems you may need to set up a signal handler to ensure that
  * temporary files are deleted if the program is interrupted.  See libjpeg.doc.
  */
+
+int main()
+{
+	read_JPEG_file ("testimg.jpg");
+	return 0;
+}
+
+

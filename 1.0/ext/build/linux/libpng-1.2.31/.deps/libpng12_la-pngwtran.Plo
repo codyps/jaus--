@@ -4,7 +4,7 @@ libpng12_la-pngwtran.lo libpng12_la-pngwtran.o: pngwtran.c png.h \
   /usr/include/sys/cdefs.h /usr/include/bits/wordsize.h \
   /usr/include/gnu/stubs.h /usr/include/gnu/stubs-32.h \
   /usr/include/bits/types.h /usr/include/bits/typesizes.h \
-  /usr/include/time.h /usr/lib/gcc/i486-linux-gnu/4.2.3/include/stddef.h \
+  /usr/include/time.h /usr/lib/gcc/i486-linux-gnu/4.2.4/include/stddef.h \
   /usr/include/endian.h /usr/include/bits/endian.h \
   /usr/include/sys/select.h /usr/include/bits/select.h \
   /usr/include/bits/sigset.h /usr/include/bits/time.h \
@@ -12,7 +12,7 @@ libpng12_la-pngwtran.lo libpng12_la-pngwtran.o: pngwtran.c png.h \
   /usr/include/unistd.h /usr/include/bits/posix_opt.h \
   /usr/include/bits/confname.h /usr/include/getopt.h pngconf.h config.h \
   /usr/include/stdio.h /usr/include/libio.h /usr/include/_G_config.h \
-  /usr/include/wchar.h /usr/lib/gcc/i486-linux-gnu/4.2.3/include/stdarg.h \
+  /usr/include/wchar.h /usr/lib/gcc/i486-linux-gnu/4.2.4/include/stdarg.h \
   /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h \
   /usr/include/bits/stdio.h /usr/include/setjmp.h \
   /usr/include/bits/setjmp.h /usr/include/string.h \
@@ -45,7 +45,7 @@ png.h:
 
 /usr/include/time.h:
 
-/usr/lib/gcc/i486-linux-gnu/4.2.3/include/stddef.h:
+/usr/lib/gcc/i486-linux-gnu/4.2.4/include/stddef.h:
 
 /usr/include/endian.h:
 
@@ -83,7 +83,7 @@ config.h:
 
 /usr/include/wchar.h:
 
-/usr/lib/gcc/i486-linux-gnu/4.2.3/include/stdarg.h:
+/usr/lib/gcc/i486-linux-gnu/4.2.4/include/stdarg.h:
 
 /usr/include/bits/stdio_lim.h:
 

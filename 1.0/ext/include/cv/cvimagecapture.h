@@ -18,7 +18,7 @@
     Modifications:
     -------------------------------------------------------------------------------
     8/10/2007 - Made imnprovements and code cleanup to interface.  This involved
-    more tightly integrating with the OpenCV library, merging the 
+    more tightly integrating with the OpenCV library, merging the
     DirectShowCapture class with the CvImageCapture class.  Also switched to
     using a Callback in DirectShow so that we do not sample the same frame
     multiple times (also increases performance).
@@ -32,7 +32,7 @@
     7/1/2008 - Made fixes which caused incompatibilities with other libraries and
                removed need to include DirectShow/Windows files in the
                header file.  Also changed pre-processor defintions.
-               You must now disable OpenCV requirement with 
+               You must now disable OpenCV requirement with
                CV_IMAGE_CAPTURE_NO_OPEN_CV.
     -------------------------------------------------------------------------------
 
@@ -149,7 +149,6 @@ private:
 
 #include <cv.h>
 #include <highgui.h>
-#include <cvcam.h>
 #include <string>
 #include <vector>
 
@@ -163,6 +162,22 @@ private:
 class CvImageCapture
 {
 public:
+    class Image
+    {
+    public:
+        Image();
+        Image(const Image& img);
+        ~Image();
+        Image& operator=(const Image& img);
+        void Destroy();
+        void Create(const unsigned short width,
+                    const unsigned short height,
+                    const unsigned short channels);
+        unsigned short mWidth;    ///<  Image width.
+        unsigned short mHeight;   ///<  Image height.
+        unsigned short mChannels; ///<  Number of channels.
+        unsigned char* mpData;    ///<  Image data.
+    };
     CvImageCapture();
     ~CvImageCapture();
     // Starts capturing from video source.
@@ -172,6 +187,8 @@ public:
               const bool interlace = false);
     // Stops image capture.
     int Stop();
+    // Gets frame from video source.
+    int GetFrame(CvImageCapture::Image* dest, const bool block = false);
     // Get frame from video source.
     int GetFrame(IplImage*& dest, const bool block = false);
     // Get height of image in pixels.
@@ -179,7 +196,7 @@ public:
     // Get width of image in pixels.
     int GetWidth() const;
     // Check if image capture is ready (incomming data).
-    bool IsReady() const; 
+    bool IsReady() const;
     const char* GetSource() const { return mSourceName.c_str(); }
     //  Get vector of sources on computer system. Not currently supported in linux.
     static unsigned int ScanForSources(std::vector<std::string>& sources);

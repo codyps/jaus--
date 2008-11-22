@@ -18,7 +18,7 @@
     Modifications:
     -------------------------------------------------------------------------------
     8/10/2007 - Made imnprovements and code cleanup to interface.  This involved
-    more tightly integrating with the OpenCV library, merging the 
+    more tightly integrating with the OpenCV library, merging the
     DirectShowCapture class with the CvImageCapture class.  Also switched to
     using a Callback in DirectShow so that we do not sample the same frame
     multiple times (also increases performance).
@@ -32,7 +32,7 @@
     7/1/2008 - Made fixes which caused incompatibilities with other libraries and
                removed need to include DirectShow/Windows files in the
                header file.  Also changed pre-processor defintions.
-               You must now disable OpenCV requirement with 
+               You must now disable OpenCV requirement with
                CV_IMAGE_CAPTURE_NO_OPEN_CV.
     -------------------------------------------------------------------------------
 
@@ -110,13 +110,13 @@ protected:
     int InitializeVideo();
     int InitializeFile();
     static HRESULT GetVideoInputFilter( IBaseFilter** gottaFilter, wchar_t* matchName);
-    static HRESULT GetVideoInputFilter( IBaseFilter** gottaFilter, const int num);    
+    static HRESULT GetVideoInputFilter( IBaseFilter** gottaFilter, const int num);
     static HRESULT GetPin(IBaseFilter* pFilter, PIN_DIRECTION dirrequired, int iNum, IPin** ppPin);
     STDMETHODIMP_(ULONG) AddRef();
     STDMETHODIMP_(ULONG) Release();
     STDMETHODIMP QueryInterface(REFIID riid, void ** ppv);
     virtual HRESULT STDMETHODCALLTYPE SampleCB(double sampleTime,
-                                               IMediaSample *pSample);    
+                                               IMediaSample *pSample);
     virtual HRESULT STDMETHODCALLTYPE BufferCB(double sampleTime,
                                                BYTE *pBuffer,
                                                long bufferLen);
@@ -150,7 +150,7 @@ protected:
         {                       \
             pUnk->Release();    \
             pUnk = NULL;        \
-        }	
+        }
 
 
 ////////////////////////////////////////////////////////////////////////////////////
@@ -158,7 +158,7 @@ protected:
 ///   \brief Constructor.
 ///
 ////////////////////////////////////////////////////////////////////////////////////
-DirectShowCapture::DirectShowCapture() 
+DirectShowCapture::DirectShowCapture()
 {
     // Image data values.
     mWidth = mHeight = 0;
@@ -213,7 +213,7 @@ DirectShowCapture::~DirectShowCapture()
 ///   \param videoSource The String/Friendly name of the video source.
 ///                      If left blank ( "" ), then the first device on the
 ///                      system will be used.  This value is the name of a
-///                      camera or a video file.  You can also use an ascii 
+///                      camera or a video file.  You can also use an ascii
 ///                      number representing the device.  For example "0" for
 ///                      camera 0, "1" for camera 1, etc.
 ///   \param width Desired image width resolution if supported.  If <= 0 then
@@ -226,10 +226,10 @@ DirectShowCapture::~DirectShowCapture()
 ///   \return 1 if started, otherwise 0.
 ///
 ////////////////////////////////////////////////////////////////////////////////////
-int DirectShowCapture::Start(const char *videoSource, 
-                             const int width, 
-                             const int height, 
-                             const bool interlace) 
+int DirectShowCapture::Start(const char *videoSource,
+                             const int width,
+                             const int height,
+                             const bool interlace)
 {
     int result = 0;
 
@@ -271,7 +271,7 @@ int DirectShowCapture::Start(const char *videoSource,
 ////////////////////////////////////////////////////////////////////////////////////
 int DirectShowCapture::Stop()
 {
-    mStopFlag = true;    
+    mStopFlag = true;
 
     if(pControl) {
         pControl->Stop();
@@ -314,7 +314,7 @@ const char *DirectShowCapture::GetSource() const { return mSourceName.c_str(); }
 ///   An internal counter is kept that keeps track of what frame number was
 ///   last retrieved from the image source.  This counter prevents you from
 ///   get the same frame multiple times (over sampling).  If you set the
-///   blocking flag to false, then if the next frame hasn't arrived yet, the 
+///   blocking flag to false, then if the next frame hasn't arrived yet, the
 ///   function will return 0.
 ///
 ///   \param dest The destination (where to save image to).
@@ -331,7 +331,7 @@ int DirectShowCapture::GetFrame(CvImageCapture::Image* dest, const bool block)
 	unsigned char * ptr, * dRowUp, * dRowDown;
     unsigned char *iplPtr = NULL;
     CvImageCapture::Image *image;
-    
+
     //  Check to see if this frame has already
     //  been captured.
     if( mGetFrameNumber >= mFrameNumber ) {
@@ -366,11 +366,11 @@ int DirectShowCapture::GetFrame(CvImageCapture::Image* dest, const bool block)
         // OK, so get the image
 
 		if (mpImageBuffer && mDataSize)
-		{	
+		{
 			ptr = mpImageBuffer;
             iplPtr = (unsigned char *)(image->mpData);
-            
-            if( !mInterlacedFlag ) 
+
+            if( !mInterlacedFlag )
             {
                 // Copy the data so that the top of the image is at
                 // row 0.
@@ -386,10 +386,10 @@ int DirectShowCapture::GetFrame(CvImageCapture::Image* dest, const bool block)
 			    {
                     ptr = (unsigned char *)(mpImageBuffer + (mHeight - i)*image->mWidth*image->mChannels);
                     iplPtr = (unsigned char *)(image->mpData + i*image->mWidth*image->mChannels);
-    				
+
                     //  Perform interlacing so that the video appears clear.  This is
                     //  only needed if the video is DV in most cases, which arrives
-                    //  interlaced. 
+                    //  interlaced.
 				    //For lines that are very top or very bottom we just copy or it is a scanline to use
                     if ((i - 1 < 0) || (i + 1 >= mHeight) || ((unsigned int)i % 2 == 0) || i==1) {
 					    //Just copy
@@ -410,10 +410,10 @@ int DirectShowCapture::GetFrame(CvImageCapture::Image* dest, const bool block)
 						    *iplPtr++ = (*dRowUp++ + *dRowDown++) / 2;  //  G
 						    *iplPtr++ = (*dRowUp++ + *dRowDown++) / 2;  //  R
 					    }
-				    }							
-			    } 
+				    }
+			    }
             }
-			result = true;	
+			result = true;
             mGetFrameNumber = mFrameNumber;
 		}
 
@@ -431,7 +431,7 @@ int DirectShowCapture::GetFrame(CvImageCapture::Image* dest, const bool block)
 ///   An internal counter is kept that keeps track of what frame number was
 ///   last retrieved from the image source.  This counter prevents you from
 ///   get the same frame multiple times (over sampling).  If you set the
-///   blocking flag to false, then if the next frame hasn't arrived yet, the 
+///   blocking flag to false, then if the next frame hasn't arrived yet, the
 ///   function will return 0.
 ///
 ///   \param dest The destination (where to save image to).
@@ -448,7 +448,7 @@ int DirectShowCapture::GetFrame(IplImage*& dest, const bool block)
 	unsigned char * ptr, * dRowUp, * dRowDown;
     unsigned char *iplPtr = NULL;
     IplImage *image;
-    
+
     //  Check to see if this frame has already
     //  been captured.
     if( mGetFrameNumber >= mFrameNumber ) {
@@ -478,7 +478,7 @@ int DirectShowCapture::GetFrame(IplImage*& dest, const bool block)
     }
 
     image = dest;
-    image->origin = IPL_ORIGIN_TL;   
+    image->origin = IPL_ORIGIN_TL;
     if(image->roi)
         cvResetImageROI(dest);
 
@@ -490,10 +490,10 @@ int DirectShowCapture::GetFrame(IplImage*& dest, const bool block)
         // OK, so get the image
 
 		if (mpImageBuffer && mDataSize)
-		{	
+		{
 			ptr = mpImageBuffer;
             iplPtr = (unsigned char *)(image->imageData);
-            
+
             if( !mInterlacedFlag ) {
                 memcpy( image->imageData, mpImageBuffer, mDataSize );
                 cvFlip( image, image, 0 );
@@ -504,7 +504,7 @@ int DirectShowCapture::GetFrame(IplImage*& dest, const bool block)
 			    {
                     ptr = (unsigned char *)(mpImageBuffer + (mHeight - i)*image->widthStep);
                     iplPtr = (unsigned char *)(image->imageData + i*image->widthStep);
-    				
+
                     /*  Perform interlacing so that the video appears clear.  This is
                         only needed if the video is DV in most cases, which arrives
                         interlaced. */
@@ -528,10 +528,10 @@ int DirectShowCapture::GetFrame(IplImage*& dest, const bool block)
 						    *iplPtr++ = (*dRowUp++ + *dRowDown++) / 2;  //  G
 						    *iplPtr++ = (*dRowUp++ + *dRowDown++) / 2;  //  R
 					    }
-				    }							
-			    } 
+				    }
+			    }
             }
-			result = true;	
+			result = true;
             mGetFrameNumber = mFrameNumber;
 		}
 
@@ -566,18 +566,18 @@ int DirectShowCapture::InitializeVideo()
     HRESULT hr; //  Used to store results of different operations.
 
     //  Create the filter graph manager and query for video interfaces
-    hr = CoCreateInstance( CLSID_CaptureGraphBuilder2, 
-                           NULL, 
+    hr = CoCreateInstance( CLSID_CaptureGraphBuilder2,
+                           NULL,
                            CLSCTX_INPROC_SERVER,
-                           IID_ICaptureGraphBuilder2, 
+                           IID_ICaptureGraphBuilder2,
                            (void **)&pCaptureGraph );
     if( FAILED(hr) ) {
         return result;
     }
 
     //  Now create a filter graph (this will do all encoding/decoding of data from camera.
-    CoCreateInstance( CLSID_FilterGraph, 
-                      NULL, 
+    CoCreateInstance( CLSID_FilterGraph,
+                      NULL,
                       CLSCTX_INPROC_SERVER,
                       IID_IFilterGraph,
                       (void **)&pGraph );
@@ -596,7 +596,7 @@ int DirectShowCapture::InitializeVideo()
     if( FAILED(hr) ) {
         return result;
     }
-    
+
     //  If the string is a number, then use it instead.
     bool isNumber = true;
     for(unsigned int i = 0; i < mSourceName.size(); i++) {
@@ -618,7 +618,7 @@ int DirectShowCapture::InitializeVideo()
 
     //  If we succeeded, add filter to our input filter graph.
     hr = pGraph->AddFilter(pVideoInputFilter, A2W( mSourceName.c_str() ) );
-   
+
     //  Create the frame grabber.
     hr = pGrabber.CoCreateInstance( CLSID_SampleGrabber );
     if( !pGrabber ) {
@@ -653,7 +653,7 @@ int DirectShowCapture::InitializeVideo()
     VIDEOINFOHEADER *pvi = NULL;
     //  Create the format type and resolution
     if( theFormat->formattype == FORMAT_VideoInfo ) {
-        
+
         pvi = (VIDEOINFOHEADER*)theFormat->pbFormat;
         hr = !S_OK;
 
@@ -705,10 +705,10 @@ int DirectShowCapture::InitializeVideo()
                                       IID_IAMVideoProcAmp,
                                       (void **)&pProcAmp);
 
-    //  Attempt to connect the pins.        
+    //  Attempt to connect the pins.
     CComPtr<IPin> pSourcePin=0;
     CComPtr<IPin> pGrabPin;
-    
+
     GetPin( pVideoInputFilter,PINDIR_OUTPUT, 0, &pSourcePin );
     GetPin( pGrabberBase, PINDIR_INPUT, 0, &pGrabPin );
 
@@ -731,7 +731,7 @@ int DirectShowCapture::InitializeVideo()
 	FreeMediaType(mmt);
 
 	hr = pGrabber->SetBufferSamples(FALSE);
-	
+
 	// Grab as a sequence of frames, not just one single image
 	hr = pGrabber->SetOneShot(FALSE);
 
@@ -745,7 +745,7 @@ int DirectShowCapture::InitializeVideo()
         // Run the graph filter.
         hr = pControl->Run();
         if( SUCCEEDED( hr ) ) {
-            
+
             //  Wait for the graph to settle
             CComQIPtr<IMediaEvent, &IID_IMediaEvent> pEvent( pGraph );
             long EvCode = 0;
@@ -755,7 +755,7 @@ int DirectShowCapture::InitializeVideo()
             mStopFlag = false;
             //  Wait until ready, but don't wait forever.
             for(unsigned int i = 0; i < 5000; i++) {
-                if(mReadyFlag) 
+                if(mReadyFlag)
                     break;
                 Sleep(1);
             }
@@ -788,26 +788,26 @@ int DirectShowCapture::InitializeFile()
     CComPtr <IMediaSeeking>             pSeeking;
     CComPtr <IMediaFilter>              pMediaFilter;
     CComPtr <ISampleGrabber>            pGrabber;
-    
+
 
     HRESULT hr;
 
     //  Initialize interfaces
-    hr = CoCreateInstance(CLSID_FilterGraph, 
-                          NULL, 
+    hr = CoCreateInstance(CLSID_FilterGraph,
+                          NULL,
                           CLSCTX_INPROC_SERVER,
-                          IID_IGraphBuilder, 
+                          IID_IGraphBuilder,
                           reinterpret_cast<void **>(&pGraph));
     if(FAILED(hr)) {
         return result;
     }
-    
-    hr = CoCreateInstance(CLSID_SampleGrabber, 
-                          NULL, 
+
+    hr = CoCreateInstance(CLSID_SampleGrabber,
+                          NULL,
                           CLSCTX_INPROC_SERVER,
-                          IID_IBaseFilter, 
+                          IID_IBaseFilter,
                           reinterpret_cast<void **>(&pGrabberFilter));
-    
+
     hr = pGrabberFilter->QueryInterface(IID_ISampleGrabber,
                                        (void **)(&pGrabber));
     if(FAILED(hr)) {
@@ -818,7 +818,7 @@ int DirectShowCapture::InitializeFile()
     if(FAILED(hr)) {
         return result;
     }
-    
+
     //  Set the media type
     AM_MEDIA_TYPE mt;
     ZeroMemory(&mt, sizeof(AM_MEDIA_TYPE));
@@ -835,33 +835,33 @@ int DirectShowCapture::InitializeFile()
     strFilename = new wchar_t[mSourceName.size() + 1];
     memset( strFilename, 0, sizeof(wchar_t)*(mSourceName.size() + 1));
     MultiByteToWideChar(CP_ACP, 0, mSourceName.c_str(), -1, strFilename, 256);
-    
+
     hr = pGraph->AddSourceFilter( strFilename, L"Source", &pSrcFilter);
     delete[] strFilename;
     if(FAILED(hr)) {
         return result;
     }
 
-    //  Attempt to connect the pins.        
+    //  Attempt to connect the pins.
     CComPtr<IPin> pGrabPin;
     CComPtr<IPin> pSourcePin;
-    
+
     GetPin( pSrcFilter, PINDIR_OUTPUT, 0, &pSourcePin );
     GetPin( pGrabberFilter, PINDIR_INPUT, 0, &pGrabPin );
     hr = pGraph->Connect( pSourcePin, pGrabPin );
     if(FAILED(hr)) {
         return result;
     }
-    
+
     // Create the NULL renderer and connect
-	hr = CoCreateInstance(CLSID_NullRenderer, 
-                          NULL, 
+	hr = CoCreateInstance(CLSID_NullRenderer,
+                          NULL,
                           CLSCTX_INPROC_SERVER,
-		                  IID_IBaseFilter, 
+		                  IID_IBaseFilter,
                           (void **)(&pNullRenderer));
 	hr = pGraph->AddFilter(pNullRenderer, L"NullRenderer");
 
-    //  Attempt to connect the pins.        
+    //  Attempt to connect the pins.
     CComPtr<IPin> pGrabPin2;
     CComPtr<IPin> pNullPin;
 
@@ -882,7 +882,7 @@ int DirectShowCapture::InitializeFile()
 	ZeroMemory(&mt, sizeof(mt));
 	hr = pGrabber->GetConnectedMediaType(&mt);
 	VIDEOINFOHEADER *pVih;
-	if (mt.formattype == FORMAT_VideoInfo) 
+	if (mt.formattype == FORMAT_VideoInfo)
 		pVih = reinterpret_cast<VIDEOINFOHEADER*>(mt.pbFormat);
     else {
 		return result; // Something went wrong, perhaps not appropriate media type
@@ -913,7 +913,7 @@ int DirectShowCapture::InitializeFile()
     if(SUCCEEDED(hr))
     {
         CComQIPtr <IMediaControl, &IID_IMediaControl> pControl(pGraph);
-        
+
         hr = this->pControl->Run(); // Run the graph to start the analyzing process!
         if( SUCCEEDED(hr) )
         {
@@ -932,8 +932,8 @@ int DirectShowCapture::InitializeFile()
 
 
 ////////////////////////////////////////////////////////////////////////////////////
-/// 
-///  \brief Enumerate all of the video input devices.  
+///
+///  \brief Enumerate all of the video input devices.
 ///
 ///  \param gottaFilter Input filter pointer.
 ///  \param matchName The friendly name of the device (camera name) to
@@ -948,10 +948,10 @@ HRESULT DirectShowCapture::GetVideoInputFilter(IBaseFilter** gottaFilter, wchar_
 
 	// Create the System Device Enumerator.
 	ICreateDevEnum *pSysDevEnum = NULL;
-	HRESULT hr = CoCreateInstance(CLSID_SystemDeviceEnum, 
-                                  NULL, 
+	HRESULT hr = CoCreateInstance(CLSID_SystemDeviceEnum,
+                                  NULL,
                                   CLSCTX_INPROC_SERVER,
-		                          IID_ICreateDevEnum, 
+		                          IID_ICreateDevEnum,
                                   (void **)&pSysDevEnum);
     if (FAILED(hr)) {
 		return hr;
@@ -959,10 +959,10 @@ HRESULT DirectShowCapture::GetVideoInputFilter(IBaseFilter** gottaFilter, wchar_
 
 	// Obtain a class enumerator for the video input category.
 	IEnumMoniker *pEnumCat = NULL;
-	hr = pSysDevEnum->CreateClassEnumerator(CLSID_VideoInputDeviceCategory, 
-                                            &pEnumCat, 
-                                            0);    
-	if (hr == S_OK) 
+	hr = pSysDevEnum->CreateClassEnumerator(CLSID_VideoInputDeviceCategory,
+                                            &pEnumCat,
+                                            0);
+	if (hr == S_OK)
 	{
 		// Enumerate the monikers.
 		IMoniker *pMoniker = NULL;
@@ -971,7 +971,7 @@ HRESULT DirectShowCapture::GetVideoInputFilter(IBaseFilter** gottaFilter, wchar_
 		{
 			// Bind the first moniker to an object
 			IPropertyBag *pPropBag;
-			hr = pMoniker->BindToStorage(0, 0, IID_IPropertyBag, 
+			hr = pMoniker->BindToStorage(0, 0, IID_IPropertyBag,
 				(void **)&pPropBag);
 			if (SUCCEEDED(hr))
 			{
@@ -982,7 +982,7 @@ HRESULT DirectShowCapture::GetVideoInputFilter(IBaseFilter** gottaFilter, wchar_
 				if (SUCCEEDED(hr))
 				{
 					// Do a comparison, find out if it's the right one
-					if (wcsncmp(varName.bstrVal, matchName, 
+					if (wcsncmp(varName.bstrVal, matchName,
 						wcslen(matchName)) == 0) {
 
 						// We found it, so send it back to the caller
@@ -990,7 +990,7 @@ HRESULT DirectShowCapture::GetVideoInputFilter(IBaseFilter** gottaFilter, wchar_
 						done = true;
 					}
 				}
-				VariantClear(&varName);	
+				VariantClear(&varName);
 				pPropBag->Release();
 			}
 			pMoniker->Release();
@@ -1000,15 +1000,15 @@ HRESULT DirectShowCapture::GetVideoInputFilter(IBaseFilter** gottaFilter, wchar_
 	pSysDevEnum->Release();
 	if (done) {
 		return hr;	// found it, return native error
-	} 
+	}
     else {
 		return VFW_E_NOT_FOUND;	// didn't find it error
 	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////////
-/// 
-///  \brief Enumerate all of the video input devices.  
+///
+///  \brief Enumerate all of the video input devices.
 ///
 ///  \param gottaFilter Input filter pointer.
 ///  \param num The video device number to get input filter for.  This is
@@ -1023,10 +1023,10 @@ HRESULT DirectShowCapture::GetVideoInputFilter(IBaseFilter** gottaFilter, const 
 
 	// Create the System Device Enumerator.
 	ICreateDevEnum *pSysDevEnum = NULL;
-	HRESULT hr = CoCreateInstance(CLSID_SystemDeviceEnum, 
-                                  NULL, 
+	HRESULT hr = CoCreateInstance(CLSID_SystemDeviceEnum,
+                                  NULL,
                                   CLSCTX_INPROC_SERVER,
-		                          IID_ICreateDevEnum, 
+		                          IID_ICreateDevEnum,
                                   (void **)&pSysDevEnum);
     if (FAILED(hr)) {
 		return hr;
@@ -1034,11 +1034,11 @@ HRESULT DirectShowCapture::GetVideoInputFilter(IBaseFilter** gottaFilter, const 
 
 	// Obtain a class enumerator for the video input category.
 	IEnumMoniker *pEnumCat = NULL;
-	hr = pSysDevEnum->CreateClassEnumerator(CLSID_VideoInputDeviceCategory, 
-                                            &pEnumCat, 
-                                            0);    
+	hr = pSysDevEnum->CreateClassEnumerator(CLSID_VideoInputDeviceCategory,
+                                            &pEnumCat,
+                                            0);
     int count = 0;
-	if (hr == S_OK) 
+	if (hr == S_OK)
 	{
 		// Enumerate the monikers.
 		IMoniker *pMoniker = NULL;
@@ -1047,7 +1047,7 @@ HRESULT DirectShowCapture::GetVideoInputFilter(IBaseFilter** gottaFilter, const 
 		{
 			// Bind the first moniker to an object
 			IPropertyBag *pPropBag;
-			hr = pMoniker->BindToStorage(0, 0, IID_IPropertyBag, 
+			hr = pMoniker->BindToStorage(0, 0, IID_IPropertyBag,
 				(void **)&pPropBag);
 			if (SUCCEEDED(hr))
 			{
@@ -1061,7 +1061,7 @@ HRESULT DirectShowCapture::GetVideoInputFilter(IBaseFilter** gottaFilter, const 
 					done = true;
 				}
                 count++;
-				VariantClear(&varName);	
+				VariantClear(&varName);
 				pPropBag->Release();
 			}
 			pMoniker->Release();
@@ -1071,14 +1071,14 @@ HRESULT DirectShowCapture::GetVideoInputFilter(IBaseFilter** gottaFilter, const 
 	pSysDevEnum->Release();
 	if (done) {
 		return hr;	// found it, return native error
-	} 
+	}
     else {
 		return VFW_E_NOT_FOUND;	// didn't find it error
 	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////////
-/// 
+///
 ///  \brief Get a pin in the the graph.
 ///
 ///  \param pFilter The filter.
@@ -1095,7 +1095,7 @@ HRESULT DirectShowCapture::GetPin(IBaseFilter* pFilter, PIN_DIRECTION dirrequire
     *ppPin = NULL;
 
     HRESULT hr = pFilter->EnumPins(&pEnum);
-    if(FAILED(hr)) 
+    if(FAILED(hr))
         return hr;
 
     ULONG ulFound;
@@ -1116,10 +1116,10 @@ HRESULT DirectShowCapture::GetPin(IBaseFilter* pFilter, PIN_DIRECTION dirrequire
                 break;
             }
             iNum--;
-        } 
+        }
 
         pPin->Release();
-    } 
+    }
 
     return hr;
 }
@@ -1129,8 +1129,8 @@ HRESULT DirectShowCapture::GetPin(IBaseFilter* pFilter, PIN_DIRECTION dirrequire
 ///   \brief This function is part of the callbacks used by ISampleGrabberCB.
 ///
 ////////////////////////////////////////////////////////////////////////////////////
-STDMETHODIMP_(ULONG) DirectShowCapture::AddRef() 
-{ 
+STDMETHODIMP_(ULONG) DirectShowCapture::AddRef()
+{
     return 2;   //  Return default value.
 }
 
@@ -1140,8 +1140,8 @@ STDMETHODIMP_(ULONG) DirectShowCapture::AddRef()
 ///   \brief This function is part of the callbacks used by ISampleGrabberCB.
 ///
 ////////////////////////////////////////////////////////////////////////////////////
-STDMETHODIMP_(ULONG) DirectShowCapture::Release() 
-{ 
+STDMETHODIMP_(ULONG) DirectShowCapture::Release()
+{
     return 1;   //  Return default value.
 }
 
@@ -1155,12 +1155,12 @@ STDMETHODIMP DirectShowCapture::QueryInterface(REFIID riid, void ** ppv)
     if( ppv == NULL ) {
         return E_POINTER;
     }
-    
-    if( riid == IID_ISampleGrabberCB || riid == IID_IUnknown ) 
+
+    if( riid == IID_ISampleGrabberCB || riid == IID_IUnknown )
     {
         *ppv = (void *) static_cast<ISampleGrabberCB*> ( this );
         return NOERROR;
-    }    
+    }
 
     return E_NOINTERFACE;
 }
@@ -1189,7 +1189,7 @@ HRESULT STDMETHODCALLTYPE DirectShowCapture::BufferCB(double sampleTime,
 {
     //  Verify we have received valid image data.
     if(pBuffer && bufferLen &&  mImageMutex) {
-        //  Enter critical section 
+        //  Enter critical section
         WaitForSingleObject(mImageMutex, INFINITE);
         // Make sure we can fit the data into our buffer
         if(bufferLen >= mDataSize) {
@@ -1229,7 +1229,7 @@ unsigned int DirectShowCapture::ScanForSources(std::vector<std::string>& sources
 	CoInitializeEx(NULL, COINIT_MULTITHREADED);
 
 	USES_CONVERSION;
-	
+
 	// COM junk variables to capture live video
 	CComPtr <ICaptureGraphBuilder2>		pCaptureGraph;
 	CComPtr <IGraphBuilder>				pGraph;
@@ -1242,20 +1242,20 @@ unsigned int DirectShowCapture::ScanForSources(std::vector<std::string>& sources
 	HRESULT hr;
 
 	// Create the filter graph manager and query for interfaces.
-	hr = CoCreateInstance(CLSID_CaptureGraphBuilder2, 
-                          NULL, 
+	hr = CoCreateInstance(CLSID_CaptureGraphBuilder2,
+                          NULL,
                           CLSCTX_INPROC_SERVER,
-						  IID_ICaptureGraphBuilder2, 
+						  IID_ICaptureGraphBuilder2,
                           (void **)&pCaptureGraph);
 
 	if (FAILED(hr))
 	    return 0;
 
 	// Create filter graph itself
-	CoCreateInstance(CLSID_FilterGraph, 
-                     NULL, 
-                     CLSCTX_INPROC_SERVER, 
-                     IID_IFilterGraph, 
+	CoCreateInstance(CLSID_FilterGraph,
+                     NULL,
+                     CLSCTX_INPROC_SERVER,
+                     IID_IFilterGraph,
                      (void **)&pGraph );
 	if (!pGraph)
         return 0;
@@ -1267,12 +1267,12 @@ unsigned int DirectShowCapture::ScanForSources(std::vector<std::string>& sources
 	    return 0;
 
 	// Using QueryInterface on the graph builder, get the Media Control object.
-	hr = pGraph->QueryInterface(IID_IMediaControl, 
+	hr = pGraph->QueryInterface(IID_IMediaControl,
                                 (void **)&pControl);
 
 	// No syncronization needed so disable clock
 	IMediaFilter *pMediaFilter = 0;
-	pGraph->QueryInterface(IID_IMediaFilter, 
+	pGraph->QueryInterface(IID_IMediaFilter,
                           (void**)&pMediaFilter);
 	pMediaFilter->SetSyncSource(NULL);
 	pMediaFilter->Release();
@@ -1282,10 +1282,10 @@ unsigned int DirectShowCapture::ScanForSources(std::vector<std::string>& sources
 
 	// Create the System Device Enumerator.
 	ICreateDevEnum *pSysDevEnum = NULL;
-	hr = CoCreateInstance(CLSID_SystemDeviceEnum, 
-                          NULL, 
+	hr = CoCreateInstance(CLSID_SystemDeviceEnum,
+                          NULL,
                           CLSCTX_INPROC_SERVER,
-		                  IID_ICreateDevEnum, 
+		                  IID_ICreateDevEnum,
                           (void **)&pSysDevEnum);
     if (FAILED(hr)) {
 		return 0;
@@ -1293,10 +1293,10 @@ unsigned int DirectShowCapture::ScanForSources(std::vector<std::string>& sources
 
 	// Obtain a class enumerator for the video input category.
 	IEnumMoniker *pEnumCat = NULL;
-	hr = pSysDevEnum->CreateClassEnumerator(CLSID_VideoInputDeviceCategory, 
-                                            &pEnumCat, 
+	hr = pSysDevEnum->CreateClassEnumerator(CLSID_VideoInputDeviceCategory,
+                                            &pEnumCat,
                                             0);
-	if (hr == S_OK) 
+	if (hr == S_OK)
 	{
 		// Enumerate the monikers.
 		IMoniker *pMoniker = NULL;
@@ -1305,9 +1305,9 @@ unsigned int DirectShowCapture::ScanForSources(std::vector<std::string>& sources
 		{
 			// Bind the first moniker to an object
 			IPropertyBag *pPropBag;
-			hr = pMoniker->BindToStorage(0, 
-                                         0, 
-                                         IID_IPropertyBag, 
+			hr = pMoniker->BindToStorage(0,
+                                         0,
+                                         IID_IPropertyBag,
                                          (void **)&pPropBag);
 			if (SUCCEEDED(hr))
 			{
@@ -1320,14 +1320,14 @@ unsigned int DirectShowCapture::ScanForSources(std::vector<std::string>& sources
 					USES_CONVERSION;
 					sources.push_back(W2A(varName.bstrVal));
 				}
-				VariantClear(&varName);	
+				VariantClear(&varName);
 				pPropBag->Release();
 			}
 			pMoniker->Release();
 		}
 		pEnumCat->Release();
 	}
-	pSysDevEnum->Release(); 
+	pSysDevEnum->Release();
 
 	return (unsigned int)(sources.size());
 }
@@ -1479,7 +1479,7 @@ int CvImageCapture::Stop()
 ////////////////////////////////////////////////////////////////////////////////////
 ///
 ///   \brief Gets a copy of the latest frame from video source.
-///   
+///
 ///   \param image Where to copy image to.
 ///   \param block If true, blocks until next image retrieved.
 ///
@@ -1495,7 +1495,7 @@ int CvImageCapture::GetFrame(CvImageCapture::Image* dest, const bool block)
 ////////////////////////////////////////////////////////////////////////////////////
 ///
 ///   \brief Gets a copy of the latest frame from video source.
-///   
+///
 ///   \param image Where to copy image to.
 ///   \param block If true, blocks until next image retrieved.
 ///
@@ -1568,7 +1568,87 @@ unsigned int CvImageCapture::ScanForSources(std::vector<std::string>& sources)
 #else
 
 #include <stdio.h>
-#include <string.h> 
+#include <string.h>
+#include <cv.h>
+#include <highgui.h>
+#include <cvaux.h>
+#include <cxcore.h>
+
+CvImageCapture::Image::Image() : mWidth(0),
+                                 mHeight(0),
+                                 mChannels(0),
+                                 mpData(0)
+{
+
+}
+
+CvImageCapture::Image::Image(const Image& img) : mWidth(0),
+                                                 mHeight(0),
+                                                 mChannels(0),
+                                                 mpData(0)
+{
+    *this = img;
+}
+
+
+CvImageCapture::Image::~Image()
+{
+    if(mpData)
+    {
+        delete[] mpData;
+        mpData = NULL;
+    }
+}
+
+CvImageCapture::Image& CvImageCapture::Image::operator =(const CvImageCapture::Image& img)
+{
+    if(this != &img)
+    {
+        if(mpData)
+        {
+            delete[] mpData;
+            mpData = NULL;
+        }
+        mWidth = img.mWidth;
+        mHeight = img.mHeight;
+        mChannels = img.mChannels;
+        if(mWidth > 0 && mHeight > 0 && mChannels > 0)
+        {
+            mpData = new unsigned char[mWidth*mHeight*mChannels];
+            memcpy(mpData, img.mpData, mWidth*mHeight*mChannels);
+        }
+    }
+    return *this;
+}
+
+void CvImageCapture::Image::Destroy()
+{
+    if(mpData)
+    {
+        delete[] mpData;
+        mpData = NULL;
+    }
+    mWidth = mHeight = mChannels = 0;
+}
+
+void CvImageCapture::Image::Create(const unsigned short width,
+                                   const unsigned short height,
+                                   const unsigned short channels)
+{
+    if(mpData)
+    {
+        delete[] mpData;
+        mpData = NULL;
+    }
+    mWidth = width;
+    mHeight = height;
+    mChannels = channels;
+    if(mWidth > 0 && mHeight > 0 && mChannels > 0)
+    {
+        mpData = new unsigned char[mWidth*mHeight*mChannels];
+        memset(mpData, 0, mWidth*mHeight*mChannels);
+    }
+}
 
 
 ////////////////////////////////////////////////////////////////////////////////////
@@ -1615,10 +1695,11 @@ CvImageCapture::~CvImageCapture()
 ///   \return 1 on OK, 0 on fail.
 ///
 ////////////////////////////////////////////////////////////////////////////////////
-int CvImageCapture::Start(const char *videoSource, 
-                          const int width, 
-                          const int height, 
-                          const bool interlace) 
+int CvImageCapture::Start(const char *videoSource,
+                          const int width,
+                          const int height,
+                          const bool interlace)
+{
     Stop();
 
     if( videoSource && (mCapture = cvCaptureFromFile(videoSource)) > 0) {
@@ -1653,7 +1734,38 @@ int CvImageCapture::Stop()
 ////////////////////////////////////////////////////////////////////////////////////
 ///
 ///   \brief Gets a copy of the latest frame from video source.
-///   
+///
+///   \param image Where to copy image to.
+///   \param block If true, blocks until next image retrieved.
+///
+///   \return 1 on OK, 0 on fail.
+///
+////////////////////////////////////////////////////////////////////////////////////
+int CvImageCapture::GetFrame(Image *dest, const bool block)
+{
+    if(!mCapture)
+        return false;
+
+    if( (mImage = cvQueryFrame(mCapture)) )
+    {
+        //  Make sure origin is in the top left corner
+        if(mImage->origin != IPL_ORIGIN_TL)
+        {
+            cvFlip(mImage, mImage, 0);
+        }
+
+        memcpy(dest->mpData, mImage->imageData, mImage->imageSize);
+
+        return 1;
+    }
+    return 0;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////
+///
+///   \brief Gets a copy of the latest frame from video source.
+///
 ///   \param image Where to copy image to.
 ///   \param block If true, blocks until next image retrieved.
 ///
