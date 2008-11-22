@@ -188,9 +188,23 @@ int VisualSensor::SetupService()
     service.AddInputMessage(JAUS_QUERY_IMAGE, 0);
     service.AddInputMessage(JAUS_QUERY_CAMERA_FORMAT_OPTIONS, presenceVector);
 
+    presenceVector = QueryCameraCapabilities::VectorMask::Description |
+                     QueryCameraCapabilities::VectorMask::MinFrameRate |
+                     QueryCameraCapabilities::VectorMask::MaxFrameRate;
+
+    service.AddInputMessage(JAUS_QUERY_CAMERA_CAPABILITIES, presenceVector);
+    service.AddOutputMessage(JAUS_REPORT_CAMERA_CAPABILITIES, presenceVector);
+
+    service.AddInputMessage(JAUS_QUERY_SELECTED_CAMERA, 0);
+    service.AddOutputMessage(JAUS_REPORT_SELECTED_CAMERA, 0);
+    service.AddInputMessage(JAUS_QUERY_CAMERA_COUNT, 0);
+    service.AddOutputMessage(JAUS_REPORT_CAMERA_COUNT, 0);
+    service.AddInputMessage(JAUS_SELECT_CAMERA, 0);
+    
     presenceVector = 0;
     presenceVector = SetCameraFormatOptions::VectorMask::ImageFormat;
     service.AddInputMessage(JAUS_SET_CAMERA_FORMAT_OPTIONS, presenceVector);
+    
 
     AddService(service);
     return JAUS_OK;
@@ -335,6 +349,11 @@ int VisualSensor::ProcessCommandMessage(const Message* message, const Byte comma
                 }
             }
             break;
+        case JAUS_SELECT_CAMERA:
+            {
+                processed = JAUS_OK;
+            }
+            break;
         default:
             processed = InformComponent::ProcessCommandMessage( message, commandAuthority);
             break;
@@ -409,6 +428,50 @@ int VisualSensor::ProcessQueryMessage(const Message* message)
     case JAUS_QUERY_CAMERA_FORMAT_OPTIONS:
         {
             processed = ReportCameraFormatOptions((QueryCameraFormatOptions *)message);
+        }
+        break;
+    case JAUS_QUERY_CAMERA_COUNT:
+        {
+            processed = JAUS_OK;
+            ReportCameraCount report;
+            report.SetSourceID(GetID());
+            report.SetDestinationID(message->GetSourceID());
+            report.SetCameraCount(1);
+            Send(&report);
+        }
+        break;
+    case JAUS_QUERY_SELECTED_CAMERA:
+        {
+            processed = JAUS_OK;
+            ReportSelectedCamera report;
+            report.SetSourceID(GetID());
+            report.SetDestinationID(message->GetSourceID());
+            report.SetCameraID(mCameraID);
+            Send(&report);
+        }
+        break;
+    case JAUS_QUERY_CAMERA_CAPABILITIES:
+        {
+            const QueryCameraCapabilities* query = dynamic_cast<const QueryCameraCapabilities*>(message);
+            if(query)
+            {
+                ReportCameraCapabilities report;
+                report.SetSourceID(GetID());
+                report.SetDestinationID(query->GetSourceID());
+                if(BitVector::IsBitSet(query->GetPresenceVector(), QueryCameraCapabilities::VectorBit::Description))
+                {
+                    report.SetDescription("Video Feed");
+                }
+                if(BitVector::IsBitSet(query->GetPresenceVector(), QueryCameraCapabilities::VectorBit::MinFrameRate))
+                {
+                    report.SetMinFrameRate(1);
+                }
+                if(BitVector::IsBitSet(query->GetPresenceVector(), QueryCameraCapabilities::VectorBit::MaxFrameRate))
+                {
+                    report.SetMaxFrameRate(30);
+                }
+                Send(&report);
+            }
         }
         break;
     default:

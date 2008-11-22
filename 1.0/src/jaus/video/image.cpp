@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////
 ///
 ///  \file image.cpp
-///  \brief This file contains the main data structure for storing and 
+///  \brief This file contains the main data structure for storing and
 ///  compressing/decompressing image data for the JAUS++ video library.
 ///
 ///  <br>Author(s): Sergey Leontyev
@@ -26,7 +26,7 @@
 ///      * Neither the name of the ACTIVE LAB, IST, UCF, nor the
 ///        names of its contributors may be used to endorse or promote products
 ///        derived from this software without specific prior written permission.
-/// 
+///
 ///  THIS SOFTWARE IS PROVIDED BY THE ACTIVE LAB''AS IS'' AND ANY
 ///  EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 ///  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -40,28 +40,21 @@
 ///
 ////////////////////////////////////////////////////////////////////////////////////
 #include "jaus/video/image.h"
+#include "jaus/video/jpeg/jpeg.h"
+#include "jaus/video/pgm/pgm.h"
+#include "jaus/video/ppm/ppm.h"
+#include "jaus/video/png/png.h"
 #include <assert.h>
 #include <string.h>
 #include <stdlib.h>
 
-#ifdef WIN32
-
-#define XMD_H // prevent redefinition of INT32
-#undef FAR    // prevent FAR redefinition
-
-#endif
-
-extern "C" {
-#include <jpeglib.h>
-#include <png.h>
-}
-
 using namespace Jaus;
 using namespace CxUtils;
 
+
 ////////////////////////////////////////////////////////////////////////////////////
 ///
-///  \brief Constructor.  
+///  \brief Constructor.
 ///
 ////////////////////////////////////////////////////////////////////////////////////
 Image::Image()
@@ -91,7 +84,7 @@ Image::Image(const Image& img)
 
 ////////////////////////////////////////////////////////////////////////////////////
 ///
-///  \brief Destructor.  Destroys the Image object and closes the temporary file 
+///  \brief Destructor.  Destroys the Image object and closes the temporary file
 ///  produced by the mVirtual file
 ///
 ////////////////////////////////////////////////////////////////////////////////////
@@ -115,9 +108,9 @@ Image::~Image()
 ///  \return JAUS_OK on success, JAUS_FAILURE on failure
 ///
 ////////////////////////////////////////////////////////////////////////////////////
-int Image::Create(const UShort width, 
-                  const UShort height, 
-                  const Jaus::Byte channels, 
+int Image::Create(const UShort width,
+                  const UShort height,
+                  const Jaus::Byte channels,
                   const Jaus::Byte* rawImage,
                   const bool vflip)
 {
@@ -134,13 +127,13 @@ int Image::Create(const UShort width,
         mDataSize = mHeight*mWidth*mChannels*sizeof(Jaus::Byte);
         mpImage = new Jaus::Byte[mDataSize + 100];
         assert(mpImage);
-    }   
+    }
 
     if (rawImage != NULL){
         if( vflip )
         {
             unsigned int widthStep = width*channels;
-            for(unsigned int row1 = 0, row2 = height - 1; 
+            for(unsigned int row1 = 0, row2 = height - 1;
                 row1 < height && row2 >= 0;
                 row1++, row2--)
             {
@@ -177,9 +170,9 @@ int Image::Create(const UShort width,
 ///  \return JAUS_OK on success, JAUS_FAILURE on failure
 ///
 ////////////////////////////////////////////////////////////////////////////////////
-int Image::Create(const UShort width, 
-                  const UShort height, 
-                  const Jaus::Byte channels, 
+int Image::Create(const UShort width,
+                  const UShort height,
+                  const Jaus::Byte channels,
                   const Jaus::Byte* rawImage,
                   const double scale,
                   const bool vflip)
@@ -227,7 +220,7 @@ int Image::Create(const UShort width,
                 y = (UShort)(i*magnitude);
             }
             for(UShort j = 0; j < newWidth; j++)
-            {                   
+            {
                 if(channels == 1)
                 {
                     x = (UShort)(j*magnitude);
@@ -266,9 +259,9 @@ int Image::Create(const UShort width,
             for(UShort j = 0; j < width; j++)
             {
                 // Copy the pixel multiple times based on how much larger
-                    // it needs to be. 
+                    // it needs to be.
                 for(UShort m = (UShort)(i*magnitude); m < (UShort)((i+1)*magnitude); m++)
-                {                    
+                {
                     for(UShort n = (UShort)(j*magnitude); n < (UShort)((j+1)*magnitude); n++)
                     {
                         if(channels == 1)
@@ -307,16 +300,16 @@ int Image::Create(const UShort width,
 ///  \param rawImage The image data to to scale.
 ///  \param vflip If true the data if flipped vertically.
 ///  \param maxWidth Set the maximum width you want the image stored within.
-///                   This will force image scaling to occur. 
+///                   This will force image scaling to occur.
 ///  \param maxHeight Set the maximum height you want the image stored within.
-///                   This will force image scaling to occur. 
+///                   This will force image scaling to occur.
 ///
 ///  \return JAUS_OK on success, JAUS_FAILURE on failure
 ///
 ////////////////////////////////////////////////////////////////////////////////////
-int Image::Create(const UShort width, 
-                  const UShort height, 
-                  const Jaus::Byte channels, 
+int Image::Create(const UShort width,
+                  const UShort height,
+                  const Jaus::Byte channels,
                   const Jaus::Byte* rawImage,
                   const UShort maxWidth,
                   const UShort maxHeight,
@@ -407,7 +400,7 @@ int Image::SetImageNumber(const UInt num)
 
 ////////////////////////////////////////////////////////////////////////////////////
 ///
-///  \brief Destroys the Image object and closes the temporary file 
+///  \brief Destroys the Image object and closes the temporary file
 ///  produced by the mVirtual file
 ///
 ////////////////////////////////////////////////////////////////////////////////////
@@ -438,10 +431,10 @@ int Image::Destroy()
 ///  \return JAUS_OK on success, JAUS_FAILURE on failure
 ///
 ////////////////////////////////////////////////////////////////////////////////////
-int Image::Compress(Jaus::Byte** buffer, 
-                    unsigned int& len, 
+int Image::Compress(Jaus::Byte** buffer,
+                    unsigned int& len,
                     unsigned int& clen,
-                    const Format format) const  
+                    const Format format) const
 {
     return Compress( mWidth, mHeight, mChannels, mpImage,
                      buffer, len, clen, format );
@@ -468,7 +461,7 @@ int Image::Compress(Jaus::Byte** buffer,
 ///              new buffer size will be saved to len.
 ///   \param clen The length of the compressed data in bytes.  This value will
 ///               be equal to or less than len after compression.
-///   \param format The image format to use for compression.  Values are 
+///   \param format The image format to use for compression.  Values are
 ///                 defined in jimageformats.h.
 ///
 ///   \return JAUS_OK if compression was successful, otherwise JAUS_FAILURE.
@@ -480,27 +473,27 @@ int Image::Compress(const UShort width,
                     const Jaus::Byte* rawImage,
                     Jaus::Byte** buffer,
                     unsigned int& len,
-                    unsigned int& clen, 
-                    const Format format) const
+                    unsigned int& clen,
+                    const Format format)
 {
     int result = JAUS_FAILURE;
 
     switch (format)
     {
     case PPM:
-        result = CompressPPM(width, height, channels, rawImage, buffer, len, clen);
+        result = PPM::CompressImage(width, height, channels, rawImage, buffer, &len, &clen);
         break;
     case PNG:
-        result = CompressPNG(width, height, channels, rawImage, buffer, len, clen);
+        result = PNG::CompressImage(width, height, channels, rawImage, buffer, &len, &clen);
         break;
     case PGM:
-        result = CompressPGM(width, height, channels, rawImage, buffer, len, clen);
+        result = PGM::CompressImage(width, height, channels, rawImage, buffer, &len, &clen);
         break;
     case JPEG:
-        result = CompressJPEG(width, height, channels, rawImage, buffer, len, clen);
+        result = JPEG::CompressImage(width, height, channels, rawImage, buffer, &len, &clen);
         break;
     case MJPEG:
-        result = CompressJPEG(width, height, channels, rawImage, buffer, len, clen);
+        result = JPEG::CompressImage(width, height, channels, rawImage, buffer, &len, &clen);
         break;
     default:
         result = JAUS_FAILURE;
@@ -513,401 +506,12 @@ int Image::Compress(const UShort width,
 
 ////////////////////////////////////////////////////////////////////////////////////
 ///
-///   \brief Takes raw uncompressed image data and converts it to another
-///   image compression format PPM (P6)
-///
-///   \param width The width of the raw image data (number of columns).
-///   \param height The height of the raw image data (number of rows).
-///   \param channels The number of color channels (3 = 24 bit color)
-///                  
-///   \param rawImage Raw image data.  The format of this data is interleved
-///                   color channels ( RGB, RGB, RGB, ... ) with the top
-///                   left corner of the image at pixel location [0, 0].
-///   \param buffer Pointer to buffer pointer.  This is where the compressed
-///                 image data is put.  If (*buffer) == NULL then memory is
-///                 automatically allocated.
-///   \param len The length of the buffer (number of bytes).  If the buffer
-///              is too small to fit the data, then it will be resized, and the
-///              new buffer size will be saved to len.
-///   \param clen The length of the compressed data in bytes.  This value will
-///               be equal to or less than len after compression.
-///
-///   \return JAUS_OK if compression was successful, otherwise JAUS_FAILURE.
-///
-////////////////////////////////////////////////////////////////////////////////////
-int Image::CompressPPM(const UShort width,
-                       const UShort height,
-                       const Jaus::Byte channels,
-                       const Jaus::Byte* rawImage,
-                       Jaus::Byte** buffer,
-                       unsigned int& len,
-                       unsigned int& clen) const
-{
-    int result = JAUS_FAILURE;
-
-    if( width == 0 || height == 0 || !(channels == 3) ||
-        rawImage == NULL || buffer == NULL ) {
-            return result;
-    }
-
-    unsigned int bytes = width*height*channels*sizeof(Jaus::Byte);
-
-    if( channels == 3) {
-        int characters = 0;
-        if( len <= bytes + 100 || *buffer == NULL ) {
-            //  If buffer is already pointing to allocated
-            //  memory, make sure we delete it before asking
-            //  for more.
-            if( (*buffer) ) {
-                delete[] (*buffer);
-                (*buffer) = NULL;
-            }
-            (*buffer) = new Jaus::Byte[bytes + 100];
-            assert( (*buffer) );
-            len = bytes + 100;
-        }
-
-        if (channels == 3){
-            characters = sprintf( ( (char *) (*buffer) ) , "P6 %d %d\n# Compressed by Image \n %d\n", width, height, 255);
-        }
-
-        memcpy( (*buffer) + characters , rawImage, bytes );
-        clen = bytes + characters;
-        result = JAUS_OK;
-    }
-    else {
-        SetJausError(ErrorCodes::InvalidValue);
-    }
-
-    return result;
-}
-
-////////////////////////////////////////////////////////////////////////////////////
-///
-///   \brief Takes raw uncompressed image data and converts it to another
-///   image compression format PGM  (P5).  Currently only supports grayscale.
-///
-///   \param width The width of the raw image data (number of columns).
-///   \param height The height of the raw image data (number of rows).
-///   \param channels The number of color channels (1 = Grayscale)
-///                   
-///   \param rawImage Raw image data.  The format of this data is interleved
-///                   color channels ( RGB, RGB, RGB, ... ) with the top
-///                   left corner of the image at pixel location [0, 0].
-///   \param buffer Pointer to buffer pointer.  This is where the compressed
-///                 image data is put.  If (*buffer) == NULL then memory is
-///                 automatically allocated.
-///   \param len The length of the buffer (number of bytes).  If the buffer
-///              is too small to fit the data, then it will be resized, and the
-///              new buffer size will be saved to len.
-///   \param clen The length of the compressed data in bytes.  This value will
-///               be equal to or less than len after compression.
-///
-///   \return JAUS_OK if compression was successful, otherwise JAUS_FAILURE.
-///
-////////////////////////////////////////////////////////////////////////////////////
-int Image::CompressPGM(const UShort width,
-                       const UShort height,
-                       const Jaus::Byte channels,
-                       const Jaus::Byte* rawImage,
-                       Jaus::Byte** buffer,
-                       unsigned int& len,
-                       unsigned int& clen) const
-{
-    int result = JAUS_FAILURE;
-
-    if( width == 0 || height == 0 || !(channels == 1) ||
-        rawImage == NULL || buffer == NULL ) {
-            return result;
-    }
-
-    unsigned int bytes = width*height*channels*sizeof(Jaus::Byte);
-
-    if( channels == 1) {
-        int characters = 0;
-        if( len <= bytes + 100 || *buffer == NULL ) {
-            //  If buffer is already pointing to allocated
-            //  memory, make sure we delete it before asking
-            //  for more.
-            if( (*buffer) ) {
-                delete[] (*buffer);
-                (*buffer) = NULL;
-            }
-            (*buffer) = new Jaus::Byte[bytes + 100];
-            assert( (*buffer) );
-            len = bytes + 100;
-        }
-
-        if (channels == 1){
-            characters = sprintf( ( (char *) (*buffer) ) , "P5 %d %d %d\n", width, height, 255);
-        }
-
-        memcpy( (*buffer) + characters , rawImage, bytes );
-        clen = bytes + characters;
-        result = JAUS_OK;
-    }
-    else {
-        SetJausError(ErrorCodes::InvalidValue);
-    }
-
-    return result;
-}
-
-////////////////////////////////////////////////////////////////////////////////////
-///
-///   \brief Takes raw uncompressed image data and converts it to another
-///   image compression format PNG
-///
-///   \param width The width of the raw image data (number of columns).
-///   \param height The height of the raw image data (number of rows).
-///   \param channels The number of color channels (1 = Grayscale, or 3 = 24 bit
-///                   color).
-///   \param rawImage Raw image data.  The format of this data is interleved
-///                   color channels ( RGB, RGB, RGB, ... ) with the top
-///                   left corner of the image at pixel location [0, 0].
-///   \param buffer Pointer to buffer pointer.  This is where the compressed
-///                 image data is put.  If (*buffer) == NULL then memory is
-///                 automatically allocated.
-///   \param len The length of the buffer (number of bytes).  If the buffer
-///              is too small to fit the data, then it will be resized, and the
-///              new buffer size will be saved to len.
-///   \param clen The length of the compressed data in bytes.  This value will
-///               be equal to or less than len after compression.
-///   \return JAUS_OK if compression was successful, otherwise JAUS_FAILURE.
-///
-////////////////////////////////////////////////////////////////////////////////////
-int Image::CompressPNG(const UShort width,
-                       const UShort height,
-                       const Jaus::Byte channels,
-                       const Jaus::Byte* rawImage,
-                       Jaus::Byte** buffer,
-                       unsigned int& len,
-                       unsigned int& clen) const
-{
-    int result = JAUS_FAILURE;
-
-    if( width == 0 || height == 0 || !(channels == 1 || channels == 3) ||
-        rawImage == NULL || buffer == NULL ) {
-            return result;
-    }
-
-    unsigned int bytes = width*height*channels*sizeof(Jaus::Byte);
-
-
-    if( channels == 3 || channels == 1 ) 
-    {
-        if( len <= bytes + 100 || *buffer == NULL ) 
-        {
-            //  If buffer is already pointing to allocated
-            //  memory, make sure we delete it before asking
-            //  for more.
-            if( (*buffer) ) {
-                delete[] (*buffer);
-                (*buffer) = NULL;
-            }
-            (*buffer) = new Jaus::Byte[bytes + 100];
-            assert( (*buffer) );
-            len = bytes + 100;
-        }
-
-        png_structp     png_ptr = NULL;
-
-        png_bytep     * row_pointers = NULL;
-
-        VirtualFile *vfPtr = ((VirtualFile*)(&mVirtualFile));
-        vfPtr->Open((char*)(*buffer), len);
-        vfPtr->Rewind();
-
-        png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
-        png_infop       info_ptr = png_create_info_struct(png_ptr);        
-        png_init_io(png_ptr, *vfPtr);
-
-        png_byte color;
-        if (channels == 1){
-            color = PNG_COLOR_TYPE_GRAY;
-        }
-        else if (channels == 3){
-            color = PNG_COLOR_TYPE_RGB;
-        }
-        else
-        {
-            color = PNG_COLOR_TYPE_RGB;
-        }
-
-
-        png_set_IHDR(png_ptr, info_ptr, width, height,
-            8, color, PNG_INTERLACE_NONE,
-            PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);
-
-
-
-
-        row_pointers = (png_bytep*)malloc(height*sizeof(png_bytep));
-        for (int i=0 ; i< height; i++){
-            row_pointers[i] = (png_byte*)malloc(info_ptr->rowbytes*sizeof(png_byte));
-
-            memcpy( row_pointers[i], mpImage+i*width*channels, sizeof(Jaus::Byte)*width*channels);
-
-        }
-
-        png_set_rows(png_ptr, info_ptr, row_pointers);
-        png_write_png(png_ptr, info_ptr, PNG_TRANSFORM_STRIP_16 , NULL);
-
-
-        for (int i =0; i< height; i++){
-            delete[] row_pointers[i];
-        }
-        delete[] row_pointers;
-
-        ::png_destroy_write_struct(&png_ptr, &info_ptr);
-
-
-        clen = vfPtr->GetCount();
-        result = JAUS_OK;
-
-    }
-    else {
-        SetJausError(ErrorCodes::InvalidValue);
-    }
-
-    return result;
-}
-
-////////////////////////////////////////////////////////////////////////////////////
-///
-///   \brief Takes raw uncompressed image data and converts it to another
-///   image compression format JPEG
-///
-///   \param width The width of the raw image data (number of columns).
-///   \param height The height of the raw image data (number of rows).
-///   \param channels The number of color channels (1 = Grayscale, or 3 = 24 bit
-///                   color).
-///   \param rawImage Raw image data.  The format of this data is interleved
-///                   color channels (RGB) with the top
-///                   left corner of the image at pixel location [0, 0].
-///   \param buffer Pointer to buffer pointer.  This is where the compressed
-///                 image data is put.  If (*buffer) == NULL then memory is
-///                 automatically allocated.
-///   \param len The length of the buffer (number of bytes).  If the buffer
-///              is too small to fit the data, then it will be resized, and the
-///              new buffer size will be saved to len.
-///   \param clen The length of the compressed data in bytes.  This value will
-///               be equal to or less than len after compression.
-///   \return JAUS_OK if compression was successful, otherwise JAUS_FAILURE.
-///
-////////////////////////////////////////////////////////////////////////////////////
-int Image::CompressJPEG(const UShort width,
-                        const UShort height,
-                        const Jaus::Byte channels,
-                        const Jaus::Byte* rawImage,
-                        Jaus::Byte** buffer,
-                        unsigned int& len,
-                        unsigned int& clen) const
-{
-    int result = JAUS_FAILURE;
-
-    try{
-
-        if( width == 0 || height == 0 || !(channels == 1 || channels == 3) ||
-            rawImage == NULL || buffer == NULL ) {
-                return result;
-        }
-
-        unsigned int bytes = width*height*channels*sizeof(Jaus::Byte);
-
-
-        if( channels == 3 || channels == 1) {
-
-            if( len < bytes + 100 || *buffer == NULL ) {
-                //  If buffer is already pointing to allocated
-                //  memory, make sure we delete it before asking
-                //  for more.
-                if( (*buffer) ) {
-                    delete[] (*buffer);
-                    (*buffer) = NULL;
-                }
-                (*buffer) = new Jaus::Byte[bytes + 100];
-                assert( (*buffer) );
-                len = bytes + 100;
-            }
-
-            struct jpeg_compress_struct cinfo;
-            struct jpeg_error_mgr jerr;
-
-            JSAMPROW row_pointer[1];    /* pointer to JSAMPLE row[s] */
-            int row_stride;            /* physical row width in image buffer */
-            cinfo.err = jpeg_std_error(&jerr);
-
-
-            jpeg_create_compress(&cinfo);
-
-
-
-            VirtualFile *vfPtr = ((VirtualFile*)(&mVirtualFile));
-            vfPtr->Open (  (char*)(*buffer), len);
-
-            jpeg_stdio_dest(&cinfo, *vfPtr); 
-
-            cinfo.image_width = width;     /* image width and height, in pixels */
-            cinfo.image_height = height;
-            cinfo.input_components = channels;        /* # of color components per pixel */
-
-            cinfo.in_color_space = channels > 1 ? JCS_RGB : JCS_GRAYSCALE;
-
-
-            jpeg_set_defaults(&cinfo);
-            /* Now you can set any non-default parameters you wish to.
-            * Here we just illustrate the use of quality (quantization table) scaling:
-            */
-            //jpeg_set_quality(&cinfo, 1, TRUE /* limit to baseline-JPEG values */);
-            jpeg_start_compress(&cinfo, TRUE);
-
-
-
-            row_stride = width * channels;    /* JSAMPLEs per row in image_buffer */
-
-            while (cinfo.next_scanline < cinfo.image_height) {
-                /* jpeg_write_scanlines expects an array of pointers to scanlines.
-                * Here the array is only one element long, but you could pass
-                * more than one scanline at a time if that's more convenient.
-                */
-                row_pointer[0] = & ((Jaus::Byte*)(rawImage)) [cinfo.next_scanline * row_stride];
-                (void) jpeg_write_scanlines(&cinfo, row_pointer, 1);
-
-            }
-
-
-            // this should be 4096 but I added 10 because of Premature end of JPEG file
-            clen = vfPtr->GetCount() + (4106-cinfo.dest->free_in_buffer);
-
-            jpeg_finish_compress(&cinfo);
-            jpeg_destroy_compress(&cinfo);
-
-            result = JAUS_OK;
-
-        }
-        else {
-            SetJausError(ErrorCodes::InvalidValue);
-        }
-
-    }
-    catch( char * str){
-
-        // Trying to catch an exception here
-        std::cout<< str<<std::endl;
-    }
-
-    return result;
-}
-
-////////////////////////////////////////////////////////////////////////////////////
-///
 ///   \brief The function saves a frame to file. The format will be compressed based
-///   on the extension of the file 
+///   on the extension of the file
 ///
 ///   \param file The name of the file
 ///
-///   \return JAUS_OK on success, JAUS_FAILURE on failure                         
+///   \return JAUS_OK on success, JAUS_FAILURE on failure
 ///
 ////////////////////////////////////////////////////////////////////////////////////
 int Image::SaveFrame(const std::string& file) const
@@ -940,12 +544,12 @@ int Image::SaveFrame(const std::string& file) const
 
 ////////////////////////////////////////////////////////////////////////////////////
 ///
-///   \brief The function loads image to internal structure. The image will be 
-///   decompressed based on the extension of the file 
+///   \brief The function loads image to internal structure. The image will be
+///   decompressed based on the extension of the file
 ///
 ///   \param file The name of the file
 ///
-///   \return JAUS_OK on success, JAUS_FAILURE on failure                         
+///   \return JAUS_OK on success, JAUS_FAILURE on failure
 ///
 ////////////////////////////////////////////////////////////////////////////////////
 int Image::LoadFrame(const std::string& file)
@@ -994,8 +598,8 @@ int Image::LoadFrame(const std::string& file)
 
 ////////////////////////////////////////////////////////////////////////////////////
 ///
-///   \brief The function returns the format based on the extension 
-///   of the file 
+///   \brief The function returns the format based on the extension
+///   of the file
 ///
 ///   \param file The name of the file
 ///
@@ -1016,14 +620,14 @@ Image::Format Image::GetFormat(const std::string& file)
     {
         return PGM;
     }
-    else if ( strstr(file.c_str(), ".jpeg") || strstr(file.c_str(),".JPEG") || 
+    else if ( strstr(file.c_str(), ".jpeg") || strstr(file.c_str(),".JPEG") ||
               strstr(file.c_str(), ".JPG")  || strstr(file.c_str(), ".jpg") )
     {
         return JPEG;
     }
 
     return Unused;
-}    
+}
 
 ////////////////////////////////////////////////////////////////////////////////////
 ///
@@ -1033,7 +637,7 @@ Image::Format Image::GetFormat(const std::string& file)
 Image& Image::operator=(const Image& img)
 {
     if(this != &img) {
-        if (mHeight != img.mHeight || mWidth != img.mWidth || mChannels != img.mChannels) 
+        if (mHeight != img.mHeight || mWidth != img.mWidth || mChannels != img.mChannels)
             Destroy();
         if (img.mpImage != NULL) {
             if (mpImage == NULL){
@@ -1061,8 +665,8 @@ Image& Image::operator=(const Image& img)
 ///   \return JAUS_OK on success, JAUS_JAILURE on failure
 ///
 ////////////////////////////////////////////////////////////////////////////////////
-int Image::Decompress(const Jaus::Byte* compressed, 
-                      const unsigned int len, 
+int Image::Decompress(const Jaus::Byte* compressed,
+                      const unsigned int len,
                       const Format format)
 {
     int result = JAUS_OK;
@@ -1070,268 +674,24 @@ int Image::Decompress(const Jaus::Byte* compressed,
     switch (format)
     {
     case PGM:
-       result = DecompressPGM(compressed, len);
-       break;
+        result = PGM::DecompressImage(compressed, len, &mpImage, &mWidth, &mHeight, &mChannels);
+        break;
     case PPM:
-       result = DecompressPPM(compressed, len);
-       break;
+        result = PPM::DecompressImage(compressed, len, &mpImage, &mWidth, &mHeight, &mChannels);
+        break;
     case PNG:
-       result = DecompressPNG(compressed, len);
-       break;
+        result = PNG::DecompressImage(compressed, len, &mpImage, &mWidth, &mHeight, &mChannels);
+        break;
     case JPEG:
-       result = DecompressJPEG(compressed, len);
-       break;
+        result = JPEG::DecompressImage(compressed, len, &mpImage, &mWidth, &mHeight, &mChannels);
+        break;
     case MJPEG:
-       result = DecompressJPEG(compressed, len);
-       break;
+        result = JPEG::DecompressImage(compressed, len, &mpImage, &mWidth, &mHeight, &mChannels);
+        break;
     default:
-       result = JAUS_FAILURE;
-       break;
-    }    
-    if(result == JAUS_FAILURE)
-    {
-        // Try guess what it is.
-        if(DecompressJPEG(compressed, len))
-            return JAUS_OK;
-        if(DecompressPPM(compressed, len))
-            return JAUS_OK;
-        if(DecompressPNG(compressed, len))
-            return JAUS_OK;
+        result = JAUS_FAILURE;
+        break;
     }
-    return result;
-}
-
-////////////////////////////////////////////////////////////////////////////////////
-///
-///   \brief Decompress' The buffer with PPM (3 channels) compressed image data into 
-///   internal structure of the image (only P6 is supported - binary) 
-///
-///   \param compressed The buffer with data
-///
-///   \param len The size of the buffer
-///
-///   \return JAUS_OK on success, JAUS_JAILURE on failure
-///
-////////////////////////////////////////////////////////////////////////////////////
-int Image::DecompressPPM(const Jaus::Byte* compressed, const unsigned int len)
-{
-
-    unsigned int width;
-    unsigned int height;
-    unsigned int temp;
-    char *ptr = (char *)compressed;
-
-
-    int params[3];
-    int cur_param=0;
-    char num[100];
-    int channels = 0;
-
-    memset(params, 0, sizeof(int)*3);
-
-    if (ptr[0] == 'P' && (ptr[1] == '6')){
-        int cur = 0;
-        int found = 0;
-        for (int i=3; i< 2000; i++){
-            
-            if (ptr[i] == '#'){
-                while( ptr[i++] != '\n');
-            }
-
-            if (isdigit(ptr[i])){
-                num[cur++] = ptr[i];
-                found = 1;
-            }
-            else if (found){
-                found = 0;
-                num[cur] = '\0';
-                params[cur_param++] = atoi(num);               
-                cur = 0;
-                if (cur_param==3) break;
-            }
-        }
-    }
-
-    if (cur_param == 3){
-        width =  params[0];
-        height = params[1];
-
-        //if (ptr[1] == '5') 
-        //    channels = 1;
-        //else 
-
-        if (ptr[1] == '6')
-            channels = 3;
-
-
-        temp = width * height *channels;
-        if( len > temp ) {
-            return Create( (UShort)(width), (UShort)(height), (Byte)(channels), &compressed[ len - temp ] );
-        }
-    }
-
-    return JAUS_FAILURE;
-}
-
-
-////////////////////////////////////////////////////////////////////////////////////
-///
-///   \brief Decompress' The buffer with PGM (1 channels) compressed image data into 
-///   internal structure of the image (only P5 is supported) 
-///
-///   \param compressed The buffer with data
-///
-///   \param len The size of the buffer
-///
-///   \return JAUS_OK on success, JAUS_JAILURE on failure
-///
-////////////////////////////////////////////////////////////////////////////////////
-int Image::DecompressPGM(const Jaus::Byte* compressed, const unsigned int len)
-{
-
-    unsigned int width;
-    unsigned int height;
-    unsigned int temp;
-    char *ptr = (char *)compressed;
-
-
-    int params[3];
-    int cur_param=0;
-    char num[100];
-    int channels = 0;
-
-    memset(params, 0, sizeof(int)*3);
-
-    if (ptr[0] == 'P' && (ptr[1] == '5')){
-        int cur = 0;
-        int found = 0;
-        for (int i=3; i< 2000; i++){
-            if (ptr[i] == '#'){
-                while( ptr[i++] != '\n');
-            }
-
-
-            if (isdigit(ptr[i])){
-                num[cur++] = ptr[i];
-                found = 1;
-            }
-            else if (found){
-                found = 0;
-                num[cur] = '\0';
-                params[cur_param++] = atoi(num);               
-                cur = 0;
-                if (cur_param==3) break;
-            }
-        }
-    }
-
-    if (cur_param == 3){
-        width =  params[0];
-        height = params[1];
-
-        if (ptr[1] == '5') 
-            channels = 1;
-        else if (ptr[2] == '6')
-            channels = 3;
-
-
-        temp = width * height *channels;
-        if( len > temp ) {
-            return Create( (UShort)(width), (UShort)(height), (Byte)(channels), &compressed[ len - temp ] );
-        }
-    }
-
-    return JAUS_FAILURE;
-}
-
-
-////////////////////////////////////////////////////////////////////////////////////
-///
-///   \brief Decompress' The buffer with JPEG (1 or 3 channels) compressed image 
-///   data into internal structure of the image 
-///
-///   \param compressed The buffer with data
-///
-///   \param len The size of the buffer
-///
-///   \return JAUS_OK on success, JAUS_JAILURE on failure
-///
-////////////////////////////////////////////////////////////////////////////////////
-int Image::DecompressJPEG(const Jaus::Byte* compressed, const unsigned int len)
-{
-    int result = JAUS_FAILURE;
-
-
-    unsigned int width = 0;
-    unsigned int height = 0;
-    Jaus::Byte channels = 1;
-
-    // Open Virtual File
-    VirtualFile *vfPtr = ((VirtualFile*)(&mVirtualFile));
-    vfPtr->Open((char *) compressed, len);
-
-
-
-    //  libjpeg woodoo
-    struct jpeg_decompress_struct cinfo;
-    JSAMPARRAY buffer;        /* Output row buffer */
-    int row_stride;        /* physical row width in output buffer */
-    struct my_error_mgr {
-        struct jpeg_error_mgr pub;    /* "public" fields */
-        jmp_buf setjmp_buffer;    /* for return to caller */
-    };
-    struct my_error_mgr jerr;
-    cinfo.err = jpeg_std_error(&jerr.pub);
-
-
-    /* Now we can initialize the JPEG decompression object. */
-    jpeg_create_decompress(&cinfo);
-
-    /* Step 2: specify data source (eg, a file) */
-    jpeg_stdio_src(&cinfo, *vfPtr);
-
-    /* Step 3: read file parameters with jpeg_read_header() */
-    (void) jpeg_read_header(&cinfo, TRUE);
-
-    /* Step 5: Start decompressor */
-    (void) jpeg_start_decompress(&cinfo);
-
-    row_stride = cinfo.output_width * cinfo.output_components;
-
-    /* Make a one-row-high sample array that will go away when done with image */
-    buffer = (*cinfo.mem->alloc_sarray)
-        ((j_common_ptr) &cinfo, JPOOL_IMAGE, row_stride, 1);
-
-    /* Here we use the library's state variable cinfo.output_scanline as the
-    * loop counter, so that we don't have to keep track ourselves.
-    */
-    int i=0;
-
-    width = cinfo.output_width;
-    height = cinfo.output_height;
-
-    if (cinfo.out_color_space == JCS_RGB) 
-        channels = 3;
-    else if (cinfo.out_color_space == JCS_GRAYSCALE)
-        channels = 1;
-
-
-    Jaus::Byte * rawImage = new Jaus::Byte[height*width*channels+100];
-    assert(rawImage);
-
-
-    while (cinfo.output_scanline < cinfo.output_height) {
-        (void) jpeg_read_scanlines(&cinfo, buffer, 1);
-        memcpy(rawImage+i, buffer[0], row_stride);
-        i+=row_stride;
-    }
-
-
-    (void) jpeg_finish_decompress(&cinfo);
-    jpeg_destroy_decompress(&cinfo);
-
-    result = Create((UShort)(width), (UShort)(height), (Byte)(channels), rawImage);
-    delete[] rawImage;
 
     return result;
 }
@@ -1343,11 +703,8 @@ int Image::DecompressJPEG(const Jaus::Byte* compressed, const unsigned int len)
 ///   the formula used: value = r*0.3 + g*0.59 + b*0.11
 ///
 ///   \param width The width of the image
-///
 ///   \param height The height of the image
-///
 ///   \param input The image data with 3 channels
-///
 ///   \param output The converted image data
 ///
 ///   \return JAUS_OK on success, JAUS_JAILURE on failure
@@ -1370,101 +727,7 @@ int Image::ConvertToGrayscale(const UShort width,
     return JAUS_FAILURE;
 }
 
-////////////////////////////////////////////////////////////////////////////////////
-///
-///   \brief Decompress' The buffer with PNG (1 or 3 channels) compressed image 
-///   data into internal structure of the image 
-///
-///   \param compressed The buffer with data
-///
-///   \param len The size of the buffer
-///
-///   \return JAUS_OK on success, JAUS_JAILURE on failure
-///
-////////////////////////////////////////////////////////////////////////////////////
-int Image::DecompressPNG(const Jaus::Byte* compressed, const unsigned int len)
-{
-    int result = JAUS_OK;
 
-    unsigned int width;
-    unsigned int height;
-    int channels = 0;
-
-    png_structp      png_ptr = NULL;
-    png_infop        info_ptr = NULL;
-    png_byte *ptr = (png_byte *)compressed;
-
-    int is_png = !png_sig_cmp(ptr, 0, 8);
-
-    if (result && is_png){
-        png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
-    }
-    else result = JAUS_FAILURE;
-
-
-    if (result && png_ptr){
-        info_ptr = png_create_info_struct(png_ptr);
-    }
-    else result = JAUS_FAILURE;
-
-
-    if (result && info_ptr){
-
-        VirtualFile *vfPtr = ((VirtualFile*)(&mVirtualFile));
-        vfPtr->Open((char *) compressed, len);
-
-        png_init_io(png_ptr, mVirtualFile);  
-
-        png_read_png(png_ptr, info_ptr, PNG_TRANSFORM_STRIP_16, NULL);
-
-
-        width = info_ptr->width;
-        height = info_ptr->height;
-
-        png_bytep * row_pointers = NULL;
-        row_pointers = NULL;
-
-
-        if (info_ptr->color_type == PNG_COLOR_TYPE_RGB || 
-            info_ptr->color_type == PNG_COLOR_TYPE_GRAY){
-
-                if (info_ptr->color_type == PNG_COLOR_TYPE_RGB)
-                    channels = 3;
-                else if (info_ptr->color_type == PNG_COLOR_TYPE_GRAY)
-                    channels = 1;
-
-
-                row_pointers = png_get_rows(png_ptr, info_ptr);
-
-                Jaus::Byte * rawImage = new Jaus::Byte[height*width*channels+100];
-
-                for (unsigned int i=0; i< height; i++){
-                    memcpy( rawImage + i*width*channels, row_pointers[i], sizeof(Jaus::Byte)*width*channels);
-                    //    delete[] row_pointers[i];
-                }
-
-                Create((UShort)(width), (UShort)(height), (Byte)(channels), rawImage);
-
-
-                delete[] rawImage;
-                // delete[] row_pointers;
-        }
-        else 
-            result = JAUS_FAILURE;
-
-    }
-    else 
-        result = JAUS_FAILURE;
-
-    if(png_ptr && info_ptr)
-        png_destroy_read_struct(&png_ptr, &info_ptr, (png_infopp)NULL);
-    else if(png_ptr)
-        png_destroy_read_struct(&png_ptr, (png_infopp)NULL, (png_infopp)NULL);
-    
-
-
-    return result;
-}
 
 ////////////////////////////////////////////////////////////////////////////////////
 ///
@@ -1482,7 +745,7 @@ int Image::ConvertToGrayscale(){
     Jaus::Byte * buff = new Jaus::Byte[mWidth*mHeight*3];
 
     ConvertToGrayscale(mWidth, mHeight, mpImage, buff);
-    int result = Create(mWidth, mHeight, 1, buff); 
+    int result = Create(mWidth, mHeight, 1, buff);
 
     delete[]buff;
 

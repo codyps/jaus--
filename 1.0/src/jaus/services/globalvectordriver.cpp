@@ -40,6 +40,7 @@
 ///
 ////////////////////////////////////////////////////////////////////////////////////
 #include "jaus/services/globalvectordriver.h"
+#include "jaus/messages/command/core/resume.h"
 #include <iostream>
 
 using namespace std;
@@ -1012,6 +1013,22 @@ bool GlobalVectorDriver::HaveControlOfPrimitiveDriver()
             //  Request control of primitive driver
            if(RequestComponentControl(mPrimitiveDriverID) == JAUS_OK)
            {
+               QueryComponentStatus query;
+               query.SetSourceID(GetID());
+               query.SetDestinationID(mPrimitiveDriverID);
+               Receipt receipt;
+               if(Send(&query, receipt) == JAUS_OK)
+               {
+                   const ReportComponentStatus* report = 
+                       dynamic_cast<const ReportComponentStatus*>(receipt.GetResponseMessage());
+                   if(report && report->GetPrimaryStatusCode() == Component::Status::Standby)
+                   {
+                       Jaus::Resume resume;
+                       resume.SetSourceID(GetID());
+                       resume.SetDestinationID(mPrimitiveDriverID);
+                       Send(&resume);
+                   }
+               }
                ready = true;
            }
         }

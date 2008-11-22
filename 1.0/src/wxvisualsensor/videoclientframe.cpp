@@ -189,7 +189,6 @@ VideoClientFrame::~VideoClientFrame()
         mpTimer = NULL;
     }
     Jaus::MessageCreator::CleanupMessageCreator();
-    CxUtils::SleepMs(750);
     Close(true);
     
 }
@@ -203,8 +202,12 @@ VideoClientFrame::~VideoClientFrame()
 void VideoClientFrame::OnQuit(wxCommandEvent& event)
 {
     mShutdownFlag = true;
+    if(mpTimer)
+    {
+        delete mpTimer;
+        mpTimer = NULL;
+    }
     mClient.Shutdown();
-    CxUtils::SleepMs(1000);
     Close(true);
 }
 
@@ -329,6 +332,15 @@ void VideoClientFrame::OnSelectVisualSensor(wxCommandEvent& event)
 bool VideoClientFrame::SetVisualSensor(const Jaus::Address& id)
 {
     mFrameNumber = 0;
+    static unsigned int checkTimeMs = 0;
+
+    if(Jaus::Time::GetUtcTimeMs() - checkTimeMs < 60000 && 
+        id.IsValid() && id == mVisualSensorID && mClient.HaveEventSubscription(mVisualSensorID, Jaus::JAUS_REPORT_IMAGE))
+    {
+        return true;
+    }
+
+    checkTimeMs = Jaus::Time::GetUtcTimeMs();
 
     // Cancel previous events.
     if(mVisualSensorID.IsValid())
@@ -347,7 +359,7 @@ bool VideoClientFrame::SetVisualSensor(const Jaus::Address& id)
     for(Jaus::Byte camID = 0; camID < 255; camID++)
     {
         queryFormats.SetCameraID(camID);
-        if(mClient.Send(&queryFormats, receipt, 0, 200, 2) == Jaus::JAUS_OK)
+        if(mClient.Send(&queryFormats, receipt, 0, 200, 1) == Jaus::JAUS_OK)
         {
             const Jaus::ReportCameraFormatOptions* formats = 
                 dynamic_cast<const Jaus::ReportCameraFormatOptions*>(receipt.GetResponseMessage());
@@ -355,7 +367,7 @@ bool VideoClientFrame::SetVisualSensor(const Jaus::Address& id)
             createEvent.SetSourceID(mClient.GetID());
             createEvent.SetMessageCode(Jaus::JAUS_REPORT_IMAGE);                
             createEvent.SetEventType(Jaus::CreateEventRequest::EveryChange);
-            if(mClient.RequestEvent(createEvent) == Jaus::JAUS_OK)
+            if(mClient.RequestEvent(createEvent, NULL, 500, 1) == Jaus::JAUS_OK)
             {
                 mImageFormat = (Jaus::Image::Format)formats->GetImageFormat1();
                 mVisualSensorID = id;

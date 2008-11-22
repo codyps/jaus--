@@ -26,7 +26,7 @@
 ///      * Neither the name of the ACTIVE LAB, IST, UCF, nor the
 ///        names of its contributors may be used to endorse or promote products
 ///        derived from this software without specific prior written permission.
-/// 
+///
 ///  THIS SOFTWARE IS PROVIDED BY THE ACTIVE LAB''AS IS'' AND ANY
 ///  EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 ///  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -180,14 +180,14 @@ int SetCameraFormatOptions::SetFormatOption(const UInt value)
 ///   \param version The desired version of the message to write.
 ///
 ///   \return Number of bytes written on success.  A return of 0 is not
-///           an error (some messages have no message body), only a 
+///           an error (some messages have no message body), only a
 ///           return of -1 and setting of an error code is
 ///           is a failure state.
 ///
 ////////////////////////////////////////////////////////////////////////////////////
 int SetCameraFormatOptions::WriteMessageBody(Stream& msg, const UShort version) const
 {
-    if(version <= JAUS_VERSION_3_4) 
+    if(version <= JAUS_VERSION_3_4)
     {
         int expected = 0;
         int written = 0;
@@ -219,13 +219,13 @@ int SetCameraFormatOptions::WriteMessageBody(Stream& msg, const UShort version) 
                 return written;
             }
         }
-        
-        SetJausError(ErrorCodes::ReadFailure); 
+
+        SetJausError(ErrorCodes::ReadFailure);
         return -1;
     }
-    else 
+    else
     {
-        SetJausError(ErrorCodes::UnsupportedVersion); 
+        SetJausError(ErrorCodes::UnsupportedVersion);
         return -1;
     }
 }
@@ -238,14 +238,14 @@ int SetCameraFormatOptions::WriteMessageBody(Stream& msg, const UShort version) 
 ///   \param version The desired version of the message to read.
 ///
 ///   \return Number of bytes read on success.  A return of 0 is not
-///           an error (some messages have no message body), only a 
+///           an error (some messages have no message body), only a
 ///           return of -1 and setting of an error code is
 ///           is a failure state.
 ///
 ////////////////////////////////////////////////////////////////////////////////////
 int SetCameraFormatOptions::ReadMessageBody(const Stream& msg, const UShort version)
 {
-    if(version <= JAUS_VERSION_3_4) 
+    if(version <= JAUS_VERSION_3_4)
     {
         int expected = 0;
         int read = 0;
@@ -277,13 +277,13 @@ int SetCameraFormatOptions::ReadMessageBody(const Stream& msg, const UShort vers
                 return read;
             }
         }
-        
-        SetJausError(ErrorCodes::ReadFailure); 
+
+        SetJausError(ErrorCodes::ReadFailure);
         return -1;
     }
-    else 
+    else
     {
-        SetJausError(ErrorCodes::UnsupportedVersion); 
+        SetJausError(ErrorCodes::UnsupportedVersion);
         return -1;
     }
 }
@@ -362,7 +362,7 @@ int SetCameraFormatOptions::RunTestCase() const
 
     //Copy our message to a new object, then clone that object so that we're
     //dealing with a clone of a copy of the original. They should all have
-    //identical data. Examine the output to make sure. 
+    //identical data. Examine the output to make sure.
 
     SetCameraFormatOptions copiedMessage(sendingMessage);
     SetCameraFormatOptions *clonedMessage = dynamic_cast<SetCameraFormatOptions*>(copiedMessage.Clone());

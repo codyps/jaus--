@@ -148,7 +148,7 @@ int ReportCameraCapabilities::SetCameraID(const Byte value)
 ///   \return JAUS_OK on success, otherwise JAUS_FAILURE.
 ///
 ////////////////////////////////////////////////////////////////////////////////////
-int ReportCameraCapabilities::SetDescription(const std::string value)
+int ReportCameraCapabilities::SetDescription(const std::string& value)
 {
     if(value.length() <= Limits::MaxDescriptionLength)
     {

@@ -544,6 +544,8 @@ void JSharedMemory::Registry::ClearRegistry()
 JSharedMemory::JSharedMemory()
 {
     mpMessageCb = NULL;
+    mEnableMultiPacketCollectionFlag;
+    mpMergedStream = NULL;
 }
 
 
@@ -555,6 +557,11 @@ JSharedMemory::JSharedMemory()
 JSharedMemory::~JSharedMemory()
 {
     Close();
+    if(mpMergedStream)
+    {
+        delete mpMergedStream;
+    }
+    mpMergedStream = NULL;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////
@@ -732,7 +739,7 @@ int JSharedMemory::Empty()
 ///  \return Number of bytes added, 0 on failure to add whole message.
 ///
 ////////////////////////////////////////////////////////////////////////////////////
-int JSharedMemory::EnqueueMessage(const Stream &msg) const
+int JSharedMemory::EnqueueMessage(const Stream &msg)
 {
     int result = JAUS_FAILURE;
     Header info;
@@ -743,7 +750,23 @@ int JSharedMemory::EnqueueMessage(const Stream &msg) const
     {
         return SetJausError(ErrorCodes::BadPacket);
     }
-
+    
+    if(mEnableMultiPacketCollectionFlag)
+    {
+        msg.Read(info);
+        if(info.mDataFlag != Header::DataControl::Single)
+        {
+            if(ProcessMultiPacketStream(msg, info, &mpMergedStream))
+            {
+                result = JAUS_OK;
+                if(mpMergedStream)
+                {
+                    result = EnqueueMessage(*mpMergedStream);
+                }
+            }    
+            return result;
+        }        
+    }
     // Enter critical section.
     // This will protect the mapped memory object from
     // other threads within our application.
@@ -974,6 +997,20 @@ void JSharedMemory::ClearCallback()
 
 ////////////////////////////////////////////////////////////////////////////////////
 ///
+///  \brief Enables automatic collection of mutli-packet stream data.  Once
+///         a message is complete it will be added to shared memory automatically.
+///
+///   \param[in] enable If true, large data set collection enabled.
+///
+////////////////////////////////////////////////////////////////////////////////////
+void JSharedMemory::EnableLargeDataSets(const bool enable)
+{
+    mEnableMultiPacketCollectionFlag = enable;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////
+///
 ///  \return Returns the number of messages in the box.
 ///
 ////////////////////////////////////////////////////////////////////////////////////
@@ -1196,5 +1233,162 @@ bool JSharedMemory::Exists(const Address &id)
     return CxUtils::MappedMemory::IsMemOpen(name);
 }
 
+
+////////////////////////////////////////////////////////////////////////////////////
+///
+///   \brief If the message is for this component, and it is part of 
+///   a multi-packet stream sequence, then this method will collect the
+///   pieces.
+///
+///   The individual packets in the stream are collected by this class in 
+///   large data sets.  Once an entire stream has been collected, it is merged
+///   and then saved to the 3rd parameter.
+///
+///   \param msg Message that is part of multi-packet stream sequence.
+///   \param header The header for the message.
+///   \param merged Pointer to a Pointer to a Stream object for storing 
+///                 a merged Stream object if full sequence has been received.
+///                 Don't forget to delete you data when done!
+///
+///   \return JAUS_OK on processing success, JAUS_FAILURE otherwise.  If 
+///           JAUS_OK is returned, check the merged parameter for a 
+///           merged message stream.
+///
+////////////////////////////////////////////////////////////////////////////////////
+int JSharedMemory::ProcessMultiPacketStream(const Stream& msg, const Header& header, Stream** merged)
+{
+    bool addedFlag = false;                         // Did we add to a data set?
+    UInt pv = 0;                                    // Presence vector.
+    MessageCreator::GetPresenceVector(msg, pv);
+    LargeDataSetMap::iterator mpstream;             // Iterator for STL map.
+    LargeDataSet::Key key(header.mSourceID,
+                          header.mCommandCode,
+                          pv);                      // Key for indexing in STL map.
+    LargeDataSet *toMerge = NULL;
+
+    mMultiPacketStreamsMutex.Enter();
+
+    // Delete any older data.
+    if(merged)
+    {
+        if(*merged)
+        {
+            delete *merged;
+            *merged = NULL;
+        }
+    }    
+
+    // See if we can add to and exisiting data set, or
+    // if we must create a new one.
+
+    if(header.mDataFlag == Header::DataControl::First)
+    {
+        mpstream = mMultiPacketStreams.find(key);
+        // Check for existing data set.
+        if(mpstream != mMultiPacketStreams.end())
+        {
+            // See if we can add to the existing stream.
+            if(mpstream->second->AddToDataSet(msg))
+            {
+                addedFlag = true;
+                if(mpstream->second->IsDataSetComplete())
+                {
+                   toMerge = mpstream->second;
+                   mMultiPacketStreams.erase(mpstream);
+                }
+            }
+        }
+    }
+    else
+    {
+        // If either a re-transmit, final, or normal packet in
+        // multi-packet stream, find a matching stream to add to
+        // and add to it.
+        for(mpstream = mMultiPacketStreams.begin();
+            mpstream != mMultiPacketStreams.end() && !addedFlag;)
+        {
+            if(mpstream->first.mCommandCode == header.mCommandCode &&
+                mpstream->first.mSourceID == header.mSourceID)
+            {
+                // Try add the stream to the data set.
+                if(mpstream->second->AddToDataSet(msg))
+                {
+                    addedFlag = true;
+                    if(mpstream->second->IsDataSetComplete())
+                    {
+                        toMerge = mpstream->second;
+                        mMultiPacketStreams.erase(mpstream);
+                    }
+                    break;
+                }
+            }
+            // If it has been more than 5 seconds, and we haven't
+            // merged the data set yet, get rid of it.
+            if(mpstream->second->IsDataSetComplete() == false &&
+                Time::GetUtcTimeMs() - mpstream->second->GetUpdateTimeMs() > 1000)
+            {
+                delete mpstream->second;
+#ifdef WIN32     
+                mpstream = mMultiPacketStreams.erase(mpstream);
+#else                
+                mMultiPacketStreams.erase(mpstream);
+                mpstream = mMultiPacketStreams.begin();
+#endif
+            }
+            else
+            {
+                mpstream++;
+            }
+        }
+    }
+
+    // If no match was found, then we need
+    // to create a new data set.
+    if(addedFlag == false)
+    {
+        LargeDataSet *lds = new LargeDataSet();
+
+        lds->StartLargeDataSet(msg, &header);
+        key.mPresenceVector = 0;
+
+        mpstream = mMultiPacketStreams.find(key);
+        while(mpstream != mMultiPacketStreams.end())
+        {
+            key.mIdentifier++;
+            mpstream = mMultiPacketStreams.find(key);
+        }
+
+        mMultiPacketStreams[key] = lds;
+        mpstream = mMultiPacketStreams.find(key);
+
+        if(lds->IsDataSetComplete())
+        {
+            toMerge = mpstream->second;
+            mMultiPacketStreams.erase(mpstream);
+        }
+        addedFlag = true;
+    }
+
+    // If we have data to merge...
+    if(toMerge != NULL)
+    {
+        (*merged) = new Stream();
+        // Merge the data
+        toMerge->GetMergedStream(**merged);
+        // Make sure ACK/NACK is off.
+        Header header;
+        (*merged)->Read(header, 0);
+        header.mAckNack = Header::AckNack::None;
+        (*merged)->Write(header, 0);
+        // Delete the data set.
+        delete toMerge;
+        toMerge = NULL;
+    }
+
+    mMultiPacketStreamsMutex.Leave();
+
+    return addedFlag ? JAUS_OK : JAUS_FAILURE;
+
+}
 
 /*  End of File */

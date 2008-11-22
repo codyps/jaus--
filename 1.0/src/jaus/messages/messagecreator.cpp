@@ -660,9 +660,8 @@ UInt MessageCreator::GetPresenceVectorMask(const UShort code, const UShort versi
         *successFlag = false;
     }
 
-    Message* tempMessage;
-
-    if( (tempMessage = CreateMessage(code) ) )
+    Message* tempMessage = CreateMessage(code);
+    if( tempMessage )
     {
         mask = tempMessage->GetPresenceVectorMask(version);
         delete tempMessage;

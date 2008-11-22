@@ -30,7 +30,7 @@
 ///      * Neither the name of the ACTIVE LAB, IST, UCF, nor the
 ///        names of its contributors may be used to endorse or promote products
 ///        derived from this software without specific prior written permission.
-/// 
+///
 ///  THIS SOFTWARE IS PROVIDED BY THE ACTIVE LAB''AS IS'' AND ANY
 ///  EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 ///  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -1347,9 +1347,10 @@ void InformComponent::StopHighPerformanceTimer(ServiceConnection* serviceConnect
 ////////////////////////////////////////////////////////////////////////////////////
 void InformComponent::SubscriptionsLoop()
 {
-
+#ifdef WIN32
     unsigned int loopCounter = 0;
     unsigned int loopCountLimit = 50;
+#endif
     unsigned int lastCheckTimeMs = 0;   // Last time that we checked for lost services/events.
     unsigned int numServiceConnections = 0, numEvents = 0;
 

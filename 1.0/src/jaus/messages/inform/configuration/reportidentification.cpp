@@ -192,12 +192,8 @@ int ReportIdentification::ReadMessageBody(const Stream& msg,
         read += msg.Read(authority);
         read += msg.Read(type);
         
-        if( msg.Length() < msg.GetReadPos() || 
-            msg.Length() - msg.GetReadPos() == 0)
-        {
-            SetJausError(ErrorCodes::InvalidValue); return -1;
-        }
         expected += msg.Length() - msg.GetReadPos();
+
         ident = new unsigned char[msg.Length() - msg.GetReadPos() + 1];
         memset(ident, 0, msg.Length() - msg.GetReadPos() + 1);
         read += msg.Read(ident, msg.Length() - msg.GetReadPos());

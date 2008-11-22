@@ -27,7 +27,7 @@
 ///      * Neither the name of the ACTIVE LAB, IST, UCF, nor the
 ///        names of its contributors may be used to endorse or promote products
 ///        derived from this software without specific prior written permission.
-/// 
+///
 ///  THIS SOFTWARE IS PROVIDED BY THE ACTIVE LAB''AS IS'' AND ANY
 ///  EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 ///  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -43,10 +43,11 @@
 #include <iostream>
 #include <iomanip>
 #include "jaus/jaus++.h"
+#include "jaus/video/image.h"
 #include <cxutils/cxutils.h>
 #include <vector>
 #ifdef WIN32
-#include <conio.h>
+#include <vld.h>
 #endif
 
 
@@ -56,7 +57,7 @@ using namespace Jaus;
 
 int main(int argc, char *argv[])
 {
-    Image frame;
+    Image frame, grayscale;
     Image scaledFrame;
 
     // Load a saved file.
@@ -66,6 +67,9 @@ int main(int argc, char *argv[])
     frame.SaveFrame("images/calculon_copy.jpg");
     frame.SaveFrame("images/calculon_copy.png");
     frame.SaveFrame("images/calculon_copy.ppm");
+    grayscale = frame;
+    grayscale.ConvertToGrayscale();
+    grayscale.SaveFrame("images/calculon_copy.pgm");
 
     scaledFrame.Create(frame.Width(), frame.Height(), frame.Channels(), frame.ImageData(), 0.5, false);
     scaledFrame.SaveFrame("images/calculon_small_copy.jpg");
@@ -83,6 +87,66 @@ int main(int argc, char *argv[])
     scaledFrame.Create(frame.Width(), frame.Height(), frame.Channels(), frame.ImageData(), 320, 240, false);
     scaledFrame.SaveFrame("images/calculon_size_fit3.jpg");
 
+    // Checking compression rates for JPEG
+    Byte* compressedImage = 0;
+    unsigned int compressedSize = 0;
+    unsigned int compressedBufferSize = 0;
+    
+    frame.LoadFrame("images/calculon640.jpg");
+    // Pre-allocate some memory.
+    compressedImage = new Byte[frame.DataSize()];
+    compressedBufferSize = frame.DataSize();
+
+    
+    cout << "Checking compression performance, press Escape to skip..\n";
+    double startTimeMs = CxUtils::Timer::GetTimeMs(), endTimeMs = 0;
+    unsigned int count = 0;
+    for(unsigned int i = 0; i < 500; i++)
+    {
+        if(CxUtils::GetChar() == 27)
+        {
+            break;
+        }
+
+        frame.Compress(&compressedImage, compressedBufferSize, compressedSize, Image::JPEG);
+        count++;
+        if(i%100 == 0)
+        {
+            cout << "FPS = " << count*1000.0/(CxUtils::Timer::GetTimeMs() - startTimeMs) << endl;
+        }
+    }
+    endTimeMs = CxUtils::Timer::GetTimeMs();
+
+    cout << "FPS = " << count*1000.0/(endTimeMs - startTimeMs) << endl;
+    
+    frame.Compress(&compressedImage, compressedBufferSize, compressedSize, Image::JPEG);
+
+    cout << "Checking decompression performance, press Escape to skip..\n";
+    startTimeMs = CxUtils::Timer::GetTimeMs();
+    count = 0;
+    for(unsigned int j = 0; j < 500; j++)
+    {
+        if(CxUtils::GetChar() == 27)
+        {
+            break;
+        }
+        frame.Decompress(compressedImage, compressedSize, Image::JPEG);
+        count++;
+        if(j%100 == 0)
+        {
+            cout << "FPS = " << count*1000.0/(CxUtils::Timer::GetTimeMs() - startTimeMs) << endl;
+        }
+    }
+    endTimeMs = CxUtils::Timer::GetTimeMs();
+
+    cout << "FPS = " << count*1000.0/(endTimeMs - startTimeMs) << endl;
+   
+
+    if(compressedImage)
+    {
+        delete[] compressedImage;
+    }
+ 
     return 0;
 }
 

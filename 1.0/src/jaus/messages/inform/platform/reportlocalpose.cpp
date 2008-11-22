@@ -25,7 +25,7 @@
 ///      * Neither the name of the ACTIVE LAB, IST, UCF, nor the
 ///        names of its contributors may be used to endorse or promote products
 ///        derived from this software without specific prior written permission.
-/// 
+///
 ///  THIS SOFTWARE IS PROVIDED BY THE ACTIVE LAB''AS IS'' AND ANY
 ///  EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 ///  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -47,23 +47,23 @@ using namespace std;
 using namespace Jaus;
 
 
-const double ReportLocalPose::Limits::MinX =            -100000;                            
-const double ReportLocalPose::Limits::MaxX =            100000;            
-const double ReportLocalPose::Limits::MinY =            -100000;            
-const double ReportLocalPose::Limits::MaxY =            100000;            
-const double ReportLocalPose::Limits::MinZ =            -10000;            
-const double ReportLocalPose::Limits::MaxZ =            35000;            
+const double ReportLocalPose::Limits::MinX =            -100000;
+const double ReportLocalPose::Limits::MaxX =            100000;
+const double ReportLocalPose::Limits::MinY =            -100000;
+const double ReportLocalPose::Limits::MaxY =            100000;
+const double ReportLocalPose::Limits::MinZ =            -10000;
+const double ReportLocalPose::Limits::MaxZ =            35000;
 const double ReportLocalPose::Limits::MinPositionRms =    0;
 const double ReportLocalPose::Limits::MaxPositionRms =    100;
-const double ReportLocalPose::Limits::MinRoll =            -JAUS_PI;                        
-const double ReportLocalPose::Limits::MaxRoll =            JAUS_PI;        
-const double ReportLocalPose::Limits::MinPitch =        -JAUS_PI;        
-const double ReportLocalPose::Limits::MaxPitch =        JAUS_PI;        
-const double ReportLocalPose::Limits::MinYaw =            -JAUS_PI;                
-const double ReportLocalPose::Limits::MaxYaw =            JAUS_PI;                
+const double ReportLocalPose::Limits::MinRoll =            -JAUS_PI;
+const double ReportLocalPose::Limits::MaxRoll =            JAUS_PI;
+const double ReportLocalPose::Limits::MinPitch =        -JAUS_PI;
+const double ReportLocalPose::Limits::MaxPitch =        JAUS_PI;
+const double ReportLocalPose::Limits::MinYaw =            -JAUS_PI;
+const double ReportLocalPose::Limits::MaxYaw =            JAUS_PI;
 const double ReportLocalPose::Limits::MinAttitudeRms =    0;
 const double ReportLocalPose::Limits::MaxAttitudeRms =    JAUS_PI;
-    
+
 
 ////////////////////////////////////////////////////////////////////////////////////
 ///
@@ -73,7 +73,7 @@ const double ReportLocalPose::Limits::MaxAttitudeRms =    JAUS_PI;
 ReportLocalPose::ReportLocalPose(): Message(JAUS_REPORT_LOCAL_POSE)
 {
     ClearMessageBody();
-    
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////////
@@ -106,7 +106,7 @@ int ReportLocalPose::SetPresenceVector(const UShort pv)
 ///
 ///   \brief Sets a X position value.
 ///
-///   \param val Integer, Meters, Scaled Integer, 
+///   \param val Integer, Meters, Scaled Integer,
 ///                 Lower Limit = -100,000, Upper Limit = 100,000
 ///
 ///   \return JAUS_OK if value set, otherwise JAUS_FAILURE.
@@ -127,7 +127,7 @@ int ReportLocalPose::SetX(const double val)
 ///
 ///   \brief Sets a Y position value.
 ///
-///   \param val Integer, Meters, Scaled Integer, 
+///   \param val Integer, Meters, Scaled Integer,
 ///                 Lower Limit = -100,000, Upper Limit = 100,000
 ///
 ///   \return JAUS_OK if value set, otherwise JAUS_FAILURE.
@@ -148,7 +148,7 @@ int ReportLocalPose::SetY(const double val)
 ///
 ///   \brief Sets a Z position value.
 ///
-///   \param val Integer, Meters, Scaled Integer, 
+///   \param val Integer, Meters, Scaled Integer,
 ///                 Lower Limit = -10,000, Upper Limit = 35,000
 ///
 ///   \return JAUS_OK if value set, otherwise JAUS_FAILURE.
@@ -169,7 +169,7 @@ int ReportLocalPose::SetZ(const double val)
 ///
 ///   \brief Sets a RMS value indicating the validity of the position data.
 ///
-///   \param val Unsigned Integer, Meters, Scaled Integer, 
+///   \param val Unsigned Integer, Meters, Scaled Integer,
 ///           Lower Limit = 0, Upper Limit = 100.
 ///
 ///   \return JAUS_OK if value set, otherwise JAUS_FAILURE.
@@ -188,10 +188,10 @@ int ReportLocalPose::SetPositionRms(const double val)
 
 ////////////////////////////////////////////////////////////////////////////////////
 ///
-///   \brief Sets a Roll value 
+///   \brief Sets a Roll value
 ///
-///   \param val Radians, Scaled Integer, 
-///                 Lower Limit = -JAUS_PI, Upper Limit = JAUS_PI 
+///   \param val Radians, Scaled Integer,
+///                 Lower Limit = -JAUS_PI, Upper Limit = JAUS_PI
 ///
 ///   \return JAUS_OK if value set, otherwise JAUS_FAILURE.
 ///
@@ -209,10 +209,10 @@ int ReportLocalPose::SetRoll(const double val)
 
 ////////////////////////////////////////////////////////////////////////////////////
 ///
-///   \brief Sets a Pitch value 
+///   \brief Sets a Pitch value
 ///
-///   \param val Radians, Scaled Integer, 
-///                 Lower Limit = -JAUS_PI, Upper Limit = JAUS_PI 
+///   \param val Radians, Scaled Integer,
+///                 Lower Limit = -JAUS_PI, Upper Limit = JAUS_PI
 ///
 ///   \return JAUS_OK if value set, otherwise JAUS_FAILURE.
 ///
@@ -230,10 +230,10 @@ int ReportLocalPose::SetPitch(const double val)
 
 ////////////////////////////////////////////////////////////////////////////////////
 ///
-///   \brief Sets a Yaw value 
+///   \brief Sets a Yaw value
 ///
-///   \param val Radians, Scaled Integer, 
-///                 Lower Limit = -JAUS_PI, Upper Limit = JAUS_PI 
+///   \param val Radians, Scaled Integer,
+///                 Lower Limit = -JAUS_PI, Upper Limit = JAUS_PI
 ///
 ///   \return JAUS_OK if value set, otherwise JAUS_FAILURE.
 ///
@@ -253,7 +253,7 @@ int ReportLocalPose::SetYaw(const double val)
 ///
 ///   \brief Sets a RMS value indicating the validity of the Roll/Pitch/Yaw data
 ///
-///   \param val Unsigned Short Integer, Radians, Scaled Integer, 
+///   \param val Unsigned Short Integer, Radians, Scaled Integer,
 ///                 Lower Limit = 0, Upper Limit = 100.
 ///
 ///   \return JAUS_OK if value set, otherwise JAUS_FAILURE.
@@ -287,12 +287,12 @@ int ReportLocalPose::SetTimeStamp(const Time& tstamp)
 }
 
 double ReportLocalPose::GetX()const
-{ 
+{
     if(mPresenceVector & VectorMask::X)
     {
-        return mX; 
+        return mX;
     }
-    return SetJausError(ErrorCodes::FieldNotPresent); 
+    return SetJausError(ErrorCodes::FieldNotPresent);
 }
 double ReportLocalPose::GetY()const
 {
@@ -300,18 +300,18 @@ double ReportLocalPose::GetY()const
     {
         return mY;
     }
-    return SetJausError(ErrorCodes::FieldNotPresent); 
+    return SetJausError(ErrorCodes::FieldNotPresent);
 }
 double ReportLocalPose::GetZ()const
-{ 
+{
     if(mPresenceVector & VectorMask::Z)
     {
         return mZ;
     }
-    return SetJausError(ErrorCodes::FieldNotPresent); 
+    return SetJausError(ErrorCodes::FieldNotPresent);
 }
 double ReportLocalPose::GetPositionRms()const
-{ 
+{
     if(mPresenceVector & VectorMask::PositionRms)
     {
         return mPositionRms;
@@ -319,50 +319,50 @@ double ReportLocalPose::GetPositionRms()const
     return SetJausError(ErrorCodes::FieldNotPresent);
 }
 double ReportLocalPose::GetRoll()const
-{ 
+{
     if(mPresenceVector & VectorMask::Roll)
     {
-        return mRoll; 
+        return mRoll;
     }
     return SetJausError(ErrorCodes::FieldNotPresent);
 }
 double ReportLocalPose::GetPitch()const
-{ 
+{
     if(mPresenceVector & VectorMask::Pitch)
     {
-        return mPitch; 
+        return mPitch;
     }
-    return SetJausError(ErrorCodes::FieldNotPresent); 
+    return SetJausError(ErrorCodes::FieldNotPresent);
 }
 double ReportLocalPose::GetYaw()const
-{ 
+{
     if(mPresenceVector & VectorMask::Yaw)
     {
-        return mYaw; 
+        return mYaw;
     }
     return SetJausError(ErrorCodes::FieldNotPresent);
 }
 double ReportLocalPose::GetAttitudeRms()const
-{ 
+{
     if(mPresenceVector & VectorMask::AttitudeRms)
     {
-        return mAttitudeRms; 
+        return mAttitudeRms;
     }
-    return SetJausError(ErrorCodes::FieldNotPresent); 
+    return SetJausError(ErrorCodes::FieldNotPresent);
 }
-Time   ReportLocalPose::GetTimeStamp() const 
-{ 
+Time   ReportLocalPose::GetTimeStamp() const
+{
     if(mPresenceVector & VectorMask::TimeStamp)
     {
-        return mTimeStamp; 
+        return mTimeStamp;
     }
     SetJausError(ErrorCodes::FieldNotPresent);
     return mTimeStamp;
 }
 
-UShort ReportLocalPose::GetPresenceVector() const 
-{ 
-    return mPresenceVector; 
+UShort ReportLocalPose::GetPresenceVector() const
+{
+    return mPresenceVector;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////
@@ -373,76 +373,76 @@ UShort ReportLocalPose::GetPresenceVector() const
 ///   \param version The desired version of the message to write.
 ///
 ///   \return Number of bytes written on success.  A return of 0 is not
-///           an error (some messages have no message body), only a 
+///           an error (some messages have no message body), only a
 ///           return of -1 and setting of an error code is
 ///           is a failure state.
 ///
 ////////////////////////////////////////////////////////////////////////////////////
 int ReportLocalPose::WriteMessageBody(Stream& msg, const UShort version) const
 {
-    if(version <= JAUS_VERSION_3_4) 
+    if(version <= JAUS_VERSION_3_4)
     {
         int expected = 0;
         int written = 0;
 
         expected = JAUS_USHORT_SIZE;
         written += msg.Write(mPresenceVector);
-        
-        if(mPresenceVector&VectorMask::X) 
+
+        if(mPresenceVector&VectorMask::X)
         {
             written += msg.Write(mX, Limits::MaxX, Limits::MinX, ScaledInteger::Int);
             expected += JAUS_INT_SIZE;
         }
 
-        if(mPresenceVector&VectorMask::Y) 
+        if(mPresenceVector&VectorMask::Y)
         {
             written += msg.Write(mY, Limits::MaxY, Limits::MinY, ScaledInteger::Int);
             expected += JAUS_INT_SIZE;
         }
 
-        if(mPresenceVector&VectorMask::Z) 
+        if(mPresenceVector&VectorMask::Z)
         {
             written += msg.Write(mZ, Limits::MaxZ, Limits::MinZ, ScaledInteger::Int);
             expected += JAUS_INT_SIZE;
         }
 
-        if(mPresenceVector&VectorMask::PositionRms) 
+        if(mPresenceVector&VectorMask::PositionRms)
         {
             written += msg.Write(mPositionRms, Limits::MaxPositionRms, Limits::MinPositionRms, ScaledInteger::UInt);
             expected += JAUS_UINT_SIZE;
         }
 
-        if(mPresenceVector&VectorMask::Roll) 
+        if(mPresenceVector&VectorMask::Roll)
         {
             written += msg.Write(mRoll, Limits::MaxRoll, Limits::MinRoll, ScaledInteger::Short);
             expected += JAUS_SHORT_SIZE;
         }
-        
-        if(mPresenceVector&VectorMask::Pitch) 
+
+        if(mPresenceVector&VectorMask::Pitch)
         {
             written += msg.Write(mPitch, Limits::MaxPitch, Limits::MinPitch, ScaledInteger::Short);
             expected += JAUS_SHORT_SIZE;
         }
 
-        if(mPresenceVector&VectorMask::Yaw) 
+        if(mPresenceVector&VectorMask::Yaw)
         {
             written += msg.Write(mYaw, Limits::MaxYaw, Limits::MinYaw, ScaledInteger::Short);
             expected += JAUS_SHORT_SIZE;
         }
 
-        if(mPresenceVector&VectorMask::AttitudeRms) 
+        if(mPresenceVector&VectorMask::AttitudeRms)
         {
             written += msg.Write(mAttitudeRms, Limits::MaxAttitudeRms, Limits::MinAttitudeRms, ScaledInteger::UShort);
             expected += JAUS_USHORT_SIZE;
         }
 
-        if(mPresenceVector&VectorMask::TimeStamp) 
+        if(mPresenceVector&VectorMask::TimeStamp)
         {
             written += msg.Write(mTimeStamp.ToUInt());
             expected += JAUS_UINT_SIZE;
         }
 
-        if( expected == written ) 
+        if( expected == written )
         {
             return written;
         }
@@ -451,7 +451,7 @@ int ReportLocalPose::WriteMessageBody(Stream& msg, const UShort version) const
             SetJausError(ErrorCodes::WriteFailure); return -1;
         }
     }
-    else 
+    else
     {
         SetJausError(ErrorCodes::UnsupportedVersion); return -1;
     }
@@ -465,70 +465,70 @@ int ReportLocalPose::WriteMessageBody(Stream& msg, const UShort version) const
 ///   \param version The desired version of the message to read.
 ///
 ///   \return Number of bytes read on success.  A return of 0 is not
-///           an error (some messages have no message body), only a 
+///           an error (some messages have no message body), only a
 ///           return of -1 and setting of an error code is
 ///           is a failure state.
 ///
 ////////////////////////////////////////////////////////////////////////////////////
 int ReportLocalPose::ReadMessageBody(const Stream& msg, const UShort version)
 {
-    if(version <= JAUS_VERSION_3_4) 
+    if(version <= JAUS_VERSION_3_4)
     {
         int expected = 0;
         int read = 0;
 
         expected = JAUS_USHORT_SIZE;
         read += msg.Read(mPresenceVector);
-        
-        if(mPresenceVector&VectorMask::X) 
+
+        if(mPresenceVector&VectorMask::X)
         {
             read += msg.Read(mX, Limits::MaxX, Limits::MinX, ScaledInteger::Int);
             expected += JAUS_INT_SIZE;
         }
 
-        if(mPresenceVector&VectorMask::Y) 
+        if(mPresenceVector&VectorMask::Y)
         {
             read += msg.Read(mY, Limits::MaxY, Limits::MinY, ScaledInteger::Int);
             expected += JAUS_INT_SIZE;
         }
 
-        if(mPresenceVector&VectorMask::Z) 
+        if(mPresenceVector&VectorMask::Z)
         {
             read += msg.Read(mZ, Limits::MaxZ, Limits::MinZ, ScaledInteger::Int);
             expected += JAUS_INT_SIZE;
         }
 
-        if(mPresenceVector&VectorMask::PositionRms) 
+        if(mPresenceVector&VectorMask::PositionRms)
         {
             read += msg.Read(mPositionRms, Limits::MaxPositionRms, Limits::MinPositionRms, ScaledInteger::UInt);
             expected += JAUS_UINT_SIZE;
         }
 
-        if(mPresenceVector&VectorMask::Roll) 
+        if(mPresenceVector&VectorMask::Roll)
         {
             read += msg.Read(mRoll, Limits::MaxRoll, Limits::MinRoll, ScaledInteger::Short);
             expected += JAUS_SHORT_SIZE;
         }
-        
-        if(mPresenceVector&VectorMask::Pitch) 
+
+        if(mPresenceVector&VectorMask::Pitch)
         {
             read += msg.Read(mPitch, Limits::MaxPitch, Limits::MinPitch, ScaledInteger::Short);
             expected += JAUS_SHORT_SIZE;
         }
 
-        if(mPresenceVector&VectorMask::Yaw) 
+        if(mPresenceVector&VectorMask::Yaw)
         {
             read += msg.Read(mYaw, Limits::MaxYaw, Limits::MinYaw, ScaledInteger::Short);
             expected += JAUS_SHORT_SIZE;
         }
 
-        if(mPresenceVector&VectorMask::AttitudeRms) 
+        if(mPresenceVector&VectorMask::AttitudeRms)
         {
             read += msg.Read(mAttitudeRms, Limits::MaxAttitudeRms, Limits::MinAttitudeRms, ScaledInteger::UShort);
             expected += JAUS_USHORT_SIZE;
         }
 
-        if(mPresenceVector&VectorMask::TimeStamp) 
+        if(mPresenceVector&VectorMask::TimeStamp)
         {
             UInt tstamp;
             read += msg.Read(tstamp);
@@ -536,7 +536,7 @@ int ReportLocalPose::ReadMessageBody(const Stream& msg, const UShort version)
             expected += JAUS_UINT_SIZE;
         }
 
-        if( expected == read ) 
+        if( expected == read )
         {
             return read;
         }
@@ -545,7 +545,7 @@ int ReportLocalPose::ReadMessageBody(const Stream& msg, const UShort version)
             SetJausError(ErrorCodes::ReadFailure); return -1;
         }
     }
-    else 
+    else
     {
         SetJausError(ErrorCodes::UnsupportedVersion); return -1;
     }
@@ -577,16 +577,16 @@ void ReportLocalPose::ClearMessageBody()
 ReportLocalPose &ReportLocalPose::operator=(const ReportLocalPose &msg)
 {
     CopyHeaderData(&msg);
-    mPresenceVector =    msg.mPresenceVector;   
-    mX =                msg.mX;                
-    mY =                msg.mY;                
-    mZ =                msg.mZ;                
-    mPositionRms =        msg.mPositionRms;    
-    mRoll =                msg.mRoll;            
-    mPitch =            msg.mPitch;            
-    mYaw =                msg.mYaw;            
-    mAttitudeRms =        msg.mAttitudeRms;  
-    mTimeStamp =        msg.mTimeStamp;     
+    mPresenceVector =    msg.mPresenceVector;
+    mX =                msg.mX;
+    mY =                msg.mY;
+    mZ =                msg.mZ;
+    mPositionRms =        msg.mPositionRms;
+    mRoll =                msg.mRoll;
+    mPitch =            msg.mPitch;
+    mYaw =                msg.mYaw;
+    mAttitudeRms =        msg.mAttitudeRms;
+    mTimeStamp =        msg.mTimeStamp;
     return *this;
 }
 
@@ -617,4 +617,4 @@ UShort ReportLocalPose::GetPresenceVectorSize(const UShort version) const { retu
 ////////////////////////////////////////////////////////////////////////////////////
 UInt ReportLocalPose::GetPresenceVectorMask(const UShort version) const { return 0x1FF; }
 
-// End of File
+//*  End of File */

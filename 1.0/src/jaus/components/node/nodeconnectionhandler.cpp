@@ -731,6 +731,7 @@ int NodeConnectionHandler::CreateConnection(const Address& id,
             JSharedMemory* connection = new JSharedMemory();
             if(connection->OpenInbox(id))
             {
+                connection->EnableLargeDataSets(true);
                 mComponents[id] = connection;
                 result = JAUS_OK;
             }
@@ -1129,7 +1130,8 @@ int NodeConnectionHandler::SendStream(const Stream& msg)
                     mDiscoveryMutex.Enter();
                     mDiscoveredComponents.insert(header.mDestinationID);
                     mDiscoveryMutex.Leave();
-
+                    
+                    connection->EnableLargeDataSets(true);
                     mComponents[header.mDestinationID] = connection;
                     connection = NULL;
                     component = mComponents.find(header.mDestinationID);
@@ -1302,6 +1304,7 @@ int NodeConnectionHandler::SendStream(const Stream& msg)
                         mDiscoveredComponents.insert(header.mDestinationID);
                         mDiscoveryMutex.Leave();
 
+                        connection->EnableLargeDataSets(true);
                         mComponents[header.mDestinationID] = connection;
                         connection = NULL;
                         component = mComponents.find(header.mDestinationID);
@@ -1334,6 +1337,29 @@ int NodeConnectionHandler::SendStream(const Stream& msg)
         nack.SwapSourceAndDestination();
         nackPacket.Write(nack);
         SendStream(nackPacket);
+    }
+    // If sent to a component on this node, and
+    // Ack/Nack was requested, and the message was
+    // part of a multi-packet stream sequence send
+    // ACK response.  We must do this for components since
+    // the Node Manager's Shared Memory interface assembles
+    // multi-packet streams for the components automatically,
+    // and when they are merged, ACK/NACK is disabled.
+    if( result == JAUS_OK &&
+        header.mDataFlag != Header::DataControl::Single &&
+        header.mAckNack == Header::AckNack::Request &&
+        header.mDestinationID.mSubsystem == mComponentID.mSubsystem &&
+        header.mDestinationID.mNode == mComponentID.mNode)
+    {
+        Header ack;
+        Stream ackPacket;
+        ack = header;
+        ack.mDataSize = 0;
+        ack.mDataFlag = Header::DataControl::Single;
+        ack.mAckNack = Header::AckNack::Ack;
+        ack.SwapSourceAndDestination();
+        ackPacket.Write(ack);
+        SendStream(ackPacket);
     }
 
     if(mLogger.IsLogOpen())
@@ -1795,6 +1821,7 @@ void NodeConnectionHandler::CheckComponents(Address::Set& newConnections, Addres
                 JSharedMemory* connection = new JSharedMemory();
                 if(connection->OpenInbox(*id) && connection->IsActive())
                 {
+                    connection->EnableLargeDataSets(true);
                     newConnections.insert(*id);
                     mComponents[*id] = connection;
                 }

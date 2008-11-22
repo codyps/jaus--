@@ -26,7 +26,7 @@
 ///      * Neither the name of the ACTIVE LAB, IST, UCF, nor the
 ///        names of its contributors may be used to endorse or promote products
 ///        derived from this software without specific prior written permission.
-/// 
+///
 ///  THIS SOFTWARE IS PROVIDED BY THE ACTIVE LAB''AS IS'' AND ANY
 ///  EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 ///  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -109,7 +109,7 @@ int SelectCamera::SetCameraID(const Byte id)
 ///   \param version The desired version of the message to write.
 ///
 ///   \return Number of bytes written on success.  A return of 0 is not
-///           an error (some messages have no message body), only a 
+///           an error (some messages have no message body), only a
 ///           return of -1 and setting of an error code is
 ///           is a failure state.
 ///
@@ -126,12 +126,12 @@ int SelectCamera::WriteMessageBody(Stream& msg, const UShort version) const
         // written.
         if(msg.Write( mCameraID ))
         {
-            // Return the number of bytes written to 
+            // Return the number of bytes written to
             // the Stream instance (msg).
             return JAUS_BYTE_SIZE;
         }
     }
-    else 
+    else
     {
         //  Return JAUS_FAILURE, and set the specific
         //  error that took place when trying to write the
@@ -155,7 +155,7 @@ int SelectCamera::WriteMessageBody(Stream& msg, const UShort version) const
 ///   \param version The desired version of the message to read.
 ///
 ///   \return Number of bytes read on success.  A return of 0 is not
-///           an error (some messages have no message body), only a 
+///           an error (some messages have no message body), only a
 ///           return of -1 and setting of an error code is
 ///           is a failure state.
 ///
@@ -172,12 +172,12 @@ int SelectCamera::ReadMessageBody(const Stream& msg, const UShort version)
         // read.
         if(msg.Read( mCameraID ))
         {
-            // Return the number of bytes read from 
+            // Return the number of bytes read from
             // the Stream instance (msg).
             return JAUS_BYTE_SIZE;
         }
     }
-    else 
+    else
     {
         //  Return -1, and set the specific
         //  error that took place when trying to write the

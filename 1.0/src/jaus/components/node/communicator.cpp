@@ -202,7 +202,7 @@ Communicator::DefaultDataLink::~DefaultDataLink()
 ///   \return True on success, false on failure.
 ///
 ////////////////////////////////////////////////////////////////////////////////////
-bool Jaus::Communicator::DefaultDataLink::SetState(const State state)
+bool Jaus::Communicator::DefaultDataLink::SetState(const DataLink::State state)
 {
     mConnectionsMutex.Enter();
 
