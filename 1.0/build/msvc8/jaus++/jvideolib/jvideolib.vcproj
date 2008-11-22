@@ -60,7 +60,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				AdditionalDependencies="libpngd.lib zlibd.lib libjpegd.lib"
+				AdditionalDependencies="libpng.lib zlib.lib libjpeg.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -175,7 +175,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="libpngd.lib zlibd.lib libjpegd.lib"
+				AdditionalDependencies="libpng.lib zlib.lib libjpeg.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -288,6 +288,38 @@
 				RelativePath="..\..\..\..\src\jaus\video\visualsensor.cpp"
 				>
 			</File>
+			<Filter
+				Name="jpeg"
+				>
+				<File
+					RelativePath="..\..\..\..\src\jaus\video\jpeg\jpeg.cpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="pgm"
+				>
+				<File
+					RelativePath="..\..\..\..\src\jaus\video\pgm\pgm.cpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="ppm"
+				>
+				<File
+					RelativePath="..\..\..\..\src\jaus\video\ppm\ppm.cpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="png"
+				>
+				<File
+					RelativePath="..\..\..\..\src\jaus\video\png\png.cpp"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -314,6 +346,38 @@
 				RelativePath="..\..\..\..\include\jaus\video\visualsensor.h"
 				>
 			</File>
+			<Filter
+				Name="jpeg"
+				>
+				<File
+					RelativePath="..\..\..\..\include\jaus\video\jpeg\jpeg.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="pgm"
+				>
+				<File
+					RelativePath="..\..\..\..\include\jaus\video\pgm\pgm.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="ppm"
+				>
+				<File
+					RelativePath="..\..\..\..\include\jaus\video\ppm\ppm.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="png"
+				>
+				<File
+					RelativePath="..\..\..\..\include\jaus\video\png\png.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Resource Files"

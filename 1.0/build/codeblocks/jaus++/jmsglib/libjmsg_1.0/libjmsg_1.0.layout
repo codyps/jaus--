@@ -1,16 +1,19 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
-	<ActiveTarget name="Release" />
+	<ActiveTarget name="Debug" />
 	<File name="../../../../../include/jaus/messages/address.h" open="0" top="0" tabpos="1">
 		<Cursor position="3047" topLine="68" />
 	</File>
 	<File name="../../../../../include/jaus/messages/errorcodes.h" open="0" top="0" tabpos="17">
 		<Cursor position="0" topLine="35" />
 	</File>
-	<File name="../../../../../include/jaus/messages/inform/configuration/reportconfiguration.h" open="1" top="0" tabpos="1">
+	<File name="../../../../../include/jaus/messages/errorhistory.h" open="0" top="0" tabpos="1">
+		<Cursor position="0" topLine="0" />
+	</File>
+	<File name="../../../../../include/jaus/messages/inform/configuration/reportconfiguration.h" open="0" top="0" tabpos="7">
 		<Cursor position="1087" topLine="13" />
 	</File>
-	<File name="../../../../../include/jaus/messages/inform/configuration/reportservices.h" open="1" top="0" tabpos="2">
+	<File name="../../../../../include/jaus/messages/inform/configuration/reportservices.h" open="0" top="0" tabpos="8">
 		<Cursor position="0" topLine="27" />
 	</File>
 	<File name="../../../../../include/jaus/messages/inform/environment/reportcameracapabilities.h" open="0" top="0" tabpos="0">
@@ -19,14 +22,17 @@
 	<File name="../../../../../include/jaus/messages/inform/environment/reportcamerapose.h" open="0" top="0" tabpos="0">
 		<Cursor position="4151" topLine="96" />
 	</File>
-	<File name="../../../../../include/jaus/messages/inform/informcodes.h" open="1" top="0" tabpos="3">
+	<File name="../../../../../include/jaus/messages/inform/informcodes.h" open="0" top="0" tabpos="9">
 		<Cursor position="963" topLine="70" />
 	</File>
 	<File name="../../../../../include/jaus/messages/query/environment/querycamerapose.h" open="0" top="0" tabpos="2">
 		<Cursor position="4239" topLine="102" />
 	</File>
-	<File name="../../../../../include/jaus/messages/query/platform/querylocalpathsegment.h" open="1" top="0" tabpos="4">
+	<File name="../../../../../include/jaus/messages/query/platform/querylocalpathsegment.h" open="0" top="0" tabpos="10">
 		<Cursor position="1047" topLine="24" />
+	</File>
+	<File name="../../../../../include/jaus/messages/stream.h" open="0" top="0" tabpos="0">
+		<Cursor position="3200" topLine="54" />
 	</File>
 	<File name="../../../../../src/jaus/messages/address.cpp" open="0" top="0" tabpos="2">
 		<Cursor position="2842" topLine="86" />

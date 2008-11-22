@@ -5,6 +5,7 @@
 		<Option title="libjcmp_1.0" />
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
+		<Option virtualFolders="src/jaus/components/;" />
 		<Build>
 			<Target title="Debug">
 				<Option output="../../../../../lib/libjcmp_1.0_d.a" prefix_auto="0" extension_auto="0" />

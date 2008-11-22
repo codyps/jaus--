@@ -14,7 +14,15 @@ CXUTILSDIR := $(JAUSDIR)/../../../cxutils/trunk/1.0
 #  project source files dirs
 #--------------------------------------------
 SRCDIR   	:= $(JAUSDIR)/src/jaus/video
-SRCDIRS		:=  $(SRCDIR)
+PNGSRCDIR	:= $(SRCDIR)/png
+JPEGSRCDIR	:= $(SRCDIR)/jpeg
+PPMSRCDIR	:= $(SRCDIR)/ppm
+PGMSRCDIR	:= $(SRCDIR)/pgm
+SRCDIRS		:=  $(SRCDIR) \
+		$(PNGSRCDIR) \
+		$(JPEGSRCDIR) \
+		$(PPMSRCDIR) \
+		$(PGMSRCDIR) \
 	
 #---------------------------------------
 #   project includes dirs

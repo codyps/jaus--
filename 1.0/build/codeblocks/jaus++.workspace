@@ -2,11 +2,17 @@
 <CodeBlocks_workspace_file>
 	<Workspace title="Workspace">
 		<Project filename="../../../../../cxutils/trunk/1.0/build/codeblocks/cxutils/cxutils.cbp" />
-		<Project filename="jaus++/jmsglib/libjmsg_1.0/libjmsg_1.0.cbp" />
+		<Project filename="jaus++/jmsglib/libjmsg_1.0/libjmsg_1.0.cbp" active="1" />
 		<Project filename="jaus++/jcmplib/libjcmp_1.0/libjcmp_1.0.cbp">
 			<Depends filename="../../../../../cxutils/trunk/1.0/build/codeblocks/cxutils/cxutils.cbp" />
 		</Project>
 		<Project filename="jaus++/jsrvclib/libjsrv_1.0/libjsrv_1.0.cbp" />
+		<Project filename="jaus++/jvideolib/libjvid_1.0/libjvid_1.0.cbp">
+			<Depends filename="../../../../../cxutils/trunk/1.0/build/codeblocks/cxutils/cxutils.cbp" />
+			<Depends filename="jaus++/jmsglib/libjmsg_1.0/libjmsg_1.0.cbp" />
+			<Depends filename="jaus++/jcmplib/libjcmp_1.0/libjcmp_1.0.cbp" />
+			<Depends filename="jaus++/jsrvclib/libjsrv_1.0/libjsrv_1.0.cbp" />
+		</Project>
 		<Project filename="example/example_messages/example_messages.cbp">
 			<Depends filename="../../../../../cxutils/trunk/1.0/build/codeblocks/cxutils/cxutils.cbp" />
 			<Depends filename="jaus++/jmsglib/libjmsg_1.0/libjmsg_1.0.cbp" />
@@ -19,7 +25,7 @@
 			<Depends filename="jaus++/jcmplib/libjcmp_1.0/libjcmp_1.0.cbp" />
 			<Depends filename="jaus++/jsrvclib/libjsrv_1.0/libjsrv_1.0.cbp" />
 		</Project>
-		<Project filename="example/example_nodemanager/example_nodemanager.cbp" active="1">
+		<Project filename="example/example_nodemanager/example_nodemanager.cbp">
 			<Depends filename="../../../../../cxutils/trunk/1.0/build/codeblocks/cxutils/cxutils.cbp" />
 			<Depends filename="jaus++/jmsglib/libjmsg_1.0/libjmsg_1.0.cbp" />
 			<Depends filename="jaus++/jcmplib/libjcmp_1.0/libjcmp_1.0.cbp" />
@@ -50,6 +56,12 @@
 			<Depends filename="jaus++/jsrvclib/libjsrv_1.0/libjsrv_1.0.cbp" />
 		</Project>
 		<Project filename="example/example_visualsensor/example_visualsensor.cbp" />
-		<Project filename="example/example_images/example_images.cbp" />
+		<Project filename="example/example_images/example_images.cbp">
+			<Depends filename="../../../../../cxutils/trunk/1.0/build/codeblocks/cxutils/cxutils.cbp" />
+			<Depends filename="jaus++/jmsglib/libjmsg_1.0/libjmsg_1.0.cbp" />
+			<Depends filename="jaus++/jcmplib/libjcmp_1.0/libjcmp_1.0.cbp" />
+			<Depends filename="jaus++/jsrvclib/libjsrv_1.0/libjsrv_1.0.cbp" />
+			<Depends filename="jaus++/jvideolib/libjvid_1.0/libjvid_1.0.cbp" />
+		</Project>
 	</Workspace>
 </CodeBlocks_workspace_file>

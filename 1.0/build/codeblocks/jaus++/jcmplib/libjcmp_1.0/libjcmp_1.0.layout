@@ -17,18 +17,18 @@
 		<Cursor position="14773" topLine="484" />
 	</File>
 	<File name="../../../../../src/jaus/components/informcomponent.cpp" open="0" top="0" tabpos="3">
-		<Cursor position="1843" topLine="21" />
+		<Cursor position="57252" topLine="1340" />
 	</File>
-	<File name="../../../../../src/jaus/components/messagehandler.cpp" open="1" top="0" tabpos="3">
+	<File name="../../../../../src/jaus/components/messagehandler.cpp" open="0" top="0" tabpos="3">
 		<Cursor position="30904" topLine="903" />
 	</File>
-	<File name="../../../../../src/jaus/components/node/communicator.cpp" open="1" top="0" tabpos="2">
+	<File name="../../../../../src/jaus/components/node/communicator.cpp" open="0" top="0" tabpos="2">
 		<Cursor position="12137" topLine="432" />
 	</File>
 	<File name="../../../../../src/jaus/components/node/nodeconnection.cpp" open="0" top="0" tabpos="5">
 		<Cursor position="2792" topLine="73" />
 	</File>
-	<File name="../../../../../src/jaus/components/node/nodeconnectionhandler.cpp" open="1" top="0" tabpos="1">
+	<File name="../../../../../src/jaus/components/node/nodeconnectionhandler.cpp" open="0" top="0" tabpos="1">
 		<Cursor position="10969" topLine="215" />
 	</File>
 	<File name="../../../../../src/jaus/components/node/nodelogger.cpp" open="0" top="0" tabpos="2">
@@ -43,7 +43,7 @@
 	<File name="../../../../../src/jaus/components/serviceconnection.cpp" open="0" top="0" tabpos="8">
 		<Cursor position="18134" topLine="552" />
 	</File>
-	<File name="../../../../../src/jaus/components/transport/jsharedmemory.cpp" open="1" top="0" tabpos="4">
+	<File name="../../../../../src/jaus/components/transport/jsharedmemory.cpp" open="0" top="0" tabpos="4">
 		<Cursor position="37045" topLine="1110" />
 	</File>
 	<File name="../../../../../src/jaus/components/transport/judpserver.cpp" open="0" top="0" tabpos="0">

@@ -261,8 +261,8 @@
 		<Unit filename="../../../../../src/jaus/messages/inform/core/reportcomponentcontrol.cpp" />
 		<Unit filename="../../../../../src/jaus/messages/inform/core/reportcomponentstatus.cpp" />
 		<Unit filename="../../../../../src/jaus/messages/inform/core/reporttime.cpp" />
-		<Unit filename="../../../../../src/jaus/messages/inform/environment/reportcamaracount.cpp" />
 		<Unit filename="../../../../../src/jaus/messages/inform/environment/reportcameracapabilities.cpp" />
+		<Unit filename="../../../../../src/jaus/messages/inform/environment/reportcameracount.cpp" />
 		<Unit filename="../../../../../src/jaus/messages/inform/environment/reportcameraformatoptions.cpp" />
 		<Unit filename="../../../../../src/jaus/messages/inform/environment/reportcamerapose.cpp" />
 		<Unit filename="../../../../../src/jaus/messages/inform/environment/reportimage.cpp" />

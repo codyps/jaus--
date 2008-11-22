@@ -1,16 +1,4 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Debug" />
-	<File name="../../../../../include/jaus/messages/command/platform/setdiscretedevices.h" open="0" top="0" tabpos="19">
-		<Cursor position="5619" topLine="112" />
-	</File>
-	<File name="../../../../../include/jaus/messages/inform/platform/reportdiscretedevices.h" open="0" top="0" tabpos="20">
-		<Cursor position="5699" topLine="113" />
-	</File>
-	<File name="../../../../../include/jaus/messages/inform/platform/reportlocalpose.h" open="0" top="0" tabpos="18">
-		<Cursor position="7840" topLine="108" />
-	</File>
-	<File name="../../../../../src/jaus/video/image.cpp" open="0" top="0" tabpos="0">
-		<Cursor position="1237" topLine="56" />
-	</File>
 </CodeBlocks_layout_file>

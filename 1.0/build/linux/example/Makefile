@@ -32,9 +32,9 @@ all:
 	cd $(EXPRIMITIVEDRIVERDIR); make
 	cd $(EXSCSUBSCRIBERDIR); make
 	cd $(EXVELOCITYSENSORDIR); make
-#	cd $(EXIMAGESDIR); make
-#	cd $(EXIMAGESUBSCRIBERDIR); make
-#	cd $(EXVISUALSENSORDIR); make
+	cd $(EXIMAGESDIR); make
+	cd $(EXIMAGESUBSCRIBERDIR); make
+	cd $(EXVISUALSENSORDIR); make
 #	cd $(EXSMTESTDIR); make
 
 

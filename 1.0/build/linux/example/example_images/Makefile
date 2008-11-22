@@ -22,7 +22,8 @@ EXTINC		:= $(JAUSDIR)/ext/include
 VLDINC		:= $(EXTINC)/vld
 CVINC		:= $(EXTINC)/cv
 TINYXMLINC	:= $(EXTINC)/tinyxml
-
+#JPEGINC		:= $(JAUSDIR)/ext/build/linux/libjpeg-6b
+#PNGINC		:= $(JAUSDIR)/ext/build/linux/libpng-1.2.31
 
 EXTINCS		:= $(VLDINC) \
 				$(CVINC) \
@@ -48,7 +49,7 @@ JAUSLIBDIR		:= $(JAUSDIR)/lib
 LIBPATHS := -L$(CXUTILSLIBDIR) \
 			-L$(JAUSLIBDIR) \
 			-L$(EXTLIBDIR) \
-			-L/usr/lib
+			-L/usr/local
 
 CXUTILSLIB	:= cxutils.1.0
 JMSGLIB		:= jmsg.1.0
@@ -65,7 +66,7 @@ LIBS		:= -l$(CXUTILSLIB) \
 		        -l$(JCMPLIB) \
                 -l$(JVIDLIB) \
 				-l$(LIBJPG) \
-				-l$(LIBPNG) 
+				-l$(LIBPNG)
 
 #---------------------------------------
 #  rules
