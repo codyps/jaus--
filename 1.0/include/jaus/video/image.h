@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////
 ///
 ///  \file image.h
-///  \brief This file contains the main data structure for storing and 
+///  \brief This file contains the main data structure for storing and
 ///  compressing/decompressing image data for the JAUS++ video library.
 ///
 ///  <br>Author(s): Sergey Leontyev
@@ -26,7 +26,7 @@
 ///      * Neither the name of the ACTIVE LAB, IST, UCF, nor the
 ///        names of its contributors may be used to endorse or promote products
 ///        derived from this software without specific prior written permission.
-/// 
+///
 ///  THIS SOFTWARE IS PROVIDED BY THE ACTIVE LAB''AS IS'' AND ANY
 ///  EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 ///  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -39,11 +39,9 @@
 ///  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ///
 ////////////////////////////////////////////////////////////////////////////////////
-#ifndef __JAUS_IMAGE_H
-#define __JAUS_IMAGE_H
+#ifndef __JAUS_IMAGE_HEADER_H
+#define __JAUS_IMAGE_HEADER_H
 
-
-#ifdef __cplusplus
 
 #include <string>
 #include <iostream>
@@ -54,7 +52,7 @@
 namespace Jaus
 {
     ////////////////////////////////////////////////////////////////////////////////////
-    /// 
+    ///
     ///  \class Image
     ///  \brief Image compression and decompression software and image data storage.
     ///  formats supported:
@@ -68,11 +66,11 @@ namespace Jaus
     {
     public:
         ////////////////////////////////////////////////////////////////////////////////////
-        /// 
+        ///
         ///  \brief Enumeration of possible image formats supported by JAUS.
         ///
         ////////////////////////////////////////////////////////////////////////////////////
-        enum JAUS_VIDEO_DLL Format
+        enum Format
         {
             Unused = 0,
             MPEG2,
@@ -95,20 +93,20 @@ namespace Jaus
         Image();
         Image(const Image& img);
         virtual ~Image();
-        int Create(const UShort width, 
-                   const UShort height, 
-                   const Byte channels, 
+        int Create(const UShort width,
+                   const UShort height,
+                   const Byte channels,
                    const Byte* rawImage,
                    const bool vflip = false);
-        int Create(const UShort width, 
-                   const UShort height, 
-                   const Jaus::Byte channels, 
+        int Create(const UShort width,
+                   const UShort height,
+                   const Jaus::Byte channels,
                    const Jaus::Byte* rawImage,
                    const double scale,
                    const bool vflip);
-        int Create(const UShort width, 
-                   const UShort height, 
-                   const Jaus::Byte channels, 
+        int Create(const UShort width,
+                   const UShort height,
+                   const Jaus::Byte channels,
                    const Jaus::Byte* rawImage,
                    const UShort maxWidth,
                    const UShort maxHeight,
@@ -118,51 +116,18 @@ namespace Jaus
         int Decompress(const Jaus::Byte* compressed,
                        const unsigned int len,
                        const Format format = Unused);
-        int DecompressPPM(const Jaus::Byte* compressed, const unsigned int len);
-        int DecompressPGM(const Jaus::Byte* compressed, const unsigned int len);
-        int DecompressPNG(const Jaus::Byte* compressed, const unsigned int len);
-        int DecompressJPEG(const Jaus::Byte* compressed, const unsigned int len);       
-        
-        int Compress(Jaus::Byte** buffer, 
-                     unsigned int& len, 
-                     unsigned int& clen,
-                     const Format format) const;
-        int Compress(const UShort width,
-                     const UShort height,
-                     const Jaus::Byte channels,
-                     const Jaus::Byte* rawImage,
-                     Jaus::Byte** buffer,
+        int Compress(Jaus::Byte** buffer,
                      unsigned int& len,
                      unsigned int& clen,
                      const Format format) const;
-        int CompressPPM(const UShort width,
-                        const UShort height,
-                        const Jaus::Byte channels,
-                        const Jaus::Byte* rawImage,
-                        Jaus::Byte** buffer,
-                        unsigned int& len,
-                        unsigned int& clent) const;
-        int CompressPNG(const UShort width,
-                        const UShort height,
-                        const Jaus::Byte channels,
-                        const Jaus::Byte* rawImage,
-                        Jaus::Byte** buffer,
-                        unsigned int& len,
-                        unsigned int& clent) const;
-        int CompressPGM(const UShort width,
-                        const UShort height,
-                        const Jaus::Byte channels,
-                        const Jaus::Byte* rawImage,
-                        Jaus::Byte** buffer,
-                        unsigned int& len,
-                        unsigned int& clent) const;
-        int CompressJPEG(const UShort width,
-                         const UShort height,
-                         const Jaus::Byte channels,
-                         const Jaus::Byte* rawImage,
-                         Jaus::Byte** buffer,
-                         unsigned int& len,
-                         unsigned int& clent) const;        
+        static int Compress(const UShort width,
+                            const UShort height,
+                            const Jaus::Byte channels,
+                            const Jaus::Byte* rawImage,
+                            Jaus::Byte** buffer,
+                            unsigned int& len,
+                            unsigned int& clen,
+                            const Format format);
         int ConvertToGrayscale();
         void FlipChannels();
         int LoadFrame(const std::string& file);
@@ -187,11 +152,9 @@ namespace Jaus
         UShort mHeight;         ///<  Vertical resolution of image in pixels.
         unsigned int mDataSize; ///<  Size of RAW data in bytes.
         Byte* mpImage;          ///<  Raw uncompressed image data.
-        UInt mImageNumber;      ///<  Unique number associated with image.
+        UInt mImageNumber;      ///<  Unique number associated with image (optional).
     };
 }
-
-#endif
 
 #endif
 /*  End of File */

@@ -113,11 +113,12 @@ namespace Jaus
                         const unsigned int size = JAUS_SHARED_MEMORY_DEFAULT_SIZE);
         int Close();
         int Empty();
-        int EnqueueMessage(const Stream &msg) const;
+        int EnqueueMessage(const Stream &msg);
         int DequeueMessage(Stream &msg, 
                            Header* header = NULL);      
         int RegisterCallback(StreamCallback* cb);
         void ClearCallback();    
+        void EnableLargeDataSets(const bool enable = true);
         bool IsOpen() const;        
         bool IsEmpty() { return Size() == 0; }
         bool IsActive(const unsigned int thresh = 2500) const;
@@ -134,6 +135,12 @@ namespace Jaus
         StreamCallback* mpMessageCb;    ///<  Pointer to your message processing callback.        
         Stream mCallbackStreamData;     ///<  Copy of message for callback.
         virtual void Execute();         ///<  Thread method.
+        // Processes large data packets.
+        virtual int ProcessMultiPacketStream(const Stream& msg, const Header& header, Stream** merged);
+        volatile bool mEnableMultiPacketCollectionFlag;   ///<  If true, interface will collect and assemble multi-packet sequences.
+        CxUtils::Mutex mMultiPacketStreamsMutex; ///<  Mutex for thread protection of multi-packet streams.
+        LargeDataSetMap mMultiPacketStreams;     ///<  Multi-packet stream sequences being assembled.
+        Stream* mpMergedStream;                  ///<  Temporary pointer to merged data stream.
     };
 }
 

@@ -25,7 +25,7 @@
 ///      * Neither the name of the ACTIVE LAB, IST, UCF, nor the
 ///        names of its contributors may be used to endorse or promote products
 ///        derived from this software without specific prior written permission.
-/// 
+///
 ///  THIS SOFTWARE IS PROVIDED BY THE ACTIVE LAB''AS IS'' AND ANY
 ///  EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 ///  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -41,6 +41,7 @@
 #ifndef _JAUS_VIDEO_LIBRARY_H
 #define _JAUS_VIDEO_LIBRARY_H
 
+#include "jaus/video/videolibdll.h"
 #include "jaus/video/image.h"
 #include "jaus/video/visualsensor.h"
 

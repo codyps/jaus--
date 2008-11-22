@@ -65,7 +65,7 @@ namespace Jaus
         ///  that can happen.
         ///
         ///////////////////////////////////////////////////////////////////////
-        enum JAUS_CMP_DLL ControlEvents
+        enum ControlEvents
         {
             ControlLost = 0,     // Lost control of a component
             ComponentDisconnect, // Component no longer exists (control lost).

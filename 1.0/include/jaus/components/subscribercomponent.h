@@ -86,7 +86,7 @@ namespace Jaus
         ///   This enumeration lists the types of events.
         ///
         ////////////////////////////////////////////////////////////////////////////////////
-        enum JAUS_CMP_DLL DiscoveryEvents
+        enum DiscoveryEvents
         {
             SubsystemConnected = 0,
             SubsystemUpdate = 1,

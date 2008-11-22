@@ -152,7 +152,7 @@ namespace Jaus
         public:
             DefaultDataLink();
             ~DefaultDataLink();
-            virtual bool SetState(const State state);
+            virtual bool SetState(const DataLink::State state);
             virtual bool Transmit(const Stream& data);
             virtual State GetState() const { return mLinkState; }
             void ToggleBroadcast(const bool on);

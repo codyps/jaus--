@@ -228,7 +228,7 @@ namespace Jaus
         ~ReportCameraCapabilities();
 
         int SetCameraID(const Byte value);
-        int SetDescription(const std::string value);
+        int SetDescription(const std::string& value);
         int SetMaxHorizontalFOV(const double value);
         int SetMinHorizontalFOV(const double value);
         int SetMaxVerticalFOV(const double value);

@@ -99,7 +99,7 @@ namespace Jaus
         ///   \brief Enumeration of possible button mappings.
         ///
         ////////////////////////////////////////////////////////////////////////////////////
-        enum JAUS_SRVC_DLL ButtonActions
+        enum ButtonActions
         {
             RequestDriveControl = 0, ///<  Request drive control.
             ReleaseDriveControl,     ///<  Release drive control.
