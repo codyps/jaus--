@@ -5,7 +5,7 @@
     <InstanceID>0</InstanceID>
     <!-- If maxWidth and maxHeight are not 0, then 
              image data will be scaled. -->
-    <Settings width="320" height="240" interlaced="false" show="true"></Settings>
+    <Settings width="640" height="480" interlaced="false" show="true"></Settings>
     <!--<ScaledResolution maxWidth="512" maxHeight="512"></ScaledResolution>-->
     <!-- MessageBoxSize is how much of a buffer to use for
              video streaming-->
