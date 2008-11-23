@@ -270,6 +270,8 @@ int Jaus::JPEG::DecompressImage(const unsigned char* jpeg,
 
     (void) jpeg_finish_decompress(&cinfo);
     jpeg_destroy_decompress(&cinfo);
+    
+    result = 1;
 
     return result;
 }

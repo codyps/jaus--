@@ -199,6 +199,8 @@ int Jaus::PNG::DecompressImage(const unsigned char* png,
         {
             png_destroy_read_struct(&png_ptr, (png_infopp)NULL, (png_infopp)NULL);
         }
+
+        return 1;
     }
     
     return 0;
