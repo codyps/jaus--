@@ -99,14 +99,19 @@ LargeDataSet::~LargeDataSet()
 ///                 JAUS_MAX_PACKET_SIZE.
 ///   \param sheader Optional paramter.  This is a pointer to a Header
 ///                  object to copy the stream header to.
+///   \param transportHeaderSize The size of the transport header so that
+///                              this packets are never larger than 
+///                              JAUS_MAX_PACKET_SIZE.
 ///
 ///   \return JAUS_OK if successful, otherwise JAUS_FAILURE.
 ///
 ////////////////////////////////////////////////////////////////////////////////////
-int LargeDataSet::CreateLargeDataSet(const Stream& stream, Header* sheader)
+int LargeDataSet::CreateLargeDataSet(const Stream& stream, 
+                                     Header* sheader,
+                                     const unsigned int transportHeaderSize)
 {
     Clear();
-    if( CreateLargeDataSet( stream, mDataSet ) ) {
+    if( CreateLargeDataSet( stream, mDataSet, transportHeaderSize ) ) {
         mLastPacketFlag = true;
         mFirstPacketFlag = true;
         mCompleteFlag = true;
@@ -181,10 +186,10 @@ int LargeDataSet::StartLargeDataSet(const Stream& stream, const Header* header)
             mFirstPacketFlag = true;
     }
     
-    if( mStreamHeader.mDataFlag == Header::DataControl::Last ||
+    if( mStreamHeader.mDataFlag == Header::DataControl::Last /*||
         (   mStreamHeader.mDataFlag == Header::DataControl::Retransmit && 
             mStreamHeader.mSequenceNumber > 0 && 
-            mStreamHeader.mDataSize < JAUS_MAX_DATA_SIZE )  ) 
+            mStreamHeader.mDataSize < JAUS_MAX_DATA_SIZE ) */ ) 
     {
 
         mLastPacketFlag = true;
@@ -304,7 +309,7 @@ int LargeDataSet::AddToDataSet(const Stream& msg)
                     insert->Read( iheader, 0 );
                     // Check and see if this data has already been 
                     // added to the set
-                    if(header.mSequenceNumber == header.mSequenceNumber)
+                    if(header.mSequenceNumber == iheader.mSequenceNumber)
                     {
                         return JAUS_FAILURE;
                     }
@@ -345,6 +350,7 @@ int LargeDataSet::AddToDataSet(const Stream& msg)
         {
             mLastPacketFlag = true;
         }
+#if 0
         //  If the last stream was retransmitted because of
         //  some error, then the last stream won't have the
         //  data control flag set to Header::DataControl::Last.  Therefore,
@@ -357,6 +363,7 @@ int LargeDataSet::AddToDataSet(const Stream& msg)
         {
             mLastPacketFlag = true;
         }
+#endif
 
         //  Check that we recevied the first msg.
         if( header.mDataFlag == Header::DataControl::First ) {
@@ -365,8 +372,7 @@ int LargeDataSet::AddToDataSet(const Stream& msg)
             mBaseSeqNumber = header.mSequenceNumber;  
             mStreamHeader.mSequenceNumber = mBaseSeqNumber;
         }
-        else if ( header.mDataSize == JAUS_MAX_DATA_SIZE &&
-                  header.mDataFlag == Header::DataControl::Retransmit &&
+        else if ( header.mDataFlag == Header::DataControl::Retransmit &&
                   header.mSequenceNumber == 0 ) 
         {
             mFirstPacketFlag = true;   
@@ -591,12 +597,16 @@ void LargeDataSet::Print() const
 ///   \param stream The resulting multi-packet stream sequence.  This will
 ///                 contain all packets in the stream in order of sequence
 ///                 number.
+///   \param transportHeaderSize The size of the transport header so that
+///                              this packets are never larger than 
+///                              JAUS_MAX_PACKET_SIZE.
 ///
 ///   \return JAUS_OK if successful, otherwise JAUS_FAILURE.
 ///
 ////////////////////////////////////////////////////////////////////////////////////
 int LargeDataSet::CreateLargeDataSet(const Stream& msg, 
-                                     Stream::List& stream)
+                                     Stream::List& stream,
+                                     const unsigned int transportHeaderSize)
 {
     Header theader;     //  Main theader to build off of.
     Header sheader;     //  Header for stream in stream.
@@ -609,7 +619,7 @@ int LargeDataSet::CreateLargeDataSet(const Stream& msg,
        
         //  If this is a small msg, then there
         //  is nothing to do.
-        if( theader.mDataSize < JAUS_MAX_DATA_SIZE ) {
+        if( theader.mDataSize < JAUS_MAX_DATA_SIZE - transportHeaderSize ) {
             return JAUS_FAILURE;
         }
 
@@ -631,7 +641,7 @@ int LargeDataSet::CreateLargeDataSet(const Stream& msg,
                 sheader.mDataFlag = Header::DataControl::Normal;
 
             //  Try write the largest amount possible. 
-            sheader.mDataSize = JAUS_MAX_DATA_SIZE;
+            sheader.mDataSize = JAUS_MAX_DATA_SIZE - transportHeaderSize;
             //  If this data size is more than is remaining, use the
             //  remaining size for the theader, and change data flag to
             //  Header::DataControl::Last since this is the last.

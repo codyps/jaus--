@@ -52,7 +52,7 @@ using namespace Jaus;
 ////////////////////////////////////////////////////////////////////////////////////
 JTCPClient::JTCPClient() : mpCallback(NULL)
 {
-    mSendStream.Write((unsigned char *)gNetworkHeader.c_str(), gNetworkHeader.size());
+    mSendStream.Write((unsigned char *)gNetworkHeader.c_str(), ((unsigned int)gNetworkHeader.size()));
 }
 
 
@@ -133,7 +133,7 @@ int JTCPClient::Send(const Jaus::Stream& msg)
 {
     int result = 0;
     mTransportMutex.Enter();
-    mSendStream.SetLength(gNetworkHeader.size());
+    mSendStream.SetLength((unsigned int)(gNetworkHeader.size()));
     mSendStream.SetWritePos(gNetworkHeader.size());
     mSendStream.Write(msg);
     result = mTCP.Send(mSendStream);
@@ -179,7 +179,7 @@ void JTCPClient::ClientThreadFunction(void *args)
                                  gNetworkHeader.c_str(), 
                                  gNetworkHeader.size()) == 0)
                     {
-                        pos += gNetworkHeader.size();
+                        pos += (unsigned int)(gNetworkHeader.size());
                         // Try read the JAUS header.
                         if(Stream::ReadHeader(&ptr[pos],
                                               client->mStreamBuffer.Length() - pos,

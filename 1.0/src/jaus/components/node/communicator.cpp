@@ -86,10 +86,10 @@ Communicator::DataLink::DataLink()
 ////////////////////////////////////////////////////////////////////////////////////
 Communicator::DataLink::~DataLink()
 {
-    mCommunicatorMutex.Enter();
+    //mCommunicatorMutex.Enter();
     mpCommunicator = NULL;
     mID = 0;
-    mCommunicatorMutex.Leave();
+    //mCommunicatorMutex.Leave();
 }
 
 
@@ -102,9 +102,9 @@ Communicator::DataLink::~DataLink()
 ////////////////////////////////////////////////////////////////////////////////////
 void Communicator::DataLink::SetID(const Byte id)
 {
-    mCommunicatorMutex.Enter();
+    //mCommunicatorMutex.Enter();
     mID = id;
-    mCommunicatorMutex.Leave();
+    //mCommunicatorMutex.Leave();
 }
 
 
@@ -125,14 +125,14 @@ bool Communicator::DataLink::ProcessReceivedMessage(const Stream &data)
 {
     bool result = false;
 
-    mCommunicatorMutex.Enter();
+    //mCommunicatorMutex.Enter();
 
     if(mpCommunicator)
     {
         // Sends to node manager for routing.
         result = mpCommunicator->ProcessDataLinkMessage(data);
     }
-    mCommunicatorMutex.Leave();
+    //mCommunicatorMutex.Leave();
 
     return result;
 }
@@ -157,12 +157,12 @@ Byte Communicator::DataLink::GetID() const
 Byte Communicator::DataLink::GetSubsystemID() const 
 { 
     Byte val = 0;
-    mCommunicatorMutex.Enter();
+    //mCommunicatorMutex.Enter();
     if(mpCommunicator)
     {  
         val = mpCommunicator->GetID().mSubsystem;  
     }
-    mCommunicatorMutex.Leave();
+    //mCommunicatorMutex.Leave();
     return val; 
 }
 
@@ -174,6 +174,7 @@ Byte Communicator::DataLink::GetSubsystemID() const
 Communicator::DefaultDataLink::DefaultDataLink()
             : mBroadcastFlag(false), mMulticastTTL(1)
 {
+    mNetworkInterface = -1;
     mLinkState = Off;
     mMulticastAddress = "224.1.0.1";
 }
@@ -208,10 +209,11 @@ bool Jaus::Communicator::DefaultDataLink::SetState(const DataLink::State state)
 
     if(state == Off)
     {
+        mLinkState = state;
         mBroadcastClient.Shutdown();
         mMulticastClient.Shutdown();
         mServer.Shutdown();
-        mRecvThread.StopThread();
+        mRecvThread.StopThread(100);
         mSubsystems.clear();
         mSubsystemHeartbeatTimesMs.clear();
     }
@@ -222,16 +224,23 @@ bool Jaus::Communicator::DefaultDataLink::SetState(const DataLink::State state)
         // to re-init.
         if(mLinkState == Off)
         {
+            // Set the network interface to use for communication.
+            mMulticastClient.SetNetworkInterface(mNetworkInterface);
+            mBroadcastClient.SetNetworkInterface(mNetworkInterface);
+            mServer.SetNetworkInterface(mNetworkInterface);
+
             mMulticastClient.InitializeMulticastSocket(mMulticastAddress.c_str(), gNetworkPort, mMulticastTTL);
             mBroadcastClient.InitializeSocket("225.225.225.225", gNetworkPort);
             mServer.InitializeMulticastSocket(gNetworkPort, mMulticastAddress.c_str());
             mRecvThread.CreateThread(DefaultDataLink::RecvThread, this);
+            mRecvThread.SetThreadName("DefaultDataLink::Thread");
         }
     }
     else if(state == Standby)
     {
         // Nothing to do.
     }
+    
     mLinkState = state;
 
     mConnectionsMutex.Leave();
@@ -356,6 +365,64 @@ void Communicator::DefaultDataLink::SetMulticastAddress(const std::string& multi
 
 ////////////////////////////////////////////////////////////////////////////////////
 ///
+///   \brief Sets the network interface to use for receiving UDP message traffic.
+///
+///   \param num The network interface number to use for receiving UDP traffic.
+///              A value of -1 means any interface, 0 the first, 1 the second, etc.
+///
+///   \return True on success, otherwise false.
+///
+////////////////////////////////////////////////////////////////////////////////////
+bool Communicator::DefaultDataLink::SetNetworkInterface(const int num)
+{
+    mNetworkInterface = num;
+    // Restart of needed.
+    if(GetState() == On)
+    {
+        SetState(Off);
+        SetState(On);
+    }
+    return true;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////
+///
+///   \brief Sets the network interface to use for receiving UDP message traffic.
+///
+///   This method looks up the network interface number to use, then sets it.
+///
+///   \param address The IP address of the network interface to use for receving
+///                  network traffic. 
+///
+///   \return True on success, otherwise false.
+///
+////////////////////////////////////////////////////////////////////////////////////
+bool Communicator::DefaultDataLink::SetNetworkInterface(const std::string& address)
+{
+    std::vector<std::string> hostnames;
+    CxUtils::Socket::GetLocalhostNames(hostnames);
+    for(size_t i = 0; i < hostnames.size(); i++)
+    {
+        if(hostnames[i] == address)
+        {
+            mNetworkInterface = (int)(i);
+            // Restart the interface if needed.
+            if(GetState() == On)
+            {
+                SetState(Off);
+                SetState(On);
+            }
+            return true;
+        }
+    }
+
+    return false;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////
+///
 ///   \brief Creates a unicast connection to a subsystem that is not subject to
 ///   dynamic discovery operations (can't be dynamically removed).
 ///
@@ -421,7 +488,7 @@ void Communicator::DefaultDataLink::RecvThread(void *arg)
         {
             link->mRecvStream.Clear();
             // Receive UDP data
-            if(link->mServer.Recv(link->mRecvStream, 2*(gNetworkHeader.size() + JAUS_MAX_PACKET_SIZE), 100, &source))
+            if(link->mServer.Recv(link->mRecvStream, (unsigned int)(2*(gNetworkHeader.size() + JAUS_MAX_PACKET_SIZE)), 100, &source))
             {
                 // Check for valid transport header and then strip it.  By default, UDP
                 // traffic adds a "JAUS0.01" string header to the front of all JAUS messages.
@@ -431,7 +498,7 @@ void Communicator::DefaultDataLink::RecvThread(void *arg)
                              gNetworkHeader.size()) == 0)
                 {
                     // Delete the header
-                    link->mRecvStream.Delete(gNetworkHeader.size(), 0);
+                    link->mRecvStream.Delete((unsigned int)gNetworkHeader.size(), 0);
                     link->mRecvStream.SetReadPos(0);
 
                     Header header;
@@ -446,7 +513,8 @@ void Communicator::DefaultDataLink::RecvThread(void *arg)
                         connection = link->mSubsystems.find(header.mSourceID.mSubsystem);
                         if(connection == link->mSubsystems.end())
                         {
-                            // Create a new connection.
+                            // Create a new connection, but only do so if within the same network that
+                            // I'm allowed to receive on.
                             link->mSubsystems[header.mSourceID.mSubsystem].InitializeSocket(source.c_str(), gNetworkPort);
 #ifdef _JAUS_DEBUG
                             cout << "Created Connection To " << header.mSourceID.ToString() << ", at: " << source << endl;
@@ -510,9 +578,6 @@ void Communicator::DefaultDataLink::RecvThread(void *arg)
 ////////////////////////////////////////////////////////////////////////////////////
 Communicator::Communicator() : mSelectedDataLink(0), mpNodeConnectionHandler(0)
 {
-    //mDataLinks[0] = new DefaultDataLink();
-    //mDataLinks[0]->mpCommunicator = this;
-    //mDataLinks[0]->SetState(DataLink::On);
 }
 
 
@@ -964,18 +1029,21 @@ int Communicator::ProcessQueryMessage(const Message* msg)
             if(query)
             {
                 Jaus::ReportConfiguration report;
-                report.SetDestinationID(query->GetSourceID());
-                report.SetSourceID(GetID());
-                mConfigurationMutex.Enter();
-                if(query->GetQueryField() == Jaus::QueryConfiguration::Node)
+                Jaus::QueryConfiguration queryNode;
+                Jaus::Receipt receipt;
+
+                queryNode = *query;
+                queryNode.SetSourceID(GetID());
+                queryNode.SetDestinationID(Address(GetID().mSubsystem, GetID().mNode, 1, 1));
+                
+                if(Send(&queryNode, receipt))
                 {
-                    report.SetConfiguration(GetID().mSubsystem, mSubsystemConfiguration.mNodes[GetID().mNode]);
+                    report = *(Jaus::ReportConfiguration*)receipt.GetResponseMessage();
+                    report.SetDestinationID(query->GetSourceID());
+                    report.SetSourceID(GetID());
+                    Send(&report);
                 }
-                else if(query->GetQueryField() == Jaus::QueryConfiguration::Subsystem)
-                {
-                    report.SetConfiguration(mSubsystemConfiguration);
-                }
-                mConfigurationMutex.Leave();
+
                 Send(&report);
             }
         }
@@ -1154,53 +1222,6 @@ std::vector<Byte> Communicator::GetDataLinkList() const
 
 }
 
-
-////////////////////////////////////////////////////////////////////////////////////
-///
-///   \brief Gets subsystem configuration data.
-///
-///   \return Returns known subsystem configuration data.
-///
-////////////////////////////////////////////////////////////////////////////////////
-Configuration::Subsystem Communicator::GetSubsystemConfiguration() const
-{
-    Configuration::Subsystem config;
-    mConfigurationMutex.Enter();
-    config = mSubsystemConfiguration;
-    mConfigurationMutex.Leave();
-    return config;
-}
-
-
-////////////////////////////////////////////////////////////////////////////////////
-///
-///   \brief Sets subsystem configuration data.
-///
-///   If the communicator is initialized, the configuration data passed is not
-///   for the communicators subsystem, this method will return failure.
-///
-///   \param config Configuration of the Communicators subsystem.
-///
-///   \return Returns JAUS_OK on succes, otherwise JAUS_FAILURE.
-///
-////////////////////////////////////////////////////////////////////////////////////
-int Communicator::SetSubsystemConfiguration(const Configuration::Subsystem& config)
-{
-    if(IsInitialized() &&
-        config.mSubsystemID != GetID().mSubsystem)
-    {
-        return JAUS_FAILURE;
-    }
-
-    mConfigurationMutex.Enter();
-    mSubsystemConfiguration = config;
-    if(IsInitialized())
-    {
-        mSubsystemConfiguration.AddComponent(GetID());
-    }
-    mConfigurationMutex.Leave();
-    return  OK;
-}
 
 ////////////////////////////////////////////////////////////////////////////////////
 ///

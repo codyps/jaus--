@@ -131,8 +131,8 @@ int Jaus::PPM::DecompressImage(const unsigned char* ppm,
                     *image = new unsigned char[size];
                 }
             }
-            *width = ppmWidth;
-            *height = ppmHeight;
+            *width = (unsigned short)ppmWidth;
+            *height = (unsigned short)ppmHeight;
             *channels = ppmChannels;
             memcpy(*image, &ppm[ppmSize - size], ppmSize - size);
             return 1;

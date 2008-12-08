@@ -39,6 +39,7 @@
 ///
 ////////////////////////////////////////////////////////////////////////////////////
 #include "wxnodemanager/nodemanagerframe.h"
+#include "jaus/components/node/nodeconnectionhandler.h"
 #include <string>
 #include <wx/image.h>
 #include <wx/aboutdlg.h>
@@ -320,7 +321,7 @@ void NodeManagerFrame::OnTimer(wxTimerEvent& event)
                 }
             }
 
-            addressSet = mpNode->GetConnectionHandler()->GetNodeConnections();
+            addressSet = ((Jaus::NodeConnectionHandler*)(mpNode->GetConnectionHandler()))->GetNodeConnections();
             for( setID = addressSet.begin(); setID != addressSet.end(); setID++)
             {
                 mpNodesTreeCtrl->AppendItem(nodeListID, wxString(setID->ToString().c_str(), wxConvUTF8), 1, 1);

@@ -65,7 +65,7 @@ int main(int argc, char *argv[])
 
     // Save the image in different formats.
     frame.SaveFrame("images/calculon_copy.jpg");
-    frame.SaveFrame("images/calculon_copy.png");
+    //frame.SaveFrame("images/calculon_copy.png");
     frame.SaveFrame("images/calculon_copy.ppm");
     grayscale = frame;
     grayscale.ConvertToGrayscale();
@@ -96,9 +96,12 @@ int main(int argc, char *argv[])
     // Pre-allocate some memory.
     compressedImage = new Byte[frame.DataSize()];
     compressedBufferSize = frame.DataSize();
-
-    
+   
     cout << "Checking compression performance, press Escape to skip..\n";
+   
+    // Intialize buffers.
+    frame.Compress(&compressedImage, compressedBufferSize, compressedSize, Image::JPEG);
+    
     double startTimeMs = CxUtils::Timer::GetTimeMs(), endTimeMs = 0;
     unsigned int count = 0;
     for(unsigned int i = 0; i < 500; i++)
@@ -111,6 +114,44 @@ int main(int argc, char *argv[])
         frame.Compress(&compressedImage, compressedBufferSize, compressedSize, Image::JPEG);
         count++;
         if(i%100 == 0)
+        {
+            cout << "FPS = " << count*1000.0/(CxUtils::Timer::GetTimeMs() - startTimeMs) << endl;
+        }
+    }
+    endTimeMs = CxUtils::Timer::GetTimeMs();
+
+    cout << "FPS = " << count*1000.0/(endTimeMs - startTimeMs) << endl;
+
+    cout << "Checking compression performance with Compressor, press Escape to skip..\n";
+    
+    JPEG::Compressor compressor;
+
+    // Initialize buffers.
+    compressor.CompressImage(frame.Width(),
+                                 frame.Height(),
+                                 frame.Channels(),
+                                 frame.ImageData(),
+                                 &compressedImage,
+                                 &compressedBufferSize,
+                                 &compressedSize);
+
+    startTimeMs = CxUtils::Timer::GetTimeMs();
+    count = 0;
+    for(unsigned int j = 0; j < 500; j++)
+    {
+        if(CxUtils::GetChar() == 27)
+        {
+            break;
+        }
+        compressor.CompressImage(frame.Width(),
+                                 frame.Height(),
+                                 frame.Channels(),
+                                 frame.ImageData(),
+                                 &compressedImage,
+                                 &compressedBufferSize,
+                                 &compressedSize);
+        count++;
+        if(j%100 == 0)
         {
             cout << "FPS = " << count*1000.0/(CxUtils::Timer::GetTimeMs() - startTimeMs) << endl;
         }
@@ -140,7 +181,7 @@ int main(int argc, char *argv[])
     endTimeMs = CxUtils::Timer::GetTimeMs();
 
     cout << "FPS = " << count*1000.0/(endTimeMs - startTimeMs) << endl;
-   
+ 
 
     if(compressedImage)
     {

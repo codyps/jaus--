@@ -597,6 +597,38 @@ bool Configuration::Subsystem::HaveComponent(const Address& id) const
 
 ////////////////////////////////////////////////////////////////////////////////////
 ///
+///   \brief Use this method to see if there are any components of a specific
+///          type on a node.
+///
+///   \param nodeID The node to look on.
+///   \param type The type of component to look for.
+///
+///   \return True if a component of a type exists on the node, otherwise false.
+///
+////////////////////////////////////////////////////////////////////////////////////
+bool Configuration::Subsystem::HaveComponentOfType(const Byte nodeID, const UShort type)
+{
+    Node::Map::const_iterator node;
+    node = mNodes.find(nodeID);
+    if(node != mNodes.end())
+    {
+        Component::Set::const_iterator component;
+        for(component = node->second.mComponents.begin();
+            component != node->second.mComponents.end();
+            component++)
+        {
+            if((*component).mID == (Byte)(type))
+            {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////
+///
 ///   \brief Gets a pointer to a component on the subsystem.
 ///
 ///   \param id The component ID to get a pointer to.
@@ -760,6 +792,7 @@ void Configuration::AddComponent(const Address& id)
 
     if( ss == mSubsystems.end() )
     {
+        mSubsystems[id.mSubsystem] = id.mSubsystem;
         mSubsystems[id.mSubsystem].AddComponent(id);  
     }
     else

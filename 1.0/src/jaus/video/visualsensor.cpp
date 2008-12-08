@@ -40,6 +40,7 @@
 ///
 ////////////////////////////////////////////////////////////////////////////////////
 #include "jaus/video/visualsensor.h"
+#include "jaus/video/jpeg/jpeg.h"
 #include "jaus/messages/command/commandmessages.h"
 #include "jaus/messages/query/querymessages.h"
 #include "jaus/messages/inform/informmessages.h"
@@ -58,12 +59,16 @@ VisualSensor::VisualSensor()
     mCompressedBufferSize = 0;
     mCompressedSize = 0;
     mFrameNumber = 0;
-    mFrameRate = 0;
+    mFrameRate = 15;
     mImageFormat = Image::JPEG;
     mSequenceNumber = 0;
     mCompressionNumber = 0;
     mCameraID = 1;
+    this->SetHighPerformanceTimerThreshold(50);
+    mEnableSharedImageFlag = false;
+    mJPEGQuality = -1;
 }
+
 
 ////////////////////////////////////////////////////////////////////////////////////
 ///
@@ -155,7 +160,6 @@ int VisualSensor::Shutdown()
     mCompressedBufferSize = 0;
     mCompressedSize = 0;
     mFrameNumber = 0;
-    mFrameRate = 0;
     mImageFormat = Image::JPEG;
     mSequenceNumber = 0;
     mCompressionNumber = 0;
@@ -272,20 +276,21 @@ int VisualSensor::SetCurrentFrame(const Byte * frame,
     int result = JAUS_FAILURE;
     
     mImageMutex.Enter();
-
     // Copy the raw image data and perform any needed scaling.
     result = mRawImage.Create(width, height, channels, frame, maxWidth, maxHeight, vflip);
     // Increase the frame count.
     mFrameNumber++;
-    // Copy the raw image data to the shared image buffer.
-    if(mSharedImage.SetFrame(mRawImage) == JAUS_FAILURE)
+    if(mEnableSharedImageFlag)
     {
-        mSharedImage.CloseSharedImage();
-        CxUtils::SleepMs(500); // Wait for subscribers to exit.
-        mSharedImage.CreateSharedImage(GetID(), mRawImage.DataSize()*2);
-        mSharedImage.SetFrame(mRawImage);
+        // Copy the raw image data to the shared image buffer.
+        if(mSharedImage.SetFrame(mRawImage) == JAUS_FAILURE)
+        {
+            mSharedImage.CloseSharedImage();
+            CxUtils::SleepMs(500); // Wait for subscribers to exit.
+            mSharedImage.CreateSharedImage(GetID(), mRawImage.DataSize()*2);
+            mSharedImage.SetFrame(mRawImage);
+        }
     }
-
     mImageMutex.Leave();
 
     // If we have data, generate events.
@@ -316,6 +321,75 @@ int VisualSensor::SetCurrentFrame(const Byte * frame,
     return result;
 }
 
+
+
+////////////////////////////////////////////////////////////////////////////////////
+///
+///   \brief If image data is already compressed, use this method to set
+///   image data.  Compression format must match that format current
+///   set for sensor (GetImageFormat()).
+///
+///   \param[in] image Compressed image data.
+///   \param[in] size Size of image buffer in bytes.
+///   \param[in] format Image format.
+///   \param[in] decompress If true, image is decompressed to save
+///                         a raw copy internally.
+///
+///   \return JAUS_OK if set, otherwise JAUS_FAILURE.
+///
+////////////////////////////////////////////////////////////////////////////////////
+int VisualSensor::SetCurrentFrameCompressed(const Byte* image,
+                                            const unsigned int size,
+                                            const Image::Format format,
+                                            const bool decompress)
+{
+    if(format == mImageFormat)
+    {
+        mImageMutex.Enter();
+        if(mCompressedBufferSize < size + 256)
+        {
+            delete[] mpCompressedImage;
+            mpCompressedImage = new Byte[size + 256];
+            mCompressedBufferSize = size + 256;
+        }
+        memcpy(mpCompressedImage, image, size);
+        mCompressedSize = size;
+        mFrameNumber++;
+        mCompressionNumber = mFrameNumber;
+        if(decompress || mEnableSharedImageFlag)
+        {
+            if(mRawImage.Decompress(image, size, format))
+            {
+                mSharedImage.SetFrame(mRawImage);
+            }
+        }
+        mImageMutex.Leave();
+
+        // Generate events if needed.
+        Event::Set myEvents;
+        Event::Set::iterator e;
+
+        mEventManager.Lock();
+        
+        myEvents = mEventManager.GetEventsOfType(JAUS_REPORT_IMAGE);
+        for(e = myEvents.begin();
+            e != myEvents.end();
+            e++)
+        {
+            if( (*e)->GetEventType() == Event::EveryChange)
+            {
+                GenerateEvent(*e);
+                (*e)->SetSequenceNumber( (*e)->GetSequenceNumber() + 1);
+                (*e)->SetTimeStampMs(Time::GetUtcTimeMs());
+            }
+        }
+
+        mEventManager.Unlock();
+
+        return OK;
+    }
+    return FAILURE;
+}
 
 
 ////////////////////////////////////////////////////////////////////////////////////
@@ -351,6 +425,8 @@ int VisualSensor::ProcessCommandMessage(const Message* message, const Byte comma
             break;
         case JAUS_SELECT_CAMERA:
             {
+                const SelectCamera* command = 
+                    dynamic_cast<const SelectCamera*>(message);
                 processed = JAUS_OK;
             }
             break;
@@ -496,13 +572,13 @@ int VisualSensor::ProcessQueryMessage(const Message* message)
 ///   In all other cases, it is up to this child class of InformComponent
 ///   to generate the events.
 ///
-///   \param command The Create Event request message.
-///   \param responseValue The response to the request. See 
+///   \param[in] command The Create Event request message.
+///   \param[out] responseValue The response to the request. See 
 ///          ConfirmEventRequest::ResponseValues for values. This value must
 ///          be set no matter what.
-///   \param confirmedRate The periodic rate that can be supported (if the
+///   \param[out] confirmedRate The periodic rate that can be supported (if the
 ///                        event is periodic).
-///   \param errorMessage If event not supported, the error message is copied
+///   \param[out] errorMessage If event not supported, the error message is copied
 ///                       to this variable.
 ///
 ///   \return JAUS_OK if the class supports the event (responeValue should be
@@ -516,12 +592,12 @@ int VisualSensor::ProcessEventRequest(const Jaus::CreateEventRequest& command,
                                       std::string& errorMessage) const
 {
     int result = JAUS_FAILURE;
-   
+    // Initialize the response value to something.
+        responseValue = RejectEventRequest::MessageNotSupported;
+    errorMessage = "Event Not Supported";
     // Currently only supports events for global pose.
     if(command.GetMessageCode() == JAUS_REPORT_IMAGE)
-    {
-        // Initialize the response value to something.
-        responseValue = RejectEventRequest::MessageNotSupported;
+    {        
         // This implementation of a Global Pose sensor only supports Periodic, EveryChange, or
         // OneTime events, so check for unsupported types.
         if(command.GetEventType() != CreateEventRequest::FirstChange &&
@@ -562,7 +638,11 @@ int VisualSensor::ProcessEventRequest(const Jaus::CreateEventRequest& command,
                             responseValue = RejectEventRequest::ConnectionRefused;
                             errorMessage = "Periodic Rate Not Supported";
                         }
-                    }                    
+                    }  
+                    else
+                    {
+                        confirmedRate = mFrameRate;
+                    }
                 }
             }
         }
@@ -669,7 +749,22 @@ int VisualSensor::GenerateEvent(const Event* eventInfo)
                 mCompressedSize = 0;
             }
             // Now compress the image data.
-            mRawImage.Compress(&mpCompressedImage, mCompressedBufferSize, mCompressedSize, mImageFormat);
+            if(mImageFormat == Image::JPEG)
+            {
+
+                mJPEGCompressor.CompressImage(mRawImage.Width(),
+                                          mRawImage.Height(),
+                                          mRawImage.Channels(),
+                                          mRawImage.ImageData(),
+                                          &mpCompressedImage,
+                                          &mCompressedBufferSize,
+                                          &mCompressedSize,
+                                          mJPEGQuality);
+            }
+            else
+            {
+                mRawImage.Compress(&mpCompressedImage, mCompressedBufferSize, mCompressedSize, mImageFormat);
+            }
             mCompressionNumber = (UShort)mFrameNumber;
         }
 
@@ -677,6 +772,9 @@ int VisualSensor::GenerateEvent(const Event* eventInfo)
         {
             report.SetImageData(mpCompressedImage, mCompressedSize, true);
         }
+        /*report.SetDestinationID(Address(100, 001, 040, 001));
+        report.SetSourceID(GetID());
+        Send(&report);*/
         mImageMutex.Leave();
        
         // Send event message to everyone.
@@ -840,6 +938,23 @@ int VisualSensor::SetCameraID(const Byte id)
         return JAUS_OK;
     }
     return JAUS_FAILURE;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////
+///
+///   \brief Sets the JPEG quality.
+///
+///   \param[in] quality Quality level of JPEG compression [-1 is do not use, 
+///              otherwise 0-100].
+///
+////////////////////////////////////////////////////////////////////////////////////
+void VisualSensor::SetJPEGQuality(const int quality)
+{
+    if(quality >= -1 && quality <= 100)
+    {
+        mJPEGQuality = quality;
+    }
 }
 
 /*  End of File */

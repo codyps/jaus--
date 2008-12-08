@@ -46,6 +46,8 @@
 #include "jaus/messages/inform/communications/reportheartbeatpulse.h"
 #include "jaus/messages/common/configuration/service.h"
 #include "jaus/components/node/serviceconnectionmanager.h"
+#include "jaus/components/node/nodemanager.h"
+#include "jaus/components/transport/net.h"
 #include <iostream>
 
 using namespace std;
@@ -57,8 +59,9 @@ using namespace Jaus;
 ///   \brief Constructor, initializes default values.
 ///
 ////////////////////////////////////////////////////////////////////////////////////
-NodeConnectionHandler::NodeConnectionHandler()
+NodeConnectionHandler::NodeConnectionHandler(NodeManager* nodeManager)
 {
+    mpNodeManager = nodeManager;
     mTCPFlag = false;
     mSubsystemDiscoverFlag = true;
     mAddressConflictFlag = false;
@@ -69,6 +72,7 @@ NodeConnectionHandler::NodeConnectionHandler()
     mMulticastAddress = "224.1.0.1";
     mMulticastTTL = 1;
     mBroadcastFlag = false;
+    mNetworkInterface = -1;
 }
 
 
@@ -97,9 +101,6 @@ NodeConnectionHandler::~NodeConnectionHandler()
 ///   \param tcp If true, TCP communication is used for communication between
 ///              nodes.  If false, then UDP is used for communication between
 ///              nodes.  (UDP is still used for dynamic discovery of nodes).
-///   \param netAddress The IP address to receive on.  If -1 any is used the first
-///                     available is used.  The value can be an IP address, or
-///                     the network device numer to use.
 ///   \param inboxSize Size of the shared memory buffer for components to use
 ///                    for routing messages through the node manager.  This
 ///                    size should be varied based on the number of components,
@@ -114,7 +115,6 @@ int NodeConnectionHandler::Initialize(const Byte sid,
                                       const Byte nid,
                                       Jaus::MessageHandler* msgHandler,
                                       const bool tcp,
-                                      const std::string& netAddress,
                                       const unsigned int inboxSize)
 {
     int result = JAUS_FAILURE;
@@ -147,6 +147,10 @@ int NodeConnectionHandler::Initialize(const Byte sid,
             #ifdef JAUS_DEBUG
             cout << "Initializing UDP Server...";
             #endif
+            mUdpInput.SetNetworkInterface(mNetworkInterface);
+            mTcpInput.SetNetworkInterface(mNetworkInterface);
+            mMulticastUDP.SetNetworkInterface(mNetworkInterface);
+            mBroadcastUDP.SetNetworkInterface(mNetworkInterface);
             if(mUdpInput.Initialize(this, mMulticastAddress) || CxUtils::Socket::GetNumInterfaces() == 0)
             {
                 #ifdef JAUS_DEBUG
@@ -697,6 +701,10 @@ int NodeConnectionHandler::CreateConnection(const Address& id,
         if(node == mNodes.end())
         {
             NodeConnection* connection = new NodeConnection();
+            
+            // Set possible network interface.
+            connection->mNetworkInterface = mNetworkInterface;
+
             if(connection->CreateConnection(nodeID, this, host, mTCPFlag))
             {
                 // Mark that whether or not we discovered this
@@ -931,6 +939,65 @@ int NodeConnectionHandler::SetMulticastAddress(const std::string& multicast,
 
 ////////////////////////////////////////////////////////////////////////////////////
 ///
+///   \brief Sets the network interface to use for receiving UDP message traffic.
+///
+///   \param num The network interface number to use for receiving UDP traffic.
+///              A value of -1 means any interface, 0 the first, 1 the second, etc.
+///
+///   \return True on success, otherwise false.
+///
+////////////////////////////////////////////////////////////////////////////////////
+bool NodeConnectionHandler::SetNetworkInterface(const int num)
+{
+    mNetworkInterface = num;
+    mUdpInput.SetNetworkInterface(num);
+    if(mUdpInput.IsActive())
+    {
+        mUdpInput.Shutdown();
+        mUdpInput.Initialize(this, mMulticastAddress);
+    }
+    mTcpInput.SetNetworkInterface(num);
+    if(mTCPFlag && mTcpInput.IsActive())
+    {
+        mTcpInput.Shutdown();
+        mTcpInput.Initialize(this);
+    }
+    return true;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////
+///
+///   \brief Sets the network interface to use for receiving UDP message traffic.
+///
+///   This method looks up the network interface number to use, then sets it.
+///
+///   \param address The IP address of the network interface to use for receving
+///                  network traffic. 
+///
+///   \return True on success, otherwise false.
+///
+////////////////////////////////////////////////////////////////////////////////////
+bool NodeConnectionHandler::SetNetworkInterface(const std::string& address)
+{
+
+    std::vector<std::string> hostnames;
+    CxUtils::Socket::GetLocalhostNames(hostnames);
+    for(size_t i = 0; i < hostnames.size(); i++)
+    {
+        if(hostnames[i] == address)
+        {
+            mNetworkInterface = (int)(i);
+            return SetNetworkInterface(mNetworkInterface);
+        }
+    }
+    
+    return false;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////
+///
 ///   \brief Checks if a connection is available.
 ///
 ///   \param id ID of connection to check for.
@@ -1071,6 +1138,247 @@ Address::Set NodeConnectionHandler::GetComponentConnections() const
 
 ////////////////////////////////////////////////////////////////////////////////////
 ///
+///  \brief Method which sends a message to components on this node.
+///  This method will send to a specific component or broadcast to multiple.
+///
+///  This method is not thread safe.
+///
+///  \param[in] msg The JAUS message being sent to components.
+///  \param[in] header The header for the JAUS message.
+///
+///  \return JAUS_OK on success, otherwise JAUS_FAILURE.
+///
+////////////////////////////////////////////////////////////////////////////////////
+int NodeConnectionHandler::SendToComponents(const Stream& msg, const Header& header)
+{
+    int result = FAILURE;
+    ComponentsMap::iterator component;
+    
+    // Only bother if the destination is to a component on this
+    // node.
+    if( (header.mDestinationID.mSubsystem == 255 || header.mDestinationID.mSubsystem == mComponentID.mSubsystem) &&
+        (header.mDestinationID.mNode == 255 || header.mDestinationID.mNode == mComponentID.mNode) )
+    {
+        if(header.mDestinationID.IsBroadcast())
+        {
+            result = OK;
+            // Broadcast to components.
+            for(component = mComponents.begin();
+                component != mComponents.end();
+                component++)
+            {
+                // If destination matches, enqueue into components
+                // shared memory inbox.  However, don't send back
+                // to the component that created the message.
+                if(Address::DestinationMatch(header.mDestinationID, component->first) &&
+                    component->first != header.mSourceID)
+                {
+                    result &= component->second->EnqueueMessage(msg);
+                }
+            }
+        }
+        else
+        {
+            // Send to specific component.
+            component = mComponents.find(header.mDestinationID);
+            if(component != mComponents.end())
+            {
+                result = component->second->EnqueueMessage(msg);
+            }
+            // Maybe we haven't discovered the
+            // component on this node yet, if this is
+            // the case, then try create a connection on the fly.
+            else
+            {
+                JSharedMemory *connection = new JSharedMemory();
+                if(connection->OpenInbox(header.mDestinationID))
+                {
+                    // Signal that a new connection has been made.
+                    mDiscoveryMutex.Enter();
+                    mDiscoveredComponents.insert(header.mDestinationID);
+                    mDiscoveryMutex.Leave();
+
+                    connection->EnableLargeDataSets(true);
+                    mComponents[header.mDestinationID] = connection;
+                    connection = NULL;
+                    component = mComponents.find(header.mDestinationID);
+                    if(component != mComponents.end())
+                    {
+                        result = component->second->EnqueueMessage(msg);
+                    }
+                }
+                if(connection) { delete connection; }
+            }
+        }
+    }
+    return result;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////
+///
+///  \brief Method which sends a message to other nodes within the same 
+///         subsystem as the node manager.  This will not send the message
+///         to other subsystems.  This method will send to a specific node
+///         or broadcast to multiple.
+///
+///  This method is not thread safe.
+///
+///  \param[in] msg The JAUS message being sent to components.
+///  \param[in] header The header for the JAUS message.
+///
+///  \return JAUS_OK on success, otherwise JAUS_FAILURE.
+///
+////////////////////////////////////////////////////////////////////////////////////
+int NodeConnectionHandler::SendToNodes(const Stream& msg, const Header& header)
+{
+    int result = FAILURE;
+    
+    if(header.mDestinationID.mSubsystem == 255 || header.mDestinationID.mSubsystem == mComponentID.mSubsystem)
+    {
+        NodesMap::iterator node;
+        if(header.mDestinationID.IsBroadcast())
+        {
+            // Only send a broadcast message to other nodes if the message
+            // originated from this node or another subsystem.
+            if((header.mSourceID.mSubsystem == mComponentID.mSubsystem && header.mDestinationID.mNode == mComponentID.mNode) ||
+                header.mSourceID.mSubsystem != mComponentID.mSubsystem)
+            {
+                result = OK;
+                // If from a different subsystem.
+                if(header.mSourceID.mSubsystem != mComponentID.mSubsystem)
+                {
+                    Configuration::Subsystem subsystemConfig = mpNodeManager->GetSubsystemConfiguration();
+                    for(node = mNodes.begin();
+                        node != mNodes.end();
+                        node++)
+                    {
+                        // If destination matches, enqueue into nodes
+                        // shared memory inbox.  However, don't send back
+                        // to the node that created the message.
+                        if(Address::DestinationMatch(header.mDestinationID, node->first) &&
+                            node->first != header.mSourceID)
+                        {
+                            // If the message came from another subsystem, check to
+                            // see if the node has a communicator on it, and if so do
+                            // not send the message to it, because its communicator
+                            // should have already received the message.
+                            if(subsystemConfig.HaveComponentOfType(node->first.mNode, Service::Communicator) == false)
+                            {
+                                result &= node->second->SendStream(msg);
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    for(node = mNodes.begin();
+                        node != mNodes.end();
+                        node++)
+                    {
+                        // If destination matches, enqueue into nodes
+                        // shared memory inbox.  However, don't send back
+                        // to the node that created the message.
+                        if(Address::DestinationMatch(header.mDestinationID, node->first) &&
+                            node->first != header.mSourceID)
+                        {
+                            result &= node->second->SendStream(msg);
+                        }
+                    }
+                }
+            }
+        }
+        else
+        {
+            // Send to specific node.
+            node = mNodes.find(Address(header.mDestinationID.mSubsystem, header.mDestinationID.mNode, 1, 1));
+            if(node != mNodes.end())
+            {
+                result = node->second->SendStream(msg);
+            }
+        }
+    }
+
+    return result;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////
+///
+///  \brief Method which uses the communicator to send a message to other
+///  subsystems or finds a node within this subsystem that has a communicator
+///  and sends the message to it for routing.
+///
+///  This method will only use the communicator if the message being sent
+///  originated from this node, or a node that does not have a
+///  communicator on it.
+///
+///  This method is thread safe.
+///
+///  \param[in] msg The JAUS message being sent to components.
+///  \param[in] header The header for the JAUS message.
+///
+///  \return JAUS_OK on success, otherwise JAUS_FAILURE.
+///
+////////////////////////////////////////////////////////////////////////////////////
+int NodeConnectionHandler::SendToSubsystems(const Stream& msg, const Header& header)
+{
+    int result = FAILURE;
+    
+    // Only send if going to other subsystems and the message originates
+    // from within this subsystem.
+    if(header.mDestinationID.mSubsystem == 255 || header.mDestinationID.mSubsystem != mComponentID.mSubsystem &&
+        header.mSourceID.mSubsystem == mComponentID.mSubsystem)
+    {
+        if(mCommunicator.IsInitialized() && mCommunicator.IsConnected())
+        {
+            result = mCommunicator.Transmit(msg);
+        }
+        else
+        {
+            // Find a node within this subsystem that has a Communicator and send to it.
+            Configuration::Subsystem subsystemConfig = mpNodeManager->GetSubsystemConfiguration();
+            Address::List communicators = subsystemConfig.GetComponentsOfType(Service::Communicator);
+            NodesMap::iterator node;
+            for(unsigned int i = 0; i < (unsigned int)(communicators.size()); i++)
+            {
+                node = mNodes.find(Address(mComponentID.mSubsystem, communicators[i].mNode, 1, 1));
+                if(node != mNodes.end())
+                {
+                    node->second->SendStream(msg);
+                    result = OK;
+                    break;
+                }
+            }
+        }
+    }
+
+    return result;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////
+///
+///  \brief Checks to see if a node within this subsystem has a communicator.
+///
+///  \param nodeID The ID of the node to check for communicator.
+///
+///  \return True on success, otherwise false.
+///
+////////////////////////////////////////////////////////////////////////////////////
+bool NodeConnectionHandler::HasCommunicator(const Byte nodeID) const
+{
+    bool result = false;
+    if(mpNodeManager)
+    {
+        result = mpNodeManager->GetSubsystemConfiguration().HaveComponentOfType(nodeID, Service::Communicator);
+    }
+    return result;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////
+///
 ///  \brief Sends the message data to the appropriate destination.  <b>Warning: this
 ///         method is NOT thread safe.</b>
 ///
@@ -1091,6 +1399,313 @@ Address::Set NodeConnectionHandler::GetComponentConnections() const
 ///
 ////////////////////////////////////////////////////////////////////////////////////
 int NodeConnectionHandler::SendStream(const Stream& msg)
+{
+    int result = JAUS_FAILURE;
+    Header header;
+
+    LargeDataSet *mpstream = NULL;  // Multi-packet stream data.
+
+    if(msg.Read(header, 0) == JAUS_FAILURE)
+    {
+        SetJausError(ErrorCodes::BadPacket);
+        return JAUS_FAILURE;
+    }
+
+    // Check to see if this message needs to be split
+    // into a large data set.
+    if(msg.Length() > JAUS_MAX_PACKET_SIZE + (unsigned int)(gNetworkHeader.size()))
+    {
+        // If going to a component on this node, then copy
+        // right to shared memory.
+        if(header.mDestinationID.mSubsystem == mComponentID.mSubsystem &&
+            header.mDestinationID.mNode == mComponentID.mNode)
+        {
+            ComponentsMap::iterator component;
+            component = mComponents.find(header.mDestinationID);
+            if(component != mComponents.end())
+            {
+                result = component->second->EnqueueMessage(msg) > 0 ? JAUS_OK : JAUS_FAILURE;
+            }
+            // Maybe we haven't discovered the
+            // component on this node yet, if this is
+            // the case, then try create a connection on the fly.
+            else
+            {
+                JSharedMemory *connection = new JSharedMemory();
+                if(connection->OpenInbox(header.mDestinationID))
+                {
+                    // Signal that a new connection has been made.
+                    mDiscoveryMutex.Enter();
+                    mDiscoveredComponents.insert(header.mDestinationID);
+                    mDiscoveryMutex.Leave();
+                    
+                    connection->EnableLargeDataSets(true);
+                    mComponents[header.mDestinationID] = connection;
+                    connection = NULL;
+                    component = mComponents.find(header.mDestinationID);
+                    if(component != mComponents.end())
+                    {
+                        result = component->second->EnqueueMessage(msg) > 0 ? JAUS_OK : JAUS_FAILURE;
+                    }
+                }
+                if(connection) { delete connection; }
+            }
+        }
+        if(result == JAUS_FAILURE)
+        {
+            LargeDataSet dataSet;
+            const Stream::List* sequence;
+            Stream::List::const_iterator packet;
+            bool failure = false;
+            Receipt receipt;
+            dataSet.CreateLargeDataSet(msg, &header, (unsigned int)(gNetworkHeader.size()));
+
+            sequence = dataSet.GetDataSet();
+            for(packet = sequence->begin();
+                packet != sequence->end() && !failure;
+                packet++)
+            {
+                // If this message request ACK/NACK, then
+                // get a receipt.  However, use the ConnectionHandler
+                // version of Send because it doesn't use the same mutex
+                // the NodeConectionHandler::Send method uses.
+                if(header.mAckNack == Header::AckNack::Request && !header.mDestinationID.IsBroadcast())
+                {
+                    if(ConnectionHandler::Send(*packet,
+                                               receipt,
+                                               header.mCommandCode) == JAUS_FAILURE)
+                    {
+                        failure = true;
+                    }
+                }
+                else
+                {
+                    if(SendStream(*packet) == JAUS_FAILURE)
+                    {
+                        // If we are sending to a component
+                        // on this node, we may be sending it the
+                        // sequence to quickly, so wait a moment, then
+                        // try one more time.
+                        if(header.mDestinationID.mSubsystem == mComponentID.mSubsystem &&
+                           header.mDestinationID.mNode == mComponentID.mNode)
+                        {
+                            CxUtils::SleepMs(50);
+                            if(SendStream(*packet) == JAUS_FAILURE)
+                            {
+                                failure = true;
+                            }
+                        }
+                        else
+                        {
+                            failure = true;
+                        }
+                    }
+                }
+            }
+
+            if(!failure)
+            {
+                result = JAUS_OK;
+            }
+        }
+    }
+    // Perform normal send/routing operation for message.
+    else
+    {
+        result |= SendToComponents(msg, header);
+        result |= SendToNodes(msg, header);
+        result |= SendToSubsystems(msg, header);
+#if 0
+        // If broadcast, extra work must be done.
+        if(header.mDestinationID.IsBroadcast())
+        {
+            // Only broadcast messages that originate from this node to other nodes/subsystem.  Failure
+            // to check this will result in possible infinite loop/echoing back of
+            // broadcast messages.
+            if(header.mSourceID.mSubsystem != mComponentID.mSubsystem && header.mSourceID.mNode != mComponentID.mNode)
+            {
+                if(header.mDestinationID.mSubsystem == 255)
+                {
+                    mCommunicator.Transmit(msg);
+                }
+
+                // Send to nodes on this subsystem.
+                NodesMap::iterator node;
+                for(node = mNodes.begin();
+                    node != mNodes.end();
+                    node++)
+                {
+                    if( (header.mDestinationID.mSubsystem == mComponentID.mSubsystem || header.mDestinationID.mSubsystem == 255) &&
+                        (header.mDestinationID.mNode == 255 || header.mDestinationID.mNode != node->first.mNode) )
+                    {
+                        node->second->SendStream(msg);
+                    }
+                }
+            }
+
+            // Send to components on this node if necessary
+            ComponentsMap::iterator component;
+            for(component = mComponents.begin();
+                component != mComponents.end();
+                component++)
+            {
+                // If destination matches, and the component is not
+                // the one who send the message, send to component.
+                if(Address::DestinationMatch(header.mDestinationID, component->first) &&
+                    component->first != header.mSourceID)
+                {
+                    result = component->second->EnqueueMessage(msg);
+                } // If the component is a matching destination.
+            } // Check each component connection on this node to see if we must send to it.
+        }
+        // Non-broadcast message, and not destined for
+        // the node manager specifically
+        else if(header.mDestinationID != mComponentID)
+        {
+            // If the destination is not on this node, then check to
+            // see if we have a direct connection to it, or use the
+            // Communicator if needed.
+            if(header.mDestinationID.mSubsystem != mComponentID.mSubsystem ||
+                header.mDestinationID.mNode != mComponentID.mNode)
+            {
+                // First see if we have a direct connection
+                // to the node, even if it is on another subsystem
+                // and send directly to it using unicast.
+                NodesMap::iterator node;
+                node = mNodes.find(Address(header.mDestinationID.mSubsystem,
+                                           header.mDestinationID.mNode,
+                                           1,
+                                           1));
+                if(node != mNodes.end()) // Have direct connection.
+                {
+                    result = node->second->SendStream(msg);
+                }
+                else
+                {
+                    // If on a different subsystem use the communicator,
+                    // otherwise send using multicast or broadcast if we don't have
+                    // a direct connection to the node.
+                    if(header.mDestinationID.mSubsystem != mComponentID.mSubsystem)
+                    {
+                        if(mCommunicator.Transmit(msg))
+                        {
+                            result = JAUS_OK;
+                        }
+                    }
+                }
+            }
+            // Send to component on this node.
+            else
+            {
+                ComponentsMap::iterator component;
+                component = mComponents.find(header.mDestinationID);
+                if(component != mComponents.end())
+                {
+                    result = component->second->EnqueueMessage(msg) > 0 ? JAUS_OK : JAUS_FAILURE;
+                }
+                // Maybe we haven't discovered the
+                // component on this node yet, if this is
+                // the case, then try create a connection on the fly.
+                else
+                {
+                    JSharedMemory *connection = new JSharedMemory();
+                    if(connection->OpenInbox(header.mDestinationID))
+                    {
+                        // Signal that a new connection has been made.
+                        mDiscoveryMutex.Enter();
+                        mDiscoveredComponents.insert(header.mDestinationID);
+                        mDiscoveryMutex.Leave();
+
+                        connection->EnableLargeDataSets(true);
+                        mComponents[header.mDestinationID] = connection;
+                        connection = NULL;
+                        component = mComponents.find(header.mDestinationID);
+                        if(component != mComponents.end())
+                        {
+                            result = component->second->EnqueueMessage(msg) > 0 ? JAUS_OK : JAUS_FAILURE;
+                        }
+                    }
+                    if(connection) { delete connection; }
+                }
+            }
+        }
+#endif
+    }
+
+    // Send NACK if needed.  This will tell the
+    // sending component that the destination is not on
+    // this node.
+    if( result == JAUS_FAILURE &&
+        header.mSourceID.mSubsystem == mComponentID.mSubsystem &&
+        header.mSourceID.mNode == mComponentID.mNode &&
+        header.mAckNack == Header::AckNack::Request &&
+        header.mDestinationID.IsBroadcast() == false )
+    {
+        Header nack;
+        Stream nackPacket;
+        nack = header;
+        nack.mDataSize = 0;
+        nack.mDataFlag = Header::DataControl::Single;
+        nack.mAckNack = Header::AckNack::Nack;
+        nack.SwapSourceAndDestination();
+        nackPacket.Write(nack);
+        SendStream(nackPacket);
+    }
+    // If sent to a component on this node, and
+    // Ack/Nack was requested, and the message was
+    // part of a multi-packet stream sequence send
+    // ACK response.  We must do this for components since
+    // the Node Manager's Shared Memory interface assembles
+    // multi-packet streams for the components automatically,
+    // and when they are merged, ACK/NACK is disabled.
+    if( result == JAUS_OK &&
+        header.mDataFlag != Header::DataControl::Single &&
+        header.mAckNack == Header::AckNack::Request &&
+        header.mDestinationID.mSubsystem == mComponentID.mSubsystem &&
+        header.mDestinationID.mNode == mComponentID.mNode)
+    {
+        Header ack;
+        Stream ackPacket;
+        ack = header;
+        ack.mDataSize = 0;
+        ack.mDataFlag = Header::DataControl::Single;
+        ack.mAckNack = Header::AckNack::Ack;
+        ack.SwapSourceAndDestination();
+        ackPacket.Write(ack);
+        SendStream(ackPacket);
+    }
+
+    if(mLogger.IsLogOpen())
+    {
+        if(result == JAUS_OK)
+        {
+            // Update Log File
+            mLogger.WriteSentDataToLog(msg, header, true);
+        }
+        else
+        {
+            // Update Log File
+            if(header.mDestinationID == mComponentID ||
+                Address::DestinationMatch(header.mDestinationID, mComponentID))
+            {
+                mLogger.WriteSentDataToLog(msg, header, true);
+            }
+            else
+            {
+                mLogger.WriteSentDataToLog(msg, header, false);
+            }
+        }
+    }
+
+    // Delete allocated memory if needed.
+    if(mpstream)
+    {
+        delete mpstream;
+    }
+
+    return result;
+}
+#if 0
 {
     int result = JAUS_FAILURE;
     Header header;
@@ -1207,31 +1822,106 @@ int NodeConnectionHandler::SendStream(const Stream& msg)
         // If broadcast, extra work must be done.
         if(header.mDestinationID.IsBroadcast())
         {
-            // Only broadcast messages that originate from this node to other nodes/subsystem.  Failure
-            // to check this will result in possible infinite loop/echoing back of
-            // broadcast messages.
-            if(header.mSourceID.mSubsystem != mComponentID.mSubsystem && header.mSourceID.mNode != mComponentID.mNode)
+#if 0
+            bool sendToSubsystems = true;
+            Address::Set nodesThatReceivedMessage;
+
+            // 1.  Establish if we need to try and transmit this message
+            //     to other subsystems.
+
+            // If destination subsystem is the same as the node, then
+            // we don't need to send to other subsystems.
+            if(header.mDestinationID.mSubsystem == mComponentID.mSubsystem)
             {
-                if(header.mDestinationID.mSubsystem == 255)
+                sendToSubsystems = false;
+            }
+            // If the message originated from another node on this subsystem, and needs to go to
+            // other subsystems, check to see if that node has a communicator, and if
+            // it does, do not send to other subsystems because its' communicator should have
+            else if(header.mSourceID.mSubsystem == mComponentID.mSubsystem && header.mSourceID.mNode != mComponentID.mNode)
+            {
+                Configuration::Subsystem subsystemConfig = mpNodeManager->GetSubsystemConfiguration();
+                if(subsystemConfig.HaveComponent(Address(header.mSourceID.mSubsystem, 
+                                                         header.mSourceID.mNode,
+                                                         (Byte)(Service::Communicator),
+                                                         1)))
+                {
+                    sendToSubsystem = false; // The originating node has a communicator, we will try send for it.
+                }
+                else
+                {
+                    sendToSubsystem = true;  // The originating node doesn't have a communicator.
+                }
+            }
+            // Message originated from this node and needs
+            // to go to other subsystems
+            else if(header.mSourceID.mSubsystem == mComponentID.mSubsystem && header.mNode == mComponentID.mNode)
+            {
+                sendToSubsystems = true;
+            }
+
+            // 2. If we have decided to transmit this message to other 
+            //    subsystems, go for it.
+
+            if(sendToSubsystems)
+            {
+                // If I have a working Communicator, use it to
+                // transmit to other subsystems.
+                if(mCommunicator.IsInitialized())
                 {
                     mCommunicator.Transmit(msg);
                 }
+                else
+                {
+                    // If I don't have an initialized/working Communicator
+                    // on this node, then I need to find another node
+                    // that has a Communicator so it can send the message
+                    // to other subsystems for me.
+                    Configuration::Subsystem subsystemConfig = mpNodeManager->GetSubsystemConfiguration();
+                    Address::List communicators = subsystemConfig.GetComponentsOfType(Service::Communicator);
 
+                    // Look up a connection to a node that has
+                    // a communicator on it, and send the data 
+                    // to it.
+                    Address::List::iterator communicator;
+                    for(communicator = communicators.begin();
+                        communicator != communicators.end();
+                        communicator++)
+                    {
+                        
+                        NodesMap::iterator node;
+                        node = mNodes.find(communicator->mNode);
+                        if(node != mNodes.end())
+                        {
+                            node->second->SendStream(msg);
+                            nodesThatReceivedMessage.insert(node->first);
+                        }
+                    }
+                }
+            }
+
+            // 3.  Check to see if this message needs to be broadcast to
+            //     other nodes within this subsystem.  But only if the message
+            //     originates from this node.
+            if(header.mSourceID.mNode == mComponentID.mNode)
+            {
                 // Send to nodes on this subsystem.
                 NodesMap::iterator node;
                 for(node = mNodes.begin();
                     node != mNodes.end();
                     node++)
                 {
-                    if( (header.mDestinationID.mSubsystem == mComponentID.mSubsystem || header.mDestinationID.mSubsystem == 255) &&
-                        (header.mDestinationID.mNode == 255 || header.mDestinationID.mNode != node->first.mNode) )
+                    if( nodesThatReceivedMessage.find(node->first) == nodesThatReceivedMessage.end() &&                             // Have not already sent message to node
+                        (header.mDestinationID.mSubsystem == mComponentID.mSubsystem || header.mDestinationID.mSubsystem == 255) && // Check subsystem destination match.
+                        (header.mDestinationID.mNode == 255 || header.mDestinationID.mNode != node->first.mNode) &&                 // Check node destination match.
+                        header.mSourceID.mSubsystem != node->first.mSubsystem && header.mSourceID.mNode != node->first.mNode)       // Don't send back to originating node.
                     {
-                        node->second->SendStream(msg);
+                        node->second->SendStream(msg); // Send to node on this subsystem.
                     }
                 }
             }
 
-            // Send to components on this node if necessary
+            // 4.  Send to components on this node if necessary.
             ComponentsMap::iterator component;
             for(component = mComponents.begin();
                 component != mComponents.end();
@@ -1245,20 +1935,53 @@ int NodeConnectionHandler::SendStream(const Stream& msg)
                     result = component->second->EnqueueMessage(msg);
                 } // If the component is a matching destination.
             } // Check each component connection on this node to see if we must send to it.
+#endif
+
         }
-        // Non-broadcast message, and not destined for
+        // Non-broadcast destination message, and not destined for
         // the node manager specifically
         else if(header.mDestinationID != mComponentID)
         {
-            // If the destination is not on this node, then check to
-            // see if we have a direct connection to it, or use the
-            // Communicator if needed.
-            if(header.mDestinationID.mSubsystem != mComponentID.mSubsystem ||
-                header.mDestinationID.mNode != mComponentID.mNode)
+            // 1.  Check to see if destination is on another subsystem.
+            if(header.mDestinationID.mSubsystem != mComponentID.mSubsystem)
             {
-                // First see if we have a direct connection
-                // to the node, even if it is on another subsystem
-                // and send directly to it using unicast.
+                // If I have a working Communicator, use it to
+                // transmit to other subsystems.
+                if(mCommunicator.IsInitialized())
+                {
+                    mCommunicator.Transmit(msg);
+                }
+                else
+                {
+                    // If I don't have an initialized/working Communicator
+                    // on this node, then I need to find another node
+                    // that has a Communicator so it can send the message
+                    // to other subsystems for me.
+                    Configuration::Subsystem subsystemConfig = mpNodeManager->GetSubsystemConfiguration();
+                    Address::List communicators = subsystemConfig.GetComponentsOfType(Service::Communicator);
+
+                    // Look up a connection to a node that has
+                    // a communicator on it, and send the data 
+                    // to it.
+                    Address::List::iterator communicator;
+                    for(communicator = communicators.begin();
+                        communicator != communicators.end();
+                        communicator++)
+                    {
+                        
+                        NodesMap::iterator node;
+                        node = mNodes.find(communicator->mNode);
+                        if(node != mNodes.end())
+                        {
+                            node->second->SendStream(msg);
+                        }
+                    }
+                }
+            }
+            // 2. If going to another node
+            else if(header.mDestinationID.mNode != mComponentID.mNode)
+            {
+                // Lookup the connection to the node and transmit to it.
                 NodesMap::iterator node;
                 node = mNodes.find(Address(header.mDestinationID.mSubsystem,
                                            header.mDestinationID.mNode,
@@ -1268,21 +1991,8 @@ int NodeConnectionHandler::SendStream(const Stream& msg)
                 {
                     result = node->second->SendStream(msg);
                 }
-                else
-                {
-                    // If on a different subsystem use the communicator,
-                    // otherwise send using multicast or broadcast if we don't have
-                    // a direct connection to the node.
-                    if(header.mDestinationID.mSubsystem != mComponentID.mSubsystem)
-                    {
-                        if(mCommunicator.Transmit(msg))
-                        {
-                            result = JAUS_OK;
-                        }
-                    }
-                }
             }
-            // Send to component on this node.
+            // 3. Going to a component on this node
             else
             {
                 ComponentsMap::iterator component;
@@ -1392,6 +2102,7 @@ int NodeConnectionHandler::SendStream(const Stream& msg)
 
     return result;
 }
+#endif
 
 
 ////////////////////////////////////////////////////////////////////////////////////
@@ -1406,11 +2117,13 @@ int NodeConnectionHandler::SendStream(const Stream& msg)
 ///   \param msg The message to process (header and message body).
 ///   \param info Header information for message.
 ///   \param transport The transport layer the data came from.
+///   \param additionalData Pointer additional data from where data came from.
 ///
 ////////////////////////////////////////////////////////////////////////////////////
 void NodeConnectionHandler::ProcessStreamCallback(const Stream &msg,
                                                   const Header *info,
-                                                  const StreamCallback::Transport transport)
+                                                  const StreamCallback::Transport transport,
+                                                  void* additionalData)
 {
     Header header;
     // Read header information if not provided.
@@ -1460,11 +2173,11 @@ void NodeConnectionHandler::ProcessStreamCallback(const Stream &msg,
         return;
     }
 
-    //if(header.mCommandCode == JAUS_CREATE_EVENT && header.mSourceID.mSubsystem != mComponentID.mSubsystem)
-    //{
-    //    int x;
-    //    x = 3;
-    //}
+    if(header.mSourceID == Address(1, 1, 15, 1) && header.mDestinationID == Address(1, 2, 37, 1))
+    {
+        int x;
+        x = 3;
+    }
 
     // If message is for this node, then give it to the
     // message handler.
@@ -1532,15 +2245,25 @@ void NodeConnectionHandler::ProcessStreamCallback(const Stream &msg,
     }
     else
     {
-        // Send the message onto its destination!
-        Send(msg);
+        // Send the message onto its destination, but only if it is not a
+        // a heartbeat pulse message used for dynamic discovery
+        if(header.mCommandCode == JAUS_REPORT_HEARTBEAT_PULSE &&
+            (header.mDestinationID.mSubsystem == 255 || header.mDestinationID.mSubsystem == mComponentID.mSubsystem) &&
+            header.mDestinationID.mNode == 255)
+        {
+            // Dump message.
+        }
+        else
+        {
+            Send(msg);
+        }
     }
 
-    // If this is a Heartbeat message from another node or subsystem
-    // see if we have a connection or not.
+    // If this is a Heartbeat message from another node on this subsystem
+    // see if we have a connection, and if not, add one or update heartbeat time.
     if( header.mCommandCode == JAUS_REPORT_HEARTBEAT_PULSE &&
         (transport == StreamCallback::UDP || transport == StreamCallback::Communicator) &&
-        (header.mSourceID.mSubsystem != mComponentID.mSubsystem || header.mSourceID.mNode != mComponentID.mNode))
+        (header.mSourceID.mSubsystem == mComponentID.mSubsystem || header.mSourceID.mNode != mComponentID.mNode))
     {
         // Create a connection to the node manager if we do
         // not already have one.
@@ -1612,34 +2335,27 @@ void NodeConnectionHandler::DiscoveryThread(void *arg)
         //  Check to see if we need to send out a heartbeat pulse message.
         if( Time::GetUtcTimeMs() - heartbeatTime >= 1000 )
         {
+            heartBeatMessage.SetSequenceNumber(heartBeatMessage.GetSequenceNumber() + 1);
+
             if(handler->mSubsystemDiscoverFlag)
             {
                 heartBeatMessage.SetDestinationID(Address(255, 255, 1, 1));
+                heartBeatMessage.Write(heartBeatStream);
+                handler->mCommunicator.Transmit(heartBeatStream);
+            }
+            
+            // Enable node discovery within subsystem.
+            heartBeatMessage.SetDestinationID(Address(handler->mComponentID.mSubsystem, 255, 1, 1));
+            heartBeatMessage.Write(heartBeatStream);
+            if(handler->mBroadcastFlag)
+            {
+                handler->mBroadcastUDP.Send(heartBeatStream);
             }
             else
             {
-                heartBeatMessage.SetDestinationID(Address(handler->mComponentID.mSubsystem, 255, 1, 1));
-            }
-            heartBeatMessage.SetSequenceNumber(heartBeatMessage.GetSequenceNumber() + 1);
-            heartBeatMessage.Write(heartBeatStream);
+                handler->mMulticastUDP.Send(heartBeatStream);
+            }            
 
-            if(handler->mSubsystemDiscoverFlag) // If going to other subsystems, give to communicator.
-            {
-                handler->mCommunicator.Transmit(heartBeatStream);
-            }
-
-            if(handler ->mSubsystemDiscoverFlag == false ||
-                (handler->mSubsystemDiscoverFlag == true && handler->mCommunicator.IsDefaultDataLinkSelected(handler->mMulticastAddress) == false))
-            {
-                if(handler->mBroadcastFlag)
-                {
-                    handler->mBroadcastUDP.Send(heartBeatStream);
-                }
-                else
-                {
-                    handler->mMulticastUDP.Send(heartBeatStream);
-                }
-            }
             heartbeatTime = Time::GetUtcTimeMs();
         }
 

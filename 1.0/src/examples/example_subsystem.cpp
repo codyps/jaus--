@@ -324,6 +324,7 @@ int main(int argc, char *argv[])
     Jaus::GlobalPose globalPose;
     Jaus::ReportVelocityState velocityState;
 
+
     // Initialize components.
     globalPoseSensor.Initialize(gSubsystem, gNode);
     velocityStateSensor.Initialize(gSubsystem, gNode);
@@ -347,6 +348,8 @@ int main(int argc, char *argv[])
     
     if(nodeManager.Initialize("settings/example_subsystem_nodesettings.xml") == false)
     {
+        gSubsystem = nodeManager.GetNodeID().mSubsystem;
+        gSubsystem = nodeManager.GetNodeID().mNode;
         Jaus::Configuration config;
         config.AddComponent(Jaus::Address(gSubsystem, gNode, 1, 1));
         config.AddComponent(Jaus::Address(gSubsystem, gNode, (Jaus::Byte)Jaus::Service::Communicator, 1));
@@ -381,6 +384,7 @@ int main(int argc, char *argv[])
     globalPose.SetAttitudeRms(0);
 
     globalPoseSensor.SetGlobalPose(globalPose);
+	globalPoseSensor.SetSensorUpdateRate(30);
 
     velocityState.SetVelocityX(0);
     velocityState.SetVelocityY(0);
@@ -394,6 +398,9 @@ int main(int argc, char *argv[])
     
     velocityStateSensor.SetVelocityState(velocityState);
     velocityStateSensor.SetTravelSpeed(0);
+
+    // Set frame rate
+    visualSensor.SetFrameRate(15);
 
     Sleep(50);
 

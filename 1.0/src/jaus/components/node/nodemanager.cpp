@@ -45,6 +45,7 @@
 ///
 ////////////////////////////////////////////////////////////////////////////////////
 #include "jaus/components/node/nodemanager.h"
+#include "jaus/components/node/nodeconnectionhandler.h"
 #include "jaus/messages/messagecreator.h"
 #include "jaus/messages/command/commandmessages.h"
 #include "jaus/messages/query/querymessages.h"
@@ -73,7 +74,7 @@ NodeManager::NodeManager() : mpConnectionHandler(NULL),
                              mConnectionEventTimeMs(0)
 
 {
-    mpConnectionHandler = new NodeConnectionHandler();
+    mpConnectionHandler = new NodeConnectionHandler(this);
     mpConnectionHandler->SetConnectionEventCallback(NodeManager::ProcessConnectionEvent, this);
     mpMessageHandler = new MessageHandler();
     mpMessageHandler->RegisterCallback(NodeManager::MessageCallbackFunction, this);
@@ -153,7 +154,7 @@ int NodeManager::Initialize(const Byte sid,
 
     Shutdown();
 
-    if(mpConnectionHandler->Initialize(sid, nid, mpMessageHandler, tcp, "-1", smSize))
+    if(mpConnectionHandler->Initialize(sid, nid, mpMessageHandler, tcp, smSize))
     {
         //std::cout << "Initialized Connection Handler.\n";
         mNodeID(sid, nid, 1, 1);
@@ -165,6 +166,8 @@ int NodeManager::Initialize(const Byte sid,
         mNodeMutex.Enter();
         mSystemConfiguration.AddComponent(mNodeID);
         mSystemConfiguration.AddComponent(GetCommunicator()->GetID());
+        mSubsystemConfigFromXML.AddComponent(mNodeID);
+        mSubsystemConfigFromXML.AddComponent(GetCommunicator()->GetID());
         mConnectionEventTimeMs = Time::GetUtcTimeMs();
         mNodeMutex.Leave();
 
@@ -263,11 +266,10 @@ int NodeManager::Initialize(const std::string& settingsFileXML)
                 componentElement = componentElement->NextSiblingElement("Component");
             }
         }
-
-        GetCommunicator()->SetSubsystemConfiguration(*mSystemConfiguration.GetSubsystem(subsystemID));
+        mSubsystemConfigFromXML = *mSystemConfiguration.GetSubsystem(subsystemID);
         nodeElement = nodeElement->NextSiblingElement("Node");
     }
-
+    
     node = docHandle.FirstChild("Jaus").FirstChild("NodeManagerComponent").FirstChild("NetHeader").ToNode();
     if(node == NULL)
     {
@@ -363,11 +365,53 @@ int NodeManager::Initialize(const std::string& settingsFileXML)
         }
     }
 
+    node = docHandle.FirstChild("Jaus").FirstChild("NodeManagerComponent").FirstChild("NodeManagerNetAddress").ToNode();
+    if(node && node->FirstChild())
+    {
+        if(CxUtils::Socket::IsIP4(node->FirstChild()->Value()) || CxUtils::Socket::IsIP6(node->FirstChild()->Value()))
+        {
+            mpConnectionHandler->SetNetworkInterface(node->FirstChild()->Value());
+        }
+        else
+        {
+            mpConnectionHandler->SetNetworkInterface(atoi(node->FirstChild()->Value()));
+        }
+    }
+
+   
     if(!Initialize((Byte)s, (Byte)n, useTCP, mbsize) )
     {
         Shutdown();
         std::cout << "NodeManager: Failed to initialize with Node ID [" << (int)s << "." << (int)n << ".1.1] provided in XML data.\n";
         return result;
+    }
+
+    node = docHandle.FirstChild("Jaus").FirstChild("NodeManagerComponent").FirstChild("CommunicatorNetAddress").ToNode();
+    if(node && node->FirstChild())
+    {
+        // Get the default data link for communicator.
+        mpConnectionHandler->GetCommunicator()->LockDataLinks();
+        Communicator::DataLink::Map* links = mpConnectionHandler->GetCommunicator()->GetDataLinks();
+        Communicator::DataLink::Map::iterator l;
+        Communicator::DefaultDataLink* defaultLink = NULL;
+        
+        for(l = links->begin(); l != links->end(); l++)
+        {
+            defaultLink = dynamic_cast<Communicator::DefaultDataLink*>(l->second);
+            if(defaultLink)
+            {
+                if(CxUtils::Socket::IsIP4(node->FirstChild()->Value()) || CxUtils::Socket::IsIP6(node->FirstChild()->Value()))
+                {
+                    defaultLink->SetNetworkInterface(node->FirstChild()->Value());
+                }
+                else
+                {
+                    defaultLink->SetNetworkInterface(atoi(node->FirstChild()->Value()));
+                }
+                break;
+            }
+        }
+        mpConnectionHandler->GetCommunicator()->UnlockDataLinks();
     }
 
     nodeElement = docHandle.FirstChild("Jaus").FirstChild("NodeManagerComponent").ToElement();
@@ -533,6 +577,9 @@ int NodeManager::Shutdown()
     mNodeMutex.Enter();
     mSubsystemList.clear();
     mConnectionEventTimeMs = 0;
+    mSystemConfiguration.Clear();
+    mSubsystemConfigFromXML.Clear();
+    mSubsystemIdentification.ClearIdentification();
     mNodeMutex.Leave();
 
     mInitializedFlag = false;
@@ -575,6 +622,8 @@ int NodeManager::Restart()
             config++;
         }
     }
+    // Reset to any configuration setup from XML.
+    *mSystemConfiguration.GetSubsystem(mNodeID.mSubsystem) = mSubsystemConfigFromXML;
 
     Configuration::IdentificationMap::iterator identity;
     identity = mSystemConfiguration.mIdentifications.begin();
@@ -1468,6 +1517,48 @@ int NodeManager::SetMulticastAddress(const std::string& multicast, const unsigne
     result = mpConnectionHandler->SetMulticastAddress(multicast, ttl);
     mNodeMutex.Leave();
     return result;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////
+///
+///   \brief Sets the network interface to use for receiving UDP message traffic.
+///
+///   \param num The network interface number to use for receiving UDP traffic.
+///              A value of -1 means any interface, 0 the first, 1 the second, etc.
+///
+///   \return True on success, otherwise false.
+///
+////////////////////////////////////////////////////////////////////////////////////
+bool NodeManager::SetNetworkInterface(const int num)
+{
+    int result = JAUS_FAILURE;
+    mNodeMutex.Enter();
+    result = mpConnectionHandler->SetNetworkInterface(num);
+    mNodeMutex.Leave();
+    return result == JAUS_OK ? true : false;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////
+///
+///   \brief Sets the network interface to use for receiving UDP message traffic.
+///
+///   This method looks up the network interface number to use, then sets it.
+///
+///   \param address The IP address of the network interface to use for receving
+///                  network traffic. 
+///
+///   \return True on success, otherwise false.
+///
+////////////////////////////////////////////////////////////////////////////////////
+bool NodeManager::SetNetworkInterface(const std::string& address)
+{
+    int result = JAUS_FAILURE;
+    mNodeMutex.Enter();
+    result = mpConnectionHandler->SetNetworkInterface(address);
+    mNodeMutex.Leave();
+    return result == JAUS_OK ? true : false;
 }
 
 

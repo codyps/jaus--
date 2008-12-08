@@ -200,11 +200,12 @@ int main(int argc, char *argv[])
     std::set<Byte> toDiscover;
     // We do not need to add our own subsystem
     // number to this list, because it is added automatically.
-    toDiscover.insert(2);
+    toDiscover.insert(1);
     toDiscover.insert(8);
     toDiscover.insert(10);
     subscriber.EnableSubsystemDiscovery(true, &toDiscover);
 
+	Platform::Map platforms;
     while(!gExitFlag)
     {
         // While the program is running, any time a 
@@ -214,6 +215,10 @@ int main(int argc, char *argv[])
         // You can also access the current system configuration
         // from the component using GetSystemConfiguration function
         // of Subscriber Component.
+		
+
+		// Get a copy of system configuration discovered.
+		platforms = subscriber.GetSystemConfiguration();
 
         if(CxUtils::GetChar() == 27)
         {

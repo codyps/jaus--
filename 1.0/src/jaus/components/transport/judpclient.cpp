@@ -54,7 +54,7 @@ using namespace CxUtils;
 JUDPClient::JUDPClient()
 {
     mTransport.Reserve( JAUS_MAX_PACKET_SIZE + gNetworkHeader.size() + 1 );
-    mTransport.Write( (unsigned char *)(gNetworkHeader.c_str()), gNetworkHeader.size() );
+    mTransport.Write( (unsigned char *)(gNetworkHeader.c_str()), (unsigned int)(gNetworkHeader.size()) );
 }
 
 
@@ -115,6 +115,23 @@ void JUDPClient::Shutdown()
 
 ////////////////////////////////////////////////////////////////////////////////////
 ///
+///  \brief Sets the network interface to use for sending, but does not
+///  restart the server.
+///
+///  \param netInterface Network interface for sending data.
+///
+///  \return True on success, otherwise false.
+///
+////////////////////////////////////////////////////////////////////////////////////
+bool JUDPClient::SetNetworkInterface(const int netInterface)
+{
+    mClient.SetNetworkInterface(netInterface);
+    return true;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////
+///
 ///  \brief Sends the serialized JAUS message.
 ///
 ///  This method adds the necessary JAUS UDP transport header and then
@@ -129,8 +146,8 @@ int JUDPClient::Send(const Stream& msg)
 {
     int result;
     mTransportMutex.Enter();
-    mTransport.SetLength( gNetworkHeader.size() );
-    mTransport.SetWritePos( gNetworkHeader.size() );
+    mTransport.SetLength( (unsigned int)gNetworkHeader.size() );
+    mTransport.SetWritePos( (unsigned int)gNetworkHeader.size() );
     mTransport.Write(msg);
     result = mClient.Send(mTransport);
     mTransportMutex.Leave();

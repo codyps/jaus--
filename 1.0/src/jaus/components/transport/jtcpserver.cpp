@@ -126,6 +126,7 @@ void JTCPServer::ServerThread::Execute()
     // Reserve some memory for receiving
     mRecvBuffer.Reserve(JAUS_MAX_PACKET_SIZE*2);
     mStreamBuffer.Reserve(JAUS_MAX_PACKET_SIZE*10);
+    std::string sourceAddress;
     while(!QuitThreadFlag() &&
           mServer.IsValid())
     {
@@ -164,9 +165,11 @@ void JTCPServer::ServerThread::Execute()
                             // Enter mutex, and run callback.
                             if(mpCallback)
                             {
+                                sourceAddress = mServer.GetClientAddress();
                                 mpCallback->ProcessStreamCallback(mMessage,
                                                                   &header,
-                                                                  StreamCallback::TCP);
+                                                                  StreamCallback::TCP,
+                                                                  &sourceAddress);
                             }
                         }
                     }
@@ -275,6 +278,23 @@ int JTCPServer::Shutdown()
     }
     mpCallback = NULL;
     return JAUS_OK;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////
+///
+///  \brief Sets the network interface to use for receiving, but does not
+///  restart the server.
+///
+///  \param netInterface Network interface for receiving data.
+///
+///  \return True on success, otherwise false.
+///
+////////////////////////////////////////////////////////////////////////////////////
+bool JTCPServer::SetNetworkInterface(const int netInterface)
+{
+    mListenSocket.SetNetworkInterface(netInterface);
+    return true;
 }
 
 

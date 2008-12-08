@@ -81,7 +81,7 @@ int main(int argc, char *argv[])
         // for receiving messages from components that need to
         // be routed.  The default size is 4MB. Make this value
         // larger depending the volume of traffice you expect.
-        else if(node.Initialize(1, 2, false, JAUS_NODE_SM_DEFAULT_SIZE))
+        else if(node.Initialize(1, 2, false, JAUS_NODE_SM_BUFFER_DEFAULT_SIZE))
         {
             cout << "JAUS Node Manager initialized." << endl;
         }

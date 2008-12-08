@@ -226,7 +226,7 @@ int LargeDataSetExample()
 
     //  Generate the mpstream.  This will split the
     //  large packet up into a mutli-packet sequence.
-    if( mpstream.CreateLargeDataSet( packet ) == JAUS_FAILURE ) 
+    if( mpstream.CreateLargeDataSet( packet, NULL, 8 ) == JAUS_FAILURE ) 
     {
         
         cout << "Couldn't create large data set, what's up with that?\n";
@@ -252,10 +252,9 @@ int LargeDataSetExample()
     // Verify the contents match up with the original.
     if ( memcmp(data, packet.pPtr() + JAUS_HEADER_SIZE, dsize) != 0 ||
          packet.Length() != JAUS_HEADER_SIZE + dsize ) 
-    {
-        
-             cout << "Could not re-assemble Johny 5!\n";
-            return 0;
+    {        
+        cout << "Could not re-assemble Johny 5!\n";
+        return 0;
     }
 
     //  Make sure all data is erased.
@@ -268,19 +267,7 @@ int LargeDataSetExample()
     //  so we can test assembly with out-of-order data.
     Stream::List streamCopy;
     streamCopy = *mpstream.GetDataSet();
-    // Set some of the values to re-transmit.
-    streamCopy[4].Read(header, 0);
-    header.mDataFlag = Header::DataControl::Retransmit;
-    streamCopy[4].Write(header, 0);
     
-    // Set some of the values to re-transmit.
-    streamCopy[1].Read(header, 0);
-    header.mDataFlag = Header::DataControl::Retransmit;
-    streamCopy[1].Write(header, 0);
-    streamCopy[3].Read(header, 0);
-    header.mDataFlag = Header::DataControl::Retransmit;
-    streamCopy[3].Write(header, 0);
-
     random_shuffle( streamCopy.begin(), streamCopy.end() );
 
     cout << "Assembling Multi-Packet Stream data that is out of order...";

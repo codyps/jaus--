@@ -54,7 +54,7 @@ using namespace CxUtils;
 JUDPServer::JUDPServer()
 {
     mpCallback = NULL;
-    mTransport.Reserve( gNetworkHeader.size() + JAUS_HEADER_SIZE );
+    mTransport.Reserve( (unsigned int)(gNetworkHeader.size() + JAUS_HEADER_SIZE) );
 }
 
 
@@ -145,14 +145,14 @@ int JUDPServer::Recv(Stream& msg,
                      std::string* src) const
 {
     msg.Clear();
-    if( mServer.Recv(msg, 2*(gNetworkHeader.size() + JAUS_MAX_PACKET_SIZE), tms, src) )
+    if( mServer.Recv(msg, (unsigned int)(2*(gNetworkHeader.size() + JAUS_MAX_PACKET_SIZE)), tms, src) )
     {
         if( msg.Length() >= gNetworkHeader.size() &&
             strncmp( (const char *)msg.pPtr(),
                      gNetworkHeader.c_str(),
                      gNetworkHeader.size() ) == 0 )
         {
-            msg.Delete(gNetworkHeader.size(), 0);
+            msg.Delete((unsigned int)(gNetworkHeader.size()), 0);
             return (int)msg.Length();
         }
         else
@@ -201,6 +201,23 @@ int JUDPServer::GetHostname(const Address& id, std::string& name) const
 
 ////////////////////////////////////////////////////////////////////////////////////
 ///
+///  \brief Sets the network interface to use for receiving, but does not
+///  restart the server.
+///
+///  \param netInterface Network interface for receiving data.
+///
+///  \return True on success, otherwise false.
+///
+////////////////////////////////////////////////////////////////////////////////////
+bool JUDPServer::SetNetworkInterface(const int netInterface)
+{
+    mServer.SetNetworkInterface(netInterface);
+    return true;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////
+///
 ///  \return A copy of the known hostnames (ip addresses) of those sending
 ///  JUDP messages.
 ///
@@ -231,7 +248,7 @@ void JUDPServer::ServerThread(void *args)
     udp = dynamic_cast<JUDPServer*>(udp);
     Header header;
 
-    udp->mTransport.Reserve( gNetworkHeader.size() + JAUS_MAX_PACKET_SIZE );
+    udp->mTransport.Reserve( (unsigned int)(gNetworkHeader.size() + JAUS_MAX_PACKET_SIZE) );
 
     // Keep looping and receiving
     while( udp &&
@@ -262,7 +279,8 @@ void JUDPServer::ServerThread(void *args)
             {
                 udp->mpCallback->ProcessStreamCallback(udp->mTransport,
                                                        NULL,
-                                                       StreamCallback::UDP);
+                                                       StreamCallback::UDP,
+                                                       &udp->mTempHostname);
             }
             else
             {

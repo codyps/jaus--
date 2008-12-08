@@ -325,65 +325,18 @@ void VideoClientFrame::OnSelectVisualSensor(wxCommandEvent& event)
 
 ////////////////////////////////////////////////////////////////////////////////////
 ///
-///  \brief Sets the ID of the visual sensor to connect to, and attempts to make
-///         a connection.
+///  \brief Sets visual sensor ID to use.
 ///
 ////////////////////////////////////////////////////////////////////////////////////
 bool VideoClientFrame::SetVisualSensor(const Jaus::Address& id)
 {
-    mFrameNumber = 0;
-    static unsigned int checkTimeMs = 0;
-
-    if(Jaus::Time::GetUtcTimeMs() - checkTimeMs < 60000 && 
-        id.IsValid() && id == mVisualSensorID && mClient.HaveEventSubscription(mVisualSensorID, Jaus::JAUS_REPORT_IMAGE))
+    if(id.IsValid() && !id.IsBroadcast())
     {
+        mVisualSensorID  = id;
         return true;
     }
-
-    checkTimeMs = Jaus::Time::GetUtcTimeMs();
-
-    // Cancel previous events.
-    if(mVisualSensorID.IsValid())
-    {
-        mClient.CancelEvents(mVisualSensorID);
-    }
-
-    Jaus::Receipt receipt;
-    Jaus::QueryCameraFormatOptions queryFormats;
-    Jaus::CreateEventRequest createEvent;
-
-    // First find out the type of image format used by sensor.
-    queryFormats.SetSourceID(mClient.GetID());
-    queryFormats.SetDestinationID(id);
-    queryFormats.SetPresenceVector(Jaus::QueryCameraFormatOptions::VectorMask::ImageFormat1);
-    for(Jaus::Byte camID = 0; camID < 255; camID++)
-    {
-        queryFormats.SetCameraID(camID);
-        if(mClient.Send(&queryFormats, receipt, 0, 200, 1) == Jaus::JAUS_OK)
-        {
-            const Jaus::ReportCameraFormatOptions* formats = 
-                dynamic_cast<const Jaus::ReportCameraFormatOptions*>(receipt.GetResponseMessage());
-            createEvent.SetDestinationID(id);
-            createEvent.SetSourceID(mClient.GetID());
-            createEvent.SetMessageCode(Jaus::JAUS_REPORT_IMAGE);                
-            createEvent.SetEventType(Jaus::CreateEventRequest::EveryChange);
-            if(mClient.RequestEvent(createEvent, NULL, 500, 1) == Jaus::JAUS_OK)
-            {
-                mImageFormat = (Jaus::Image::Format)formats->GetImageFormat1();
-                mVisualSensorID = id;
-                // Enable discovery for the subsystem so we know when bad things happen.
-                std::set<Jaus::Byte> toDiscover;
-                toDiscover.insert(id.mSubsystem);
-                toDiscover.insert(mClient.GetID().mSubsystem);
-                mClient.EnableSubsystemDiscovery(true, &toDiscover);
-                return true;
-            }
-        }
-    }
-
     return false;
 }
-
 
 ////////////////////////////////////////////////////////////////////////////////////
 ///
@@ -399,44 +352,14 @@ void VideoClientFrame::ProcessMessageCallback(const Jaus::Message* message, void
         report && report->GetImageData() && 
         report->GetSourceID() == client->mVisualSensorID)
     {
+        client->mMutex.Enter();
         client->mCurrentImage.Decompress(report->GetImageData(),
                                          report->GetDataSize(),
-                                         client->mImageFormat);        
-        if(!client->mShutdownFlag &&
-            client->mCurrentImage.Width() > 0 &&
-            client->mCurrentImage.Height() > 0 &&
-            client->mCurrentImage.ImageData() != NULL)
-        {
-            client->mpImagePanel->SetImage(wxImage(client->mCurrentImage.Width(),
-                                                   client->mCurrentImage.Height(),
-                                                   client->mCurrentImage.ImageData(),
-                                                   true));
-            wxSize windowSize(client->mCurrentImage.Width(), client->mCurrentImage.Height());
-            client->mpImagePanel->SetClientSize(windowSize);
-            client->SetClientSize(client->mpImagePanel->GetBestSize());
-        }
-
-        client->mpMainPanel->Update();
-
-        if(!client->mShutdownFlag)
-        {
-            char buffer[256];
-            sprintf(buffer, "Video Client - %d", ++client->mFrameNumber);
-            client->mFrameUpdateTimeMs = Jaus::Time::GetUtcTimeMs();
-            client->SetTitle(wxString(buffer, wxConvUTF8));
-        }
+                                         client->mImageFormat);  
+        client->mFrameNumber++;
+        client->mFrameUpdateTimeMs = Jaus::Time::GetUtcTimeMs();        
+        client->mMutex.Leave();
     }
-    else if(!client->mShutdownFlag && report && report->GetImageData() && report->GetSourceID() != client->mVisualSensorID)
-    {
-        // Maybe we didn't cancel our previous event properly, so repeat the cancelation.
-        Jaus::CancelEvent cancelEvent;
-        cancelEvent.SetSourceID(client->mClient.GetID());
-        cancelEvent.SetDestinationID(report->GetSourceID());
-        cancelEvent.SetMessageCode(Jaus::JAUS_REPORT_IMAGE);
-        cancelEvent.SetRequestID(Jaus::EventManager::GenerateRequestID());
-        client->mClient.Send(&cancelEvent);
-    }
-    
 }
 
 
@@ -452,10 +375,82 @@ void VideoClientFrame::ProcessMessageCallback(const Jaus::Message* message, void
 ////////////////////////////////////////////////////////////////////////////////////
 void VideoClientFrame::OnTimer(wxTimerEvent& event)
 {
+    mMutex.Enter();
+    if(!mShutdownFlag &&
+        mCurrentImage.Width() > 0 &&
+        mCurrentImage.Height() > 0 &&
+        mCurrentImage.ImageData() != NULL)
+    {
+        mpImagePanel->SetImage(wxImage(mCurrentImage.Width(),
+                                               mCurrentImage.Height(),
+                                               mCurrentImage.ImageData(),
+                                               true));
+        wxSize windowSize(mCurrentImage.Width(), mCurrentImage.Height());
+        mpImagePanel->SetClientSize(windowSize);
+        SetClientSize(mpImagePanel->GetBestSize());
+    }
+    mMutex.Leave();
+    mpMainPanel->Update();
+
+    if(!mShutdownFlag)
+    {
+        char buffer[256];
+        if(mFrameNumber > 0)
+        {
+            sprintf(buffer, "Video Client - %d", mFrameNumber);
+        }
+        else
+        {
+            sprintf(buffer, "Video Client", mFrameNumber);
+        }
+        SetTitle(wxString(buffer, wxConvUTF8));
+    }   
+    
+    // If we haven't received an image in a while, and
+    // have a valid visual sensor ID, try re-create subscription.
     if( mVisualSensorID.IsValid() &&
         Jaus::Time::GetUtcTimeMs() - mFrameUpdateTimeMs > 500 )
     {
-        SetVisualSensor(mVisualSensorID);
+        if(mClient.HaveEventSubscription(mVisualSensorID, Jaus::JAUS_REPORT_IMAGE))
+        {
+            mClient.CancelEvents(mVisualSensorID);
+        }
+
+        // Try to re-create a subscription.
+        Jaus::Receipt receipt;
+        Jaus::QueryCameraFormatOptions queryFormats;
+        Jaus::CreateEventRequest createEvent;
+        Jaus::QueryCameraCount queryCameraCount;
+        queryCameraCount.SetSourceID(mClient.GetID());
+        queryCameraCount.SetDestinationID(mVisualSensorID);
+        
+        if(mClient.Send(&queryCameraCount, receipt, 0, 200))
+        {
+            Jaus::ReportCameraCount reportCameraCount = 
+                *(dynamic_cast<const Jaus::ReportCameraCount*>(receipt.GetResponseMessage()));
+            // First find out the type of image format used by sensor.
+            queryFormats.SetSourceID(mClient.GetID());
+            queryFormats.SetDestinationID(mVisualSensorID);
+            queryFormats.SetPresenceVector(Jaus::QueryCameraFormatOptions::VectorMask::ImageFormat1);
+            for(Jaus::Byte camID = 0; camID <= reportCameraCount.GetCameraCount(); camID++)
+            {
+                queryFormats.SetCameraID(camID);
+                if(mClient.Send(&queryFormats, receipt, 0, 500, 1) == Jaus::JAUS_OK)
+                {
+                    const Jaus::ReportCameraFormatOptions* formats = 
+                        dynamic_cast<const Jaus::ReportCameraFormatOptions*>(receipt.GetResponseMessage());
+                    createEvent.SetDestinationID(mVisualSensorID);
+                    createEvent.SetSourceID(mClient.GetID());
+                    createEvent.SetMessageCode(Jaus::JAUS_REPORT_IMAGE);                
+                    createEvent.SetEventType(Jaus::CreateEventRequest::EveryChange);
+                    if(mClient.RequestEvent(createEvent, NULL, 200, 1) == Jaus::JAUS_OK)
+                    {
+                        mImageFormat = (Jaus::Image::Format)formats->GetImageFormat1();
+                        mClient.RegisterCallback(Jaus::JAUS_REPORT_IMAGE, VideoClientFrame::ProcessMessageCallback, this);
+                    }
+                }
+            }
+        }
     }
 }   
 

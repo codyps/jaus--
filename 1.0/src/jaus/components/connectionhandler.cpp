@@ -608,13 +608,15 @@ int ConnectionHandler::CheckForReceipt(const Stream& msg, const Header& header)
 ///   \param msg Serialized JAUS message received.
 ///   \param info Pointer to header data if available (data read from msg).
 ///   \param transport Transport layer message was received from.
+///   \param additionalData Pointer additional data from where data came from.
 ///
 ///   \return JAUS_OK if processed, otherwise JAUS_FAILURE.
 ///
 ////////////////////////////////////////////////////////////////////////////////////
 void ConnectionHandler::ProcessStreamCallback(const Stream& msg,
                                               const Header* info,
-                                              const StreamCallback::Transport transport)
+                                              const StreamCallback::Transport transport,
+                                              void* additionalData)
 {
     Header header;
     if( info )

@@ -1183,7 +1183,8 @@ void JSharedMemory::Execute()
             {
                 mpMessageCb->ProcessStreamCallback(mCallbackStreamData,
                                                    &info,
-                                                   StreamCallback::SharedMemory);
+                                                   StreamCallback::SharedMemory,
+                                                   NULL);
             }
             else
             {

@@ -57,7 +57,8 @@ NodeConnection::NodeConnection() : mDiscoveryFlag(false),
                                    mpTCP(0),
                                    mpSerial(0),
                                    mSendTimeMs(0),
-                                   mRecvTimeMs(0)
+                                   mRecvTimeMs(0),
+                                   mNetworkInterface(-1)
 
 {
 
@@ -115,6 +116,7 @@ int NodeConnection::CreateConnection(const Address& id,
         if(tcp == false)
         {
             mpUDP = new JUDPClient();
+            mpUDP->SetNetworkInterface(mNetworkInterface);
             if(mpUDP->Initialize(*host))
             {
                 mConnectionType = StreamCallback::UDP;
@@ -130,6 +132,7 @@ int NodeConnection::CreateConnection(const Address& id,
         {
             // Finally, try TCP
             mpTCP = new JTCPClient();
+            mpTCP->SetNetworkInterface(mNetworkInterface);
             if(mpTCP->Initialize(*host, cb))
             {
                 mConnectionType = StreamCallback::TCP;
@@ -279,12 +282,13 @@ int NodeConnection::SendStream(const Stream& stream)
 ////////////////////////////////////////////////////////////////////////////////////
 void NodeConnection::ProcessStreamCallback(const Stream& msg,
                                            const Header* info,
-                                           const StreamCallback::Transport transport)
+                                           const StreamCallback::Transport transport,
+                                           void* additionalData)
 {
     mRecvTimeMs = Time::GetUtcTimeMs();
     if(mpCallback)
     {
-        mpCallback->ProcessStreamCallback(msg, info, transport);
+        mpCallback->ProcessStreamCallback(msg, info, transport, additionalData);
     }
 }
 

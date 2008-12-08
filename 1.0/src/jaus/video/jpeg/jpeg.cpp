@@ -336,7 +336,7 @@ namespace Jaus
         void TerminateDestination(j_compress_ptr cinfo)
         {
             OutputSource *dest = (OutputSource *) cinfo->dest;
-            unsigned int datacount = JPEG_BUFFER_SIZE - dest->mDestinationManager.free_in_buffer;
+            unsigned int datacount = (unsigned int)(JPEG_BUFFER_SIZE - dest->mDestinationManager.free_in_buffer);
             // Write any remaining data.
 
             // See if we need to allocate more memory.
@@ -482,6 +482,151 @@ int Jaus::JPEG::CompressImage(const unsigned short width,
     }
 
     return result;
+}
+
+
+namespace Jaus
+{
+    namespace JPEG
+    {
+        Compressor::Compressor() : mpCompressionObject(0)
+        {
+        }
+        Compressor::~Compressor()
+        {
+            if(mpCompressionObject)
+            {
+                jpeg_destroy_compress((j_compress_ptr)(mpCompressionObject));
+                delete ((jpeg_compress_struct *)(mpCompressionObject));
+            }
+            mpCompressionObject = 0;
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////
+        ///
+        ///   \brief Compresses RAW image data to JPEG format.
+        ///
+        ///   \param[in] image Pointer to raw image data that needs to be compressed.
+        ///   \param[in] width The width of the image.
+        ///   \param[in] height The height of the image.
+        ///   \param[in] channels The number of channels in the image.
+        ///   \param[out] jpeg Pointer to buffer which will store resulting JPEG
+        ///                    data.  If NULL or too small this buffer will grow
+        ///                    dynamically.
+        ///   \param[out] jpegBufferSize The size of the buffer in bytes holding the
+        ///                              compressed JPEG.
+        ///   \param[out] jpegSize The size of the JPEG data inside the buffer in bytes.
+        ///   \param[in] quality The compression quality.  Set to -1 for default, 0 worst
+        ///                      and 100 best (but larger size).
+        ///
+        ///   \return 1 on success, 0 on failure.
+        ///
+        ////////////////////////////////////////////////////////////////////////////////////
+        int Compressor::CompressImage(const unsigned short width,
+                                      const unsigned short height,
+                                      const unsigned char channels,
+                                      const unsigned char* image,
+                                      unsigned char** jpeg,
+                                      unsigned int* jpegBufferSize,
+                                      unsigned int* jpegSize,
+                                      const int quality)
+        {
+            int result = 0;
+
+            if(width > 0 && 
+                height > 0 && 
+                (channels == 1 || channels == 3) &&
+                image != 0 && 
+                jpeg != 0)
+            {
+                unsigned int imageSize = width*height*channels*sizeof(unsigned char);
+                // Reset the compressed JPEG size to 0.
+                *jpegSize = 0;
+
+                // If necessary, allocate some memory to store
+                // the resulting compressed image.
+                if(*jpeg == NULL || jpegBufferSize == 0)
+                {
+                    if(*jpeg)
+                    {
+                        delete[] *jpeg;
+                        *jpeg = 0;
+                    }
+                    *jpeg = new unsigned char[imageSize];
+                    assert( *jpeg );
+                    *jpegBufferSize = imageSize;
+                }
+
+                // Create a JPEG compression structure and an error manager.
+                if(mpCompressionObject == 0)
+                {
+                    mpCompressionObject = (void *)(new jpeg_compress_struct);
+                    // Create a compression object.
+                     jpeg_create_compress((j_compress_ptr)(mpCompressionObject));
+                }
+                j_compress_ptr cinfo = (j_compress_ptr)(mpCompressionObject);
+                struct jpeg_error_mgr jerr;
+
+                
+                cinfo->err = jpeg_std_error(&jerr);
+                // Create a compression output destination object.
+                OutputSource dest;
+
+                // Initialize output destination manager.
+                dest.mpCompressedJPEG = *jpeg;
+                dest.mCompressionBufferSize = *jpegBufferSize;
+                dest.mNumBytesCompressed = 0;
+                dest.mDestinationManager.init_destination = InitDestination;
+                dest.mDestinationManager.empty_output_buffer = EmptyOutputBuffer;
+                dest.mDestinationManager.term_destination = TerminateDestination;
+
+                cinfo->dest = (struct jpeg_destination_mgr *)&dest;
+
+                cinfo->image_width = width;    
+                cinfo->image_height = height;
+                cinfo->input_components = channels; 
+                cinfo->in_color_space = channels > 1 ? JCS_RGB : JCS_GRAYSCALE;
+
+                // Sets default values.
+                jpeg_set_defaults(cinfo);
+
+                // Adjust quality if set.
+                if(quality >= 0)
+                {
+                    jpeg_set_quality(cinfo, quality, TRUE);
+                }
+
+                // Start compression process
+                jpeg_start_compress(cinfo, TRUE);
+
+                JSAMPROW row_pointer[1];    /// JSAMPLE row to store a single compressed row.
+                int row_stride;             /// Physical row width in image buffer (width*channels).
+                row_stride = width*channels;
+                
+                while (cinfo->next_scanline < cinfo->image_height)
+                {
+                    // jpeg_write_scanlines expects an array of pointers to scanlines.
+                    // Here the array is only one element long, but you could pass
+                    // more than one scanline at a time if that's more convenient.
+                    row_pointer[0] = & ((unsigned char *)(image)) [cinfo->next_scanline * row_stride];
+                    (void) jpeg_write_scanlines(cinfo, row_pointer, 1);
+
+                }
+
+                // Finish compression (finalize).
+                jpeg_finish_compress(cinfo);
+
+                // Save results
+                *jpegSize = dest.mNumBytesCompressed;
+                *jpegBufferSize = dest.mCompressionBufferSize;
+                *jpeg = dest.mpCompressedJPEG; // Make sure pointer is saved.
+
+                result = 1;
+            }
+
+            return result;
+        }
+    }
 }
 
 

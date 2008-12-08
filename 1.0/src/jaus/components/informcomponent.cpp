@@ -404,7 +404,7 @@ int InformComponent::ProcessCommandMessage(const Message* msg, const Byte comman
                         eventInfo->GetEventSubscribers()->insert(command->GetSourceID());
                          // Get an event ID value.
                         eventInfo->SetEventID(mEventManager.GenerateEventID(command->GetMessageCode()));
-
+                        eventInfo->SetTimeStampMs(0);
                         response.SetEventID(eventInfo->GetEventID());
 
                         if(eventInfo->IsPeriodic())
@@ -1206,10 +1206,15 @@ void InformComponent::GeneratePeriodicEvents(const bool lock)
         if(mUseHighPerformanceTimerFlag || e->second->GetPeriodicRate() >= mTimerThresholdFrequency)
         {
             continue;
-        }
+        } 
 
         if( Time::GetUtcTimeMs() - e->second->GetTimeStampMs() >= 1000.0/(e->second->GetPeriodicRate() + JAUS_EPSILON))
         {
+            if(e->first.mMessageCode == JAUS_REPORT_IMAGE)
+            {
+                int x;
+                x = 3;
+            }
             GenerateEvent(e->second);
             e->second->SetTimeStampMs(Time::GetUtcTimeMs());
             e->second->SetSequenceNumber(e->second->GetSequenceNumber() + 1);

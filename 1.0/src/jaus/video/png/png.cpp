@@ -234,10 +234,10 @@ namespace Jaus
                 memcpy(temp, output->mpCompressedPNG, output->mNumBytesCompressed);
                 delete[] output->mpCompressedPNG;
                 output->mpCompressedPNG = temp;
-                output->mCompressedBufferSize += length;        
+                output->mCompressedBufferSize += (unsigned int)length;        
             }
             memcpy(&output->mpCompressedPNG[output->mNumBytesCompressed], data, length);
-            output->mNumBytesCompressed += length;
+            output->mNumBytesCompressed += (unsigned int)length;
         }
     }
 }
