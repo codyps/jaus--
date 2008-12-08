@@ -41,8 +41,8 @@
              for routing.  The value is in bytes. Default size is
              4 MB -->
         <MessageBoxSize>4194304</MessageBoxSize>
-        <SubsystemID>54</SubsystemID>
-        <NodeID>3</NodeID>
+        <SubsystemID>1</SubsystemID>
+        <NodeID>1</NodeID>
         <!-- Option Subsystem Identification data if available.  Authority
              is the lowest level of authority to gain control of parts of
              subsystem, identification is the name of the subsystem and
