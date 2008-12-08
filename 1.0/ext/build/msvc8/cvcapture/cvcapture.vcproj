@@ -102,6 +102,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				Optimization="3"
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;CV_NO_OPENCV"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
