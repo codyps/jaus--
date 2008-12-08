@@ -224,6 +224,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				Optimization="3"
 				AdditionalIncludeDirectories="../../../../ext/include/libjpeg;../../../../ext/include/libpng;../../../../ext/include/zlib"
 				PreprocessorDefinitions="JAUS_SRVC_DLL_IMPORT;JAUS_MSG_DLL_IMPORT;JAUS_CMP_DLL_IMPORT;JAUS_VIDEO_DLL_EXPORT"
 				WarningLevel="4"
