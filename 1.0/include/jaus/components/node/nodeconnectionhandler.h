@@ -57,6 +57,7 @@ namespace Jaus
     typedef void (*NodeConnectionCallback)(const Byte type, const Address& id, void *args);
     const unsigned int JAUS_NODE_SM_DEFAULT_SIZE    = 4194304;   ///<  Default Shared Memory size for the node to recieve messages.
     class ServiceConnectionManager;
+    class NodeManager;
 
     ////////////////////////////////////////////////////////////////////////////////////
     ///
@@ -81,15 +82,22 @@ namespace Jaus
             ComponentDisconnect,
             NodeDisconnect
         };
+        enum MessageOrigin
+        {
+            ThisNode = 0,           ///  Message originated from this node.
+            NodeInThisSubsystem,    ///  Message originated from another node on this subsystem.
+            CommunicatorOnNodeInThisSubsystem, /// Message traffic originated from another nodes communicator.
+            AnotherSubsystem,                  /// Message was received by this nodes communicator from another subsystem.         
+            
+        };
         // Constructor.
-        NodeConnectionHandler();
+        NodeConnectionHandler(NodeManager* nodeManager = NULL);
         // Destructor.
         ~NodeConnectionHandler();
         int Initialize(const Byte sid,
                        const Byte nid,
                        Jaus::MessageHandler* msgHandler,
                        const bool tcp = false,
-                       const std::string& netAddress = "-1",
                        const unsigned int inboxSize = JAUS_NODE_SM_DEFAULT_SIZE);
         // Shutsdown all connections.
         virtual int Shutdown();
@@ -126,6 +134,10 @@ namespace Jaus
         // Set the address to use for multicasting.
         int SetMulticastAddress(const std::string& multicast = "224.1.0.1",
                                 const unsigned char ttl = 1);
+        // Set the network interface to use for receiving network traffic.
+        bool SetNetworkInterface(const int num);
+        // Set the network interface to use for receiving network traffic.
+        bool SetNetworkInterface(const std::string& address);
         // Check if a connection exists to the given ID.
         bool HaveConnection(const Address& id) const;
         // Toggles subsystem hearbeat broadcasting versus node only broadcasting.
@@ -143,16 +155,22 @@ namespace Jaus
         // Get a pointer to the communicator.
         Jaus::Communicator* GetCommunicator() const { return (Jaus::Communicator*)(&mCommunicator); }
     protected: 
+        int SendToComponents(const Stream& msg, const Header& header); 
+        int SendToNodes(const Stream& msg, const Header& header);
+        int SendToSubsystems(const Stream& msg, const Header& header);
+        bool HasCommunicator(const Byte nodeID) const;
         // Sends the byte array data to destination.
         virtual int SendStream(const Stream& msg);
         virtual void ProcessStreamCallback(const Stream& msg,
                                            const Header* info,
-                                           const StreamCallback::Transport transport);
+                                           const StreamCallback::Transport transport,
+                                           void* additionalData);
         static void DiscoveryThread(void *args);
         void CheckComponents(Address::Set& newConnections, Address::Set& lostConnections);
         void CheckNodes(Address::Set& newConnections, Address::Set& lostConnections);
         typedef std::map<Address, JSharedMemory*> ComponentsMap;  ///<  STL map of component connections.
         typedef std::map<Address, NodeConnection*> NodesMap;      ///<  STL map of node connections.  
+        NodeManager* mpNodeManager;                 ///<  Pointer to the Node Manager parent.
         // Handles SC management
         ServiceConnectionManager* mpServiceManager; ///<  SC management.
         // Flags
@@ -179,6 +197,7 @@ namespace Jaus
         JSharedMemory::Registry mComponentRegistry; ///<  Shared Memory list of components on node.
         std::string mMulticastAddress;              ///<  Address to use for multicast sending/receiving.
         unsigned char mMulticastTTL;                ///<  TTL for Multicast.
+        int mNetworkInterface;                      ///<  Network interface to use for sending/receiving network traffic.
         // Outgoing connections.
         JUDPClient mMulticastUDP;                   ///<  For transmission to multicast address.
         JUDPClient mBroadcastUDP;                   ///<  If broadcast is enabled, broadcast discovery message.

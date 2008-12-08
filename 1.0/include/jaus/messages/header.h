@@ -50,8 +50,8 @@
 namespace Jaus
 {
     const UShort JAUS_HEADER_SIZE           = 16;       ///<  Serialized JAUS Header size in bytes.
-    const UInt   JAUS_MAX_DATA_SIZE         = 4079;     ///<  Maximum message size without JAUS header. (MAX DATA FIELD SIZE).
-    const UInt   JAUS_MAX_PACKET_SIZE       = 4095;     ///<  Maximum size of a stream in bytes without UDP header.
+    const UInt   JAUS_MAX_DATA_SIZE         = 4080;     ///<  Maximum message size without JAUS header. (MAX DATA FIELD SIZE).
+    const UInt   JAUS_MAX_PACKET_SIZE       = 4096;     ///<  Maximum size of a stream in bytes including any transport header.
                
     const UShort JAUS_NO_ACK_NACK                = 0;   ///<  No acknowledge request.
     const UShort JAUS_REQ_ACK_NACK               = 1;   ///<  Ack/Nack requested.

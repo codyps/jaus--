@@ -82,7 +82,8 @@ namespace Jaus
         // Received data first arrives here, and is then passed to connection handler.
         virtual void ProcessStreamCallback(const Stream& msg,
                                            const Header* info,
-                                           const StreamCallback::Transport transport);
+                                           const StreamCallback::Transport transport,
+                                           void* additionalData);
         Address mID;                    ///<  ID of the destination.
         volatile bool mDiscoveryFlag;   ///<  Was this connection manually set, or discovered dynamically?
         Transport mConnectionType;      ///<  Type of connection.
@@ -93,6 +94,7 @@ namespace Jaus
         JSerial* mpSerial;              ///<  Serial port connection.
         volatile unsigned int mSendTimeMs;       ///<  Last time data was sent.
         volatile unsigned int mRecvTimeMs;       ///<  Last time data was received from node.
+        int mNetworkInterface;                   ///<  ID of network interface to use (default is -1 or any).
     };
 };
 

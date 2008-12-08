@@ -158,6 +158,8 @@ namespace Jaus
             void ToggleBroadcast(const bool on);
             void SetMulticastAddress(const std::string& multicast = "224.1.0.1",
                                      const unsigned char ttl = 1);
+            bool SetNetworkInterface(const int num);
+            bool SetNetworkInterface(const std::string& address);
             std::string GetMulticastAddress() const { return mMulticastAddress; }
             bool AddSubsystem(const Byte subsystemID, const std::string& host);
             Byte GetMulticastTTL() const { return mMulticastTTL; }
@@ -171,6 +173,7 @@ namespace Jaus
             CxUtils::UdpClient mMulticastClient;    ///<  UDP client for sending UDP multicast.
             CxUtils::UdpServer mServer;             ///<  UDP server for receiving UDP messages.
             std::string mMulticastAddress;          ///<  Multicast address for transmission.
+            int mNetworkInterface;                  ///<  Network interface to use.
             unsigned char mMulticastTTL;            ///<  Time To Live (TTL) for multicast transmissions.
             std::set<Byte> mFixedConnections;       ///<  Unicast connections that can't be dynamically removed.
             std::map<Byte, CxUtils::UdpClient> mSubsystems;          ///<  Known subsystems and connections to them for sending unicast traffic.
@@ -197,17 +200,14 @@ namespace Jaus
         DataLink::Map* GetDataLinks();
         void UnlockDataLinks() const;
         std::vector<Byte> GetDataLinkList() const;
-        Configuration::Subsystem GetSubsystemConfiguration() const;
         Identification GetSubsystemIdentification() const;
         int SetSubsystemIdentification(const Identification& identity);
-        int SetSubsystemConfiguration(const Configuration::Subsystem& config);
     protected:
         DataLink::Map mDataLinks;       ///<  Map of Data Links.
         CxUtils::Mutex mDataLinksMutex; ///<  Mutex for thread protection of data links.
         Byte mSelectedDataLink;         ///<  The current selected data link.
         CxUtils::Mutex mConfigurationMutex;               ///< Thread protection of configuration data.
         Identification mSubsystemIdentification;          ///< Subsystem identification data.
-        Configuration::Subsystem mSubsystemConfiguration; ///< Subsystem configuration.
     private:
         CxUtils::Mutex mNodeConnectionHandlerMutex; ///<  Mutex for thread protection of node connection handler.
         StreamCallback* mpNodeConnectionHandler;    ///<  Routes all messages through the Node Manager.

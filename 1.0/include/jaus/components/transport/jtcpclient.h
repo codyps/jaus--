@@ -68,6 +68,7 @@ namespace Jaus
                        StreamCallback* cb);
         int Shutdown();
         int Send(const Stream& msg);
+        int SetNetworkInterface(const int num) { return mTCP.SetNetworkInterface(num); }
     protected:
         static void ClientThreadFunction(void *args);
         Address mDestinationID;         ///<  ID of destination connection.

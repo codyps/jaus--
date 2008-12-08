@@ -148,7 +148,9 @@ namespace Jaus
         LargeDataSet(const LargeDataSet& stream);
         ~LargeDataSet();
         //  Create data set from stream, and save list internally.
-        int CreateLargeDataSet(const Stream& packet, Header* sheader = NULL);
+        int CreateLargeDataSet(const Stream& packet, 
+                               Header* sheader = NULL, 
+                               const unsigned int transportHeaderSize = 0);
         //  Start assembling a multi-packet stream sequence.
         int StartLargeDataSet(const Stream& packet, const Header* header = NULL);
         //  Add stream to the data set being assembled.
@@ -181,7 +183,8 @@ namespace Jaus
         std::set<UShort> GetMissingPackets() const { return mMissing; }
         //  Generate or merge multi-packet streams.
         static int CreateLargeDataSet(const Stream& packet, 
-                                      Stream::List& stream);
+                                      Stream::List& stream, 
+                                      const unsigned int transportHeaderSize = 0);
         static int CreateLargeDataSet(const Stream& packet,
                                       unsigned char *buffer, 
                                       const unsigned int len,

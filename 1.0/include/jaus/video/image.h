@@ -47,6 +47,10 @@
 #include <iostream>
 #include "jaus/video/videolibdll.h"
 #include "jaus/messages/errorhistory.h"
+#include "jaus/video/jpeg/jpeg.h"
+#include "jaus/video/png/png.h"
+#include "jaus/video/pgm/pgm.h"
+#include "jaus/video/ppm/ppm.h"
 #include <cxutils/virtualfile.h>
 
 namespace Jaus

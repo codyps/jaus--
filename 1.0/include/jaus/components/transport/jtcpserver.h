@@ -67,6 +67,8 @@ namespace Jaus
         ~JTCPServer();
         int Initialize(StreamCallback* cb);
         int Shutdown();
+        bool SetNetworkInterface(const int netInterface);
+        bool IsActive() const { return mListenThread.IsThreadActive(); }
     private:
         ////////////////////////////////////////////////////////////////////////////////////
         ///

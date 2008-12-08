@@ -79,6 +79,8 @@ namespace Jaus
                          const long int tms = 0,
                          std::string* src = 0) const;
         int GetHostname(const Address& id, std::string& name) const;
+        bool IsActive() const { return mServerThread.IsThreadActive(); }
+        bool SetNetworkInterface(const int netInterface);
         std::map<Address, std::string> GetHostnames() const;
     private:
         static void ServerThread(void *args);   ///<  Thread function for continuous receiving.

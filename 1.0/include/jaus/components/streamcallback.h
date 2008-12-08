@@ -112,19 +112,22 @@ namespace Jaus
         ///    \brief Whenever a message is received for processing
         ///    this function is called to handle it immediately.
         ///
-        ///    \param msg The serialized message data in a Stream
+        ///    \param[in] msg The serialized message data in a Stream
         ///               structure.  Only a single message will
         ///               be written into the Stream, not
         ///               multiple.
-        ///    \param info Already read header information for
+        ///    \param[in] info Already read header information for
         ///                the stream if available.  NULL if data
         ///                has not been read yet.
-        ///    \param transport The transport layer the message comes from.
+        ///    \param[in] transport The transport layer the message comes from.
+        ///    \param[in] additionalData Pointer to optional additional data to use in 
+        ///                              the callback.
         ///
         ////////////////////////////////////////////////////////////////////////////////////
         virtual void ProcessStreamCallback(const Stream& msg,
                                            const Header* info,
-                                           const StreamCallback::Transport transport = StreamCallback::MessageHandler) = 0;
+                                           const StreamCallback::Transport transport = StreamCallback::MessageHandler,
+                                           void* additionalData = 0) = 0;
     };
 
     typedef std::map<UShort, StreamCallback::Data> StreamCallbackMap;   ///<  STL Map of Stream Callbacks.

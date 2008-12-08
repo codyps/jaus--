@@ -97,6 +97,30 @@ namespace Jaus
                                          unsigned int* jpegBufferSize,
                                          unsigned int* jpegSize,
                                          const int quality = -1);
+
+        ////////////////////////////////////////////////////////////////////////////////////
+        ///
+        ///   \class Compressor
+        ///   \brief If compressing multiple JPEG images, use a compressor because
+        ///          it will re-use memory for a slight speed up.
+        ///
+        ////////////////////////////////////////////////////////////////////////////////////
+        class JAUS_VIDEO_DLL Compressor
+        {
+        public:
+            Compressor();
+            ~Compressor();
+            int CompressImage(const unsigned short width,
+                              const unsigned short height,
+                              const unsigned char channels,
+                              const unsigned char* image,
+                              unsigned char** jpeg,
+                              unsigned int* jpegBufferSize,
+                              unsigned int* jpegSize,
+                              const int quality = -1);
+        private:
+            void* mpCompressionObject;
+        };
     }
 }
 

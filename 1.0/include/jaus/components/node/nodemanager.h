@@ -52,10 +52,14 @@
 #include "jaus/messages/common/configuration/service.h"
 #include "jaus/messages/common/configuration/configuration.h"
 #include "jaus/components/eventmanager.h"
-#include "jaus/components/node/nodeconnectionhandler.h"
+#include "jaus/components/receipt.h"
+#include "jaus/components/node/communicator.h"
 
 namespace Jaus
 {
+    class NodeConnectionHandler;
+    const unsigned int JAUS_NODE_SM_BUFFER_DEFAULT_SIZE    = 4194304;   ///<  Default Shared Memory size for the node to recieve messages.
+    
     ////////////////////////////////////////////////////////////////////////////////////
     ///
     ///   \class NodeManager
@@ -83,7 +87,7 @@ namespace Jaus
         int Initialize(const Byte sid, 
                        const Byte nid,
                        const bool tcp = false,
-                       const UInt smSize = JAUS_NODE_SM_DEFAULT_SIZE);
+                       const UInt smSize = JAUS_NODE_SM_BUFFER_DEFAULT_SIZE);
         // Initialize from settings file.
         int Initialize(const std::string& settingsXML);
         // Shutdown the node manager.
@@ -120,6 +124,10 @@ namespace Jaus
         int ProcessExperimentalMessage(const Message* msg);
         // Set the address to use for multicasting.
         int SetMulticastAddress(const std::string& multicast, const unsigned char ttl);
+        // Set the network interface to use for receiving network traffic.
+        bool SetNetworkInterface(const int num);
+        // Set the network interface to use for receiving network traffic.
+        bool SetNetworkInterface(const std::string& address);
         // Create a log file by generating a unique file name.
         int CreateLogFile();
         // Create a log file using specified file name.
@@ -171,20 +179,21 @@ namespace Jaus
         void ReportSubsystemListEvent(const bool lockNode = true, const bool lockEvents = true);
         static void ProcessConnectionEvent(const Byte type, const Address& id, void *args);
         static void MessageCallbackFunction(const Message*, void *);        
-        bool mInitializedFlag;                          ///<  Indicates node manager is initialized.
-        CxUtils::Mutex mNodeMutex;                      ///<  Mutex to protect node manager data.
-        Address mNodeID;                                ///<  Node ID.
-        Address::Set mNoEventSupport;                   ///<  List of nodes that do not support events.
-        EventManager mEvents;                           ///<  Node events.
-        Address::Set mSubsystemList;                    ///<  Subsystem list.
-        Service mServices;                              ///<  Node services.
-        Identification mSubsystemIdentification;        ///<  Subsystem identification.
-        Configuration mSystemConfiguration;             ///<  System configuration information.
-        NodeConnectionHandler* mpConnectionHandler;     ///<  Handles all connections.
-        MessageHandler *mpMessageHandler;               ///<  Handles all message processing for node.
-        volatile bool mSubsystemDiscoveryFlag;          ///<  Enable subsystem configuration discovery.
-        volatile unsigned int mConnectionEventTimeMs;   ///<  Time of last connection event in ms.
-        std::map<Byte, unsigned int> mNodeRequestTimeMs;///<  The last time the manager requested events/configuration from node in subsystem.
+        bool mInitializedFlag;                              ///<  Indicates node manager is initialized.
+        CxUtils::Mutex mNodeMutex;                          ///<  Mutex to protect node manager data.
+        Address mNodeID;                                    ///<  Node ID.
+        Address::Set mNoEventSupport;                       ///<  List of nodes that do not support events.
+        EventManager mEvents;                               ///<  Node events.
+        Address::Set mSubsystemList;                        ///<  Subsystem list.
+        Service mServices;                                  ///<  Node services.
+        Identification mSubsystemIdentification;            ///<  Subsystem identification.
+        Configuration mSystemConfiguration;                 ///<  System configuration information.
+        Configuration::Subsystem mSubsystemConfigFromXML;   ///<  Subsystem configuration data found in XML file.
+        NodeConnectionHandler* mpConnectionHandler;         ///<  Handles all connections.
+        MessageHandler *mpMessageHandler;                   ///<  Handles all message processing for node.
+        volatile bool mSubsystemDiscoveryFlag;              ///<  Enable subsystem configuration discovery.
+        volatile unsigned int mConnectionEventTimeMs;       ///<  Time of last connection event in ms.
+        std::map<Byte, unsigned int> mNodeRequestTimeMs;    ///<  The last time the manager requested events/configuration from node in subsystem.
     };
 }
 

@@ -138,7 +138,8 @@ namespace Jaus
         // Does quick pre-processing of received messages.
         virtual void ProcessStreamCallback(const Stream& msg,
                                            const Header* info,
-                                           const StreamCallback::Transport transport);
+                                           const StreamCallback::Transport transport,
+                                           void* additionalData = 0);
         // Processes large data packets.
         virtual int ProcessMultiPacketStream(const Stream& msg, const Header& header, Stream** merged);
         // Clears any pending receipts.

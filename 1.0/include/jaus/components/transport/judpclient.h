@@ -69,6 +69,7 @@ namespace Jaus
         int Initialize(const std::string& host);
         int InitializeMulticast(const std::string& host, const unsigned char ttl);
         void Shutdown();
+        bool SetNetworkInterface(const int netInterface);
         virtual int Send(const Stream& msg);
     private:
         CxUtils::UdpClient mClient;     ///<  Client socket connection.

@@ -79,18 +79,24 @@ namespace Jaus
         // Setup service for the Visual Sensor
         virtual int SetupService();
         //  Set raw uncompressed image data.
-        virtual int SetCurrentFrame(const Image &frame,
-                                    const UShort maxWidth = 0,
-                                    const UShort maxHeight = 0);
+        int SetCurrentFrame(const Image &frame,
+                            const UShort maxWidth = 0,
+                            const UShort maxHeight = 0);
         //  Set raw uncompressed image data.
-        virtual int SetCurrentFrame(const Byte * frame,       
-                                    const UShort width, 
-                                    const UShort height, 
-                                    const Byte channels,
-                                    const bool vflip,
-                                    const UShort maxWidth = 0,
-                                    const UShort maxHeight = 0);
+        int SetCurrentFrame(const Byte * frame,       
+                            const UShort width, 
+                            const UShort height, 
+                            const Byte channels,
+                            const bool vflip,
+                            const UShort maxWidth = 0,
+                            const UShort maxHeight = 0);
+        //  Set compressed image data.
+        int SetCurrentFrameCompressed(const Byte* image,
+                                      const unsigned int size,
+                                      const Image::Format format,
+                                      const bool decompress = false);
         virtual int ProcessCommandMessage(const Message* message, const Byte commandAuthority);
+        // Method to process incomming query messages.
         virtual int ProcessQueryMessage(const Message* message);
         // This method is called whenever a request for an event is made.
         virtual int ProcessEventRequest(const CreateEventRequest& command,
@@ -121,6 +127,9 @@ namespace Jaus
         Byte GetCameraID() const { return mCameraID; }
         // Gets the number of the frame set.
         unsigned int GetFrameNumber() const { return mFrameNumber; }
+        // If using JPEG compression, this sets the
+        // quality of it.
+        void SetJPEGQuality(const int quality);
     protected:       
         CxUtils::Mutex mImageMutex;         ///< Mutex to protect RAW image data.
         Image mRawImage;                    ///< The internal Image object to compress/decompress
@@ -134,6 +143,9 @@ namespace Jaus
         unsigned int mCompressedBufferSize; ///< Size of the buffer used for compression results.
         unsigned int mCompressedSize;       ///< Size of compressed image data.
         unsigned int mFrameNumber;          ///< Counter to know what the current frame number is.
+        volatile bool mEnableSharedImageFlag; ///<  If true, shared memory image is created.
+        int mJPEGQuality;                     ///<  Quality level for JPEG.
+        JPEG::Compressor mJPEGCompressor;     ///<  JPEG Compressor to re-use as much memory as possible.
     };
 }
 

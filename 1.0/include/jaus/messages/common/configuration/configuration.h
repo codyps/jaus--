@@ -75,7 +75,7 @@ namespace Jaus
         class JAUS_MSG_DLL Component
         {
         public:
-            typedef std::set<Component>     Set;       ///< STL set of component configurations.
+            typedef std::set<Component>     Set;    ///< STL set of component configurations.
             typedef std::vector<Component>  List;   ///< STL vector of component configurations.     
             Component();
             Component(const Byte cid, const Byte iid);
@@ -142,6 +142,7 @@ namespace Jaus
             void Print() const;
             void Clear();
             bool HaveComponent(const Address& id) const;
+            bool HaveComponentOfType(const Byte nodeID, const UShort cid);
             Component* GetComponent(const Address& id) const;
             Address::List GetAddresses() const;
             Address::List GetComponentsOfType(const UShort cid) const;
