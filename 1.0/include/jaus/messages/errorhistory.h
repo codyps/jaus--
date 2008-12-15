@@ -71,7 +71,6 @@ namespace Jaus
         virtual const char* GetLastJausErrorString() const;
         virtual void PrintJausError() const;
         virtual ErrorCodes::Type GetLastJausError() const;
-    protected:
         virtual void ClearLastJausError() const;
         virtual int SetJausError(const ErrorCodes::Type error) const;
         virtual int AssertJausError(const ErrorCodes::Type error) const;

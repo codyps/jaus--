@@ -132,6 +132,7 @@ namespace Jaus
         double GetVelocityX() const { return mVelocityX; }      // Check presence vector 1st!
         double GetVelocityY() const { return mVelocityY; }      // Check presence vector 1st!
         double GetVelocityZ() const { return mVelocityZ; }      // Check presence vector 1st!
+        double GetTravelSpeed() const;
         double GetVelocityRms() const { return mVelocityRms; }  // Check presence vector 1st!
         double GetRollRate() const { return mRollRate; }        // Check presence vector 1st!
         double GetPitchRate() const { return mPitchRate; }      // Check presence vector 1st!

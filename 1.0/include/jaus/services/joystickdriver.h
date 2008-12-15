@@ -150,7 +150,7 @@ namespace Jaus
         // Take/Release control of a subsystems visual sensor pose.
         int TakeCameraControl(const bool enable = true);
         // Get ID of the subsystem being driven.
-        Byte GetSubsystemID(const Byte sid) { return mSubsystemID; }
+        Byte GetSubsystemID(const Byte sid) { return mJoystickSubsystemID; }
         // Get the ID of the camera to control (if set).
         Byte GetCameraID() const { return mCameraID; }
         // Get the mode indicator vector for camera pose. Bits 0-5 indicate Rate/Position 1/0 for Pose Axis.
@@ -165,7 +165,7 @@ namespace Jaus
         void PrintCameraWrench() const;
     protected:
         static void JoystickCallback(const CxUtils::Joystick& joystick, void* args);
-        Byte mSubsystemID;                ///<  ID of the subsystem to drive.
+        Byte mJoystickSubsystemID;        ///<  ID of the subsystem to drive.
         Byte mCameraID;                   ///<  ID of the camera to control.
         Address mDriverID;                ///<  ID of primitive driver to control.
         Address mVisualSensorID;          ///<  ID of visual sensor to control.

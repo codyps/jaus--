@@ -128,7 +128,7 @@ namespace Jaus
             ////////////////////////////////////////////////////////////////////////////////////
             virtual bool Transmit(const Stream& data) = 0;
             // Method called when a message is received over your data link.
-            virtual bool ProcessReceivedMessage(const Stream& data);
+            virtual bool ProcessReceivedMessage(const Stream& data, void* additionalData);
             // Gets the ID of the data link.
             Byte GetID() const;
             // Gets the ID of the Subsystem of the Communicator.
@@ -164,6 +164,7 @@ namespace Jaus
             bool AddSubsystem(const Byte subsystemID, const std::string& host);
             Byte GetMulticastTTL() const { return mMulticastTTL; }
         protected:
+            typedef std::map<Address, JSharedMemory*> SharedMemoryMap; ///< Connections in shared memory.
             static void RecvThread(void *arg);      ///<  Method run in thread for receiving UDP traffic.
             State mLinkState;                       ///<  State of the link.
             bool mBroadcastFlag;                    ///<  If true, UDP broadcast is used over Multicast.
@@ -180,6 +181,7 @@ namespace Jaus
             std::map<Byte, unsigned int> mSubsystemHeartbeatTimesMs; ///<  Time at which a heartbeat message was received from a subsystem.
             Stream mTransportStream;                                 ///<  Stream used for transmitting data over UDP.
             Stream mRecvStream;                                      ///<  Buffer for receiving data on.
+            SharedMemoryMap mSharedMemoryConnections;                ///<  Connections to subsystems through shared memory.
         };
         Communicator();
         virtual ~Communicator();
@@ -194,7 +196,7 @@ namespace Jaus
         virtual int ProcessCommandMessage(const Message* msg, const Byte commandAuthority);
         virtual int ProcessQueryMessage(const Message* msg);
         // Method called when a message is received over your data link.
-        bool ProcessDataLinkMessage(const Stream& data);
+        bool ProcessDataLinkMessage(const Stream& data, void* additionalData);
         bool SetNodeConnectionHandlerCallback(StreamCallback* handler);
         void LockDataLinks() const;
         DataLink::Map* GetDataLinks();
