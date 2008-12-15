@@ -60,6 +60,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				LinkIncremental="2"
+				IgnoreDefaultLibraryNames="libcmt"
 				GenerateDebugInformation="true"
 				SubSystem="1"
 				TargetMachine="1"

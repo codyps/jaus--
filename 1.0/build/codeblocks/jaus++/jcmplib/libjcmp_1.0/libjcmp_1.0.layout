@@ -7,6 +7,9 @@
 	<File name="../../../../../include/jaus/components/transport/jsharedmemory.h" open="0" top="0" tabpos="3">
 		<Cursor position="4409" topLine="79" />
 	</File>
+	<File name="../../../../../include/jaus/components/transport/net.h" open="1" top="0" tabpos="2">
+		<Cursor position="2472" topLine="34" />
+	</File>
 	<File name="../../../../../src/jaus/components/commandcomponent.cpp" open="0" top="0" tabpos="9">
 		<Cursor position="953" topLine="0" />
 	</File>
@@ -42,9 +45,6 @@
 	</File>
 	<File name="../../../../../src/jaus/components/serviceconnection.cpp" open="0" top="0" tabpos="8">
 		<Cursor position="18134" topLine="552" />
-	</File>
-	<File name="../../../../../src/jaus/components/transport/jsharedmemory.cpp" open="0" top="0" tabpos="4">
-		<Cursor position="37045" topLine="1110" />
 	</File>
 	<File name="../../../../../src/jaus/components/transport/judpserver.cpp" open="0" top="0" tabpos="0">
 		<Cursor position="6610" topLine="184" />
