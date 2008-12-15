@@ -332,10 +332,14 @@ int main(int argc, char *argv[])
     visualSensor.Initialize(gSubsystem, gNode, 1);
 
     Jaus::Image imageData;
-
-    if(imageData.LoadFrame("images/calculon640.jpg") == Jaus::FAILURE)
+    unsigned int frameNumber = 0;
+    char fname[512];
+    sprintf(fname, "video/mgs_frames/mgs_image_%0.3d.jpg", frameNumber++);
+        
+    if(imageData.LoadFrame(fname) == Jaus::FAILURE)
     {
-        imageData.Create(640, 480, 3, NULL);
+        cout << "Can't find image data for simulated camera.\n";
+        return 0;
     }
 
     CxUtils::SleepMs(100);
@@ -402,7 +406,7 @@ int main(int argc, char *argv[])
     // Set frame rate
     visualSensor.SetFrameRate(15);
 
-    Sleep(50);
+    Sleep(50);    
 
     while(!gExitFlag)
     {
@@ -433,8 +437,19 @@ int main(int argc, char *argv[])
         {
             gExitFlag = true;
         }
+
+        // Load the next frame.
+        sprintf(fname, "video/mgs_frames/mgs_image_%0.3d.jpg", frameNumber++);
+        if(imageData.LoadFrame(fname) == Jaus::FAILURE)
+        {
+            // Loop forever (start over at image 0).
+            frameNumber = 0;
+            sprintf(fname, "video/mgs_frames/mgs_image_%0.3d.jpg", frameNumber++);
+            imageData.LoadFrame(fname);
+        }
+
         visualSensor.SetCurrentFrame(imageData);
-        Sleep(200);
+        Sleep(33);
     }
 
     primitiveDriver.Shutdown();

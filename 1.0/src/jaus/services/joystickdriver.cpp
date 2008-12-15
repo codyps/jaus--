@@ -58,7 +58,7 @@ JoystickDriver::JoystickDriver()
     memset(mButtonValues, 0, sizeof(int)*32);
     mTakeDriveControlFlag = false;
     mTakeCameraControlFlag = false;
-    mSubsystemID = 0;
+    mJoystickSubsystemID = 0;
     mCameraModeIndicator = 0;
     MapAxisToWrench(Joystick::Y, PropulsiveLinearEffortX, true, 2);
     MapAxisToWrench(Joystick::X, PropulsiveRotationalEffortZ, false, 2);
@@ -584,6 +584,11 @@ int JoystickDriver::TakeDriveControl(const bool enable)
     
     mJoystickMutex.Enter();
     mTakeDriveControlFlag = enable;
+	if(mTakeDriveControlFlag == false && mDriverID.IsValid())
+	{
+		SendStandbyCommand(mDriverID);
+        ReleaseComponentControl(mDriverID, 50);
+	}
     mJoystickMutex.Leave();
 
     return result;
@@ -627,7 +632,7 @@ int JoystickDriver::ProcessDiscoveryEvent(const Platform& subsystem, const Subsc
     if(eventType == SubscriberComponent::SubsystemDisconnect)
     {
         mJoystickMutex.Enter();
-        if(subsystem.GetSubsystemID() == mSubsystemID)
+        if(subsystem.GetSubsystemID() == mJoystickSubsystemID)
         {
             mDriverID(0, 0, 0, 0);
             mVisualSensorID(0, 0, 0, 0);
@@ -638,10 +643,10 @@ int JoystickDriver::ProcessDiscoveryEvent(const Platform& subsystem, const Subsc
     else
     {
         mJoystickMutex.Enter();
-        if(subsystem.GetSubsystemID() == mSubsystemID)
+        if(subsystem.GetSubsystemID() == mJoystickSubsystemID)
         {
             // If we haven't discovered a driving component yet, lets check for one.
-            if(mDriverID.IsValid() == false && mSubsystemID != 0 && mSubsystemID != 255)
+            if(mDriverID.IsValid() == false && mJoystickSubsystemID != 0 && mJoystickSubsystemID != 255)
             {
                 Address::List drivers = subsystem.GetConfiguration()->GetComponentsOfType(Service::PrimitiveDriver);
                 if(drivers.size() > 0)
@@ -651,7 +656,7 @@ int JoystickDriver::ProcessDiscoveryEvent(const Platform& subsystem, const Subsc
             }
             
             // If we haven't discovered a visual sensor component yet, lets check for one.
-            if(mVisualSensorID.IsValid() == false && mSubsystemID != 0 && mSubsystemID != 255)
+            if(mVisualSensorID.IsValid() == false && mJoystickSubsystemID != 0 && mJoystickSubsystemID != 255)
             {
                 Address::List sensors = subsystem.GetConfiguration()->GetComponentsOfType(Service::VisualSensor);
                 if(sensors.size() > 0)
@@ -739,12 +744,13 @@ int JoystickDriver::SetSubsystemToControl(const Byte sid)
     {
         std::set<Byte> subsystems;
         subsystems.insert(sid);
-        EnableSubsystemDiscovery(true, &subsystems);
+		AddSubsystemToDiscover(sid);
 
         mJoystickMutex.Enter();
-        mSubsystemID = sid;
+        mJoystickSubsystemID = sid;
         mJoystickMutex.Leave();
-        return JAUS_OK;
+        
+		return JAUS_OK;
     }
     return JAUS_FAILURE;
 }
@@ -1048,22 +1054,44 @@ void JoystickDriver::JoystickCallback(const CxUtils::Joystick& joystick, void *a
     {
         // Get the driver ID.
         Platform info;
-        if(driver->GetPlatformInfo(info, driver->mSubsystemID))
+        if(driver->GetPlatformInfo(info, driver->mJoystickSubsystemID))
         {
             Address::List drivers;
             drivers = info.GetConfiguration()->GetComponentsOfType(Service::PrimitiveDriver);
             if(drivers.size() > 0)
             {
                 driver->mDriverID = *drivers.begin();
-            }
+            }			
         }
+		if(driver->mDriverID.IsValid() == false && driver->mJoystickSubsystemID != 0)
+		{
+			static unsigned int queryTimeMs = 0;
+
+			if(Time::GetUtcTimeMs() - queryTimeMs > 1000)
+			{
+				QueryConfiguration queryConfiguration;
+				queryConfiguration.SetSourceID(driver->GetID());
+				queryConfiguration.SetDestinationID(Address(driver->mJoystickSubsystemID,
+															255, 1, 1));
+				queryConfiguration.SetQueryField((Byte)QueryConfiguration::Node);
+				driver->Send(&queryConfiguration);
+
+				QueryIdentification queryIdentification;
+				queryIdentification.SetSourceID(driver->GetID());
+				queryIdentification.SetDestinationID(Address(driver->mJoystickSubsystemID,
+															 255, 1, 1));
+				queryIdentification.SetQueryType((Byte)(QueryIdentification::Subsystem));
+				driver->Send(&queryIdentification);
+				queryTimeMs = Time::GetUtcTimeMs();
+			}
+		}
     }
 
     if(driver->mTakeCameraControlFlag && driver->mVisualSensorID.IsValid() == false)
     {
         // Get the driver ID.
         Platform info;
-        if(driver->GetPlatformInfo(info, driver->mSubsystemID))
+        if(driver->GetPlatformInfo(info, driver->mJoystickSubsystemID))
         {
             Address::List camera;
             camera = info.GetConfiguration()->GetComponentsOfType(Service::VisualSensor);

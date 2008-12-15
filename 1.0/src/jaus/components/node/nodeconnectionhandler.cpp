@@ -53,6 +53,10 @@
 using namespace std;
 using namespace Jaus;
 
+#ifndef WIN32
+#define JAUS_DEBUG
+#endif
+
 
 ////////////////////////////////////////////////////////////////////////////////////
 ///
@@ -127,7 +131,7 @@ int NodeConnectionHandler::Initialize(const Byte sid,
     {
         SetComponentID(Address(sid, nid, 1, 1));
 #ifdef JAUS_DEBUG
-        cout << "Initializing Shared Memory Input...";
+        cout << "\nInitializing Shared Memory Input...";
 #endif
         // Create an inbox in shared memory for the Node Manager
         if(mSharedMemoryInput.CreateInbox(GetID(), NULL, inboxSize) ||
@@ -313,9 +317,10 @@ int NodeConnectionHandler::Initialize(const Byte sid,
                         mCommunicator.SetSelectedDataLinkState(defaultLink->GetID(), Communicator::DataLink::On);
                     }
                     else
-                    {
+                    {                        
 #ifdef JAUS_DEBUG
                         cout << "Failure.\n";
+                        mCommunicator.PrintJausError();
 #endif
                     }
 
@@ -343,6 +348,7 @@ int NodeConnectionHandler::Initialize(const Byte sid,
                     else
                     {
                         SetJausError(ErrorCodes::ConnectionFailure);
+                        mpNodeManager->SetJausError(ErrorCodes::ConnectionFailure);
                     }
                 } // If Node ID is available.
             } // If initialized UDP input
@@ -1173,7 +1179,7 @@ int NodeConnectionHandler::SendToComponents(const Stream& msg, const Header& hea
                 if(Address::DestinationMatch(header.mDestinationID, component->first) &&
                     component->first != header.mSourceID)
                 {
-                    result &= component->second->EnqueueMessage(msg);
+                    result &= component->second->EnqueueMessage(msg) > 0 ? JAUS_OK : JAUS_FAILURE;
                 }
             }
         }
@@ -1183,7 +1189,7 @@ int NodeConnectionHandler::SendToComponents(const Stream& msg, const Header& hea
             component = mComponents.find(header.mDestinationID);
             if(component != mComponents.end())
             {
-                result = component->second->EnqueueMessage(msg);
+                result = component->second->EnqueueMessage(msg) > 0 ? JAUS_OK : JAUS_FAILURE;
             }
             // Maybe we haven't discovered the
             // component on this node yet, if this is
@@ -1204,7 +1210,7 @@ int NodeConnectionHandler::SendToComponents(const Stream& msg, const Header& hea
                     component = mComponents.find(header.mDestinationID);
                     if(component != mComponents.end())
                     {
-                        result = component->second->EnqueueMessage(msg);
+                        result = component->second->EnqueueMessage(msg) > 0 ? JAUS_OK : JAUS_FAILURE;
                     }
                 }
                 if(connection) { delete connection; }
@@ -1234,7 +1240,9 @@ int NodeConnectionHandler::SendToNodes(const Stream& msg, const Header& header)
 {
     int result = FAILURE;
     
-    if(header.mDestinationID.mSubsystem == 255 || header.mDestinationID.mSubsystem == mComponentID.mSubsystem)
+    if(header.mDestinationID.mSubsystem == 255 || 
+        header.mDestinationID.mSubsystem == mComponentID.mSubsystem ||
+        mNodeRegistry.IsRegistered(header.mDestinationID))
     {
         NodesMap::iterator node;
         if(header.mDestinationID.IsBroadcast())
@@ -1298,6 +1306,7 @@ int NodeConnectionHandler::SendToNodes(const Stream& msg, const Header& header)
             }
         }
     }
+
 
     return result;
 }
@@ -1512,6 +1521,7 @@ int NodeConnectionHandler::SendStream(const Stream& msg)
     // Perform normal send/routing operation for message.
     else
     {
+
         result |= SendToComponents(msg, header);
         result |= SendToNodes(msg, header);
         result |= SendToSubsystems(msg, header);
@@ -2173,12 +2183,6 @@ void NodeConnectionHandler::ProcessStreamCallback(const Stream &msg,
         return;
     }
 
-    if(header.mSourceID == Address(1, 1, 15, 1) && header.mDestinationID == Address(1, 2, 37, 1))
-    {
-        int x;
-        x = 3;
-    }
-
     // If message is for this node, then give it to the
     // message handler.
     if(header.mDestinationID == mComponentID ||
@@ -2263,7 +2267,7 @@ void NodeConnectionHandler::ProcessStreamCallback(const Stream &msg,
     // see if we have a connection, and if not, add one or update heartbeat time.
     if( header.mCommandCode == JAUS_REPORT_HEARTBEAT_PULSE &&
         (transport == StreamCallback::UDP || transport == StreamCallback::Communicator) &&
-        (header.mSourceID.mSubsystem == mComponentID.mSubsystem || header.mSourceID.mNode != mComponentID.mNode))
+        (header.mSourceID.mSubsystem == mComponentID.mSubsystem && header.mSourceID.mNode != mComponentID.mNode))
     {
         // Create a connection to the node manager if we do
         // not already have one.
@@ -2275,9 +2279,19 @@ void NodeConnectionHandler::ProcessStreamCallback(const Stream &msg,
         {
             //  See if this is a network connection.
             std::string host;
-            if( mUdpInput.GetHostname(header.mSourceID, host) )
+            // Try get the host name.
+            std::string* hostNamePtr = dynamic_cast<std::string*>((std::string*)(additionalData));
+            if( (mUdpInput.GetHostname(header.mSourceID, host) && !CxUtils::Socket::IsLocalhost(host.c_str())) ||
+                (hostNamePtr != NULL && !CxUtils::Socket::IsLocalhost(hostNamePtr->c_str())) )
             {
-                CreateConnection( nid, true, &host );
+                if(hostNamePtr)
+                {
+                    CreateConnection( nid, true, hostNamePtr );
+                }
+                else
+                {
+                    CreateConnection( nid, true, &host );
+                }
             }
             else
             {

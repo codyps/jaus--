@@ -1852,6 +1852,41 @@ void SubscriberComponent::CheckDiscoveryEvents()
             command.SetQueryMessage(&query);
             RequestEvent(command, NULL, 50, 1);
         }
+
+        // Go through the subsystem list and verify we have
+        // all the data we need.
+        Platform::Map::iterator platform;
+        
+        mSubsystemsMutex.Enter();
+        for(platform = mSubsystems.begin();
+            platform != mSubsystems.end();
+            platform++)
+        {
+            // If we don't have identification data yet, or we don't
+            // have complete subsystem identification send a query.
+            if(platform != mSubsystems.end() &&
+                platform->second.HaveIdentification() == false ||
+                (platform->second.HaveIdentification() &&
+                    platform->second.GetIdentification()->GetIdentification().empty() ||
+                    platform->second.GetIdentification()->GetType() != ReportIdentification::Subsystem))
+            {
+                Address::Set::iterator id;
+                for(id = mSubsystemList.begin();
+                    id != mSubsystemList.end();
+                    id++)
+                {
+                    if(id->mSubsystem == platform->second.GetSubsystemID())
+                    {
+                        QueryIdentification queryIdent;
+                        queryIdent.SetSourceID(GetID());
+                        queryIdent.SetDestinationID(*id);
+                        queryIdent.SetQueryType(QueryIdentification::Subsystem);                    
+                        Send(&queryIdent);
+                    }
+                }
+            }
+        }
+        mSubsystemsMutex.Leave();
     }
 }
 
@@ -1997,14 +2032,13 @@ void SubscriberComponent::UpdateSubsystemList(const ReportSubsystemList* report)
         id != newSubsystems.end();
         id++)
     {
+        // Query for the subsystem configuration.
+        queryConfig.SetDestinationID(*id);
+        Send(&queryConfig);
+        // Request an event in case the subsystem
+        // configuration every changes.
         request.SetDestinationID(*id);
-        if(RequestEvent(request) == JAUS_FAILURE)
-        {
-            // If we can't create and event, then
-            // send a query for the configuration.
-            queryConfig.SetDestinationID(*id);
-            Send(&queryConfig);
-        }
+        RequestEvent(request);
         // Query the subsystem identification.
         queryIdent.SetDestinationID(*id);
         Send(&queryIdent);
@@ -2053,12 +2087,18 @@ void SubscriberComponent::UpdateSubsystemList(const ReportSubsystemList* report)
             // do not have it.
             mSubsystemsMutex.Enter();
             platform = mSubsystems.find(id->mSubsystem);
+            // If we don't have identification data yet, or we don't
+            // have complete subsystem identification send a query.
             if(platform != mSubsystems.end() &&
-                platform->second.HaveIdentification() == false)
+                platform->second.HaveIdentification() == false ||
+                (platform->second.HaveIdentification() &&
+                    platform->second.GetIdentification()->GetIdentification().empty() ||
+                    platform->second.GetIdentification()->GetType() != ReportIdentification::Subsystem))
             {
                 queryIdent.SetDestinationID(*id);
                 Send(&queryIdent);
             }
+
             mSubsystemsMutex.Leave();            
         }
     }

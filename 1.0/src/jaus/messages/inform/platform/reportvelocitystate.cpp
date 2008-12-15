@@ -41,6 +41,7 @@
 #include "jaus/messages/inform/platform/reportvelocitystate.h"
 #include "jaus/messages/inform/informcodes.h"
 #include <iostream>
+#include <math.h>
 
 using namespace std;
 using namespace Jaus;
@@ -262,6 +263,21 @@ int ReportVelocityState::SetTimeStamp(const Time& tstamp)
     mTimeStamp = tstamp;
     mPresenceVector |= VectorMask::TimeStamp;
     return JAUS_OK;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////
+///
+///   \return The magnitude of the 3 velocity vectors.
+///
+////////////////////////////////////////////////////////////////////////////////////
+double ReportVelocityState::GetTravelSpeed() const
+{
+    double x, y, z;
+    x = GetVelocityX();
+    y = GetVelocityY();
+    z = GetVelocityZ();
+    return sqrt(x*x + y*y + z*z);
 }
 
 

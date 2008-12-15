@@ -1461,7 +1461,8 @@ int Stream::Read(LongFloat& val,
     case ScaledInteger::Byte:
         {
             Byte scaled;
-            if((read = Read(scaled, pos)))
+            read = Read(scaled, pos);
+            if(read > 0)
             {
                 val = ScaledInteger::ToDouble(scaled, upper, lower);
             }
@@ -1470,7 +1471,8 @@ int Stream::Read(LongFloat& val,
     case ScaledInteger::Short:
         {
             Short scaled;
-            if((read = Read(scaled, pos)))
+            read = Read(scaled, pos);
+            if(read > 0)
             {
                 val = ScaledInteger::ToDouble(scaled, upper, lower);
             }
@@ -1479,7 +1481,8 @@ int Stream::Read(LongFloat& val,
     case ScaledInteger::UShort:
         {
             UShort scaled;
-            if((read = Read(scaled, pos)))
+            read = Read(scaled, pos);
+            if(read > 0)
             {
                 val = ScaledInteger::ToDouble(scaled, upper, lower);
             }
@@ -1488,7 +1491,8 @@ int Stream::Read(LongFloat& val,
     case ScaledInteger::Int:
         {
             Int scaled;
-            if((read = Read(scaled, pos)))
+            read = Read(scaled, pos);
+            if(read > 0)
             {
                 val = ScaledInteger::ToDouble(scaled, upper, lower);
             }
@@ -1497,7 +1501,8 @@ int Stream::Read(LongFloat& val,
     case ScaledInteger::UInt:
         {
             UInt scaled;
-            if((read = Read(scaled, pos)))
+            read = Read(scaled, pos);
+            if(read > 0)
             {
                 val = ScaledInteger::ToDouble(scaled, upper, lower);
             }
@@ -1506,7 +1511,8 @@ int Stream::Read(LongFloat& val,
     case ScaledInteger::Long:
         {
             Long scaled;
-            if((read = Read(scaled, pos)))
+            read = Read(scaled, pos);
+            if(read > 0)
             {
                 val = ScaledInteger::ToDouble(scaled, upper, lower);
             }
@@ -1515,7 +1521,8 @@ int Stream::Read(LongFloat& val,
     case ScaledInteger::ULong:
         {
             ULong scaled;
-            if((read = Read(scaled, pos)))
+            read = Read(scaled, pos);
+            if(read > 0)
             {
                 val = ScaledInteger::ToDouble(scaled, upper, lower);
             }

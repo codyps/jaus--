@@ -26,7 +26,7 @@
 ///      * Neither the name of the ACTIVE LAB, IST, UCF, nor the
 ///        names of its contributors may be used to endorse or promote products
 ///        derived from this software without specific prior written permission.
-/// 
+///
 ///  THIS SOFTWARE IS PROVIDED BY THE ACTIVE LAB''AS IS'' AND ANY
 ///  EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 ///  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -67,7 +67,7 @@ Image::Format gImageFormat = Image::JPEG;
 class VideoSubscriber : public SubscriberComponent
 {
 public:
-    VideoSubscriber() 
+    VideoSubscriber()
     {
         mStartTimeMs = mUpdateTimeMs = mRecvCount = mTotalCount = 0;
     }
@@ -126,7 +126,6 @@ int main(int argc, char *argv[])
     Address nodeID;     // ID of the node manager.
     VideoSubscriber subscriber;
     Image image;
-    unsigned int currentNumber = 0;
 
     cout << "Looking for node manager...";
     while(gExitFlag == false)
@@ -150,7 +149,7 @@ int main(int argc, char *argv[])
     cout << "Initializing Image Subscriber...";
 
     // Initialize the component with any instance ID.
-   
+
     //****************************************************************
     //****************************************************************
     // You must create a larger message inbox for receiving image data
@@ -159,7 +158,7 @@ int main(int argc, char *argv[])
     //****************************************************************
     for(Byte i = 1; i < 255; i++)
     {
-        if(subscriber.Initialize("Video Subscriber", 
+        if(subscriber.Initialize("Video Subscriber",
                                  Address(nodeID.mSubsystem, nodeID.mNode, 15, i),
                                  JAUS_VISUAL_SENSOR_MESSAGE_BOX_SIZE) == JAUS_OK)
         {
@@ -178,12 +177,11 @@ int main(int argc, char *argv[])
 
     Sleep(50);
 
-    // Transition the component from the standy by state, 
-    // which is default after initialization to 
+    // Transition the component from the standy by state,
+    // which is default after initialization to
     // a ready state.
     subscriber.SetPrimaryStatus(Component::Status::Ready);
     bool createdEvent = false;
-    bool createdVelocityEvent = false;
     while(!gExitFlag)
     {
         // If connected to Node Manager...
@@ -191,7 +189,7 @@ int main(int argc, char *argv[])
         {
             // If no subscription has been made to any service provider, try create one.
             if(!createdEvent && subscriber.HaveEventSubscriptionsOfType(JAUS_REPORT_IMAGE) == false)
-            {                
+            {
                 // Clear receive count information.
                 subscriber.mTotalCount = 0;
                 subscriber.mRecvCount = 0;
@@ -203,28 +201,28 @@ int main(int argc, char *argv[])
                 queryConfiguration.SetSourceID(subscriber.GetID());
                 queryConfiguration.SetDestinationID(nodeID);
                 queryConfiguration.SetQueryField(QueryConfiguration::Subsystem);
-                
+
                 // Get the configuration of the subsystem to see if a Global Pose Sensor
                 // is present.
                 if(subscriber.Send(&queryConfiguration, receipt) == JAUS_OK)
                 {
-                    const ReportConfiguration* reportConfiguration = 
+                    const ReportConfiguration* reportConfiguration =
                                                     dynamic_cast<const ReportConfiguration*>(receipt.GetResponseMessage());
                     if(reportConfiguration)
                     {
                         // Find a visual sensor.
-                        Address::List sensors = 
+                        Address::List sensors =
                             reportConfiguration->GetConfiguration()->GetComponentsOfType((Byte)Service::VisualSensor);
 
                         if(sensors.size() > 0)
                         {
                             cout << "Create Event from Visual Sensor " << sensors.front().ToString() << "...";
-                            CreateEventRequest createEvent;                          
-                            
+                            CreateEventRequest createEvent;
+
                             createEvent.SetSourceID(subscriber.GetID());
                             createEvent.SetDestinationID(sensors.front());
-                            createEvent.SetMessageCode(JAUS_REPORT_IMAGE);                          
-                            createEvent.SetEventType(CreateEventRequest::EveryChange); 
+                            createEvent.SetMessageCode(JAUS_REPORT_IMAGE);
+                            createEvent.SetEventType(CreateEventRequest::EveryChange);
 
                             // Request the event.
                             if(subscriber.RequestEvent(createEvent) == JAUS_OK)

@@ -355,7 +355,7 @@ int VisualSensor::SetCurrentFrameCompressed(const Byte* image,
         memcpy(mpCompressedImage, image, size);
         mCompressedSize = size;
         mFrameNumber++;
-        mCompressionNumber = mFrameNumber;
+        mCompressionNumber = (UShort)mFrameNumber;
         if(decompress || mEnableSharedImageFlag)
         {
             if(mRawImage.Decompress(image, size, format))

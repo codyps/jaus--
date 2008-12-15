@@ -55,60 +55,6 @@ using namespace Jaus;
 
 bool gExitFlag = false;
 
-int LoadNumbers(std::vector<Image>& numbers)
-{
-    int result = 0;
-    Image img;
-    numbers.clear();
-    char buffer[256];
-
-    for(int i = 1; i <= 9; i++)
-    {
-        sprintf(buffer, "images/%d.jpg", i);
-        if(img.LoadFrame(buffer) == JAUS_FAILURE)
-        {
-            return 0;
-        }
-        numbers.push_back(img);
-    }
-    return 1;
-}
-
-
-void ApplyNumber(const unsigned int num, 
-                 const std::vector<Image>& numbers, 
-                 const Image& original, 
-                 Image& output)
-{
-    Byte* ptr1,* ptr2;
-
-    output = original;
-
-    ptr1 = numbers[num].ImageData();
-    ptr2 = output.ImageData();
-
-    for(UShort i = 0; i < numbers[num].Height(); i++)
-    {
-        for(UShort j = 0; j < numbers[num].Width(); j++)
-        {
-            if(i < output.Width() && j < output.Height())
-            {
-                if(ptr1[i*numbers[num].Width()*3 + j*3] == 254 &&
-                    ptr1[i*numbers[num].Width()*3 + j*3 + 1] == 0 &&
-                    ptr1[i*numbers[num].Width()*3 + j*3 + 2] == 0)
-                {
-                }
-                else
-                {
-                    ptr2[i*output.Width()*3 + j*3] = ptr1[i*numbers[num].Width()*3 + j*3];
-                    ptr2[i*output.Width()*3 + j*3 + 1] = ptr1[i*numbers[num].Width()*3 + j*3 + 1];
-                    ptr2[i*output.Width()*3 + j*3 + 2] = ptr1[i*numbers[num].Width()*3 + j*3 + 2];
-                }
-            }
-        }
-    }
-}
-
 
 int main(int argc, char *argv[])
 {
@@ -139,10 +85,11 @@ int main(int argc, char *argv[])
 
 
     // Set camera update rate.
+    unsigned int frameNumber = 1;
+    char fname[512];
     camera.SetFrameRate(30);
     // Load image data to simulate video.
-    if(original.LoadFrame("images/calculon640.jpg") == 0 ||
-       LoadNumbers(numbers) == 0)
+    if(original.LoadFrame("video/mgs_frames/mgs_image_000.jpg") == 0)
     {
         cout << "Failed to load image data for streaming.\n";
         return 0;
@@ -172,18 +119,24 @@ int main(int argc, char *argv[])
 
     while(!gExitFlag)
     {
-        ApplyNumber(currentNumber++, numbers, original, output);
-        if(currentNumber > 8)
-            currentNumber = 0;
+        // Load the next frame.
+        sprintf(fname, "video/mgs_frames/mgs_image_%0.3d.jpg", frameNumber++);
+        if(original.LoadFrame(fname) == FAILURE)
+        {
+            // Loop forever (start over at image 0).
+            frameNumber = 0;
+            sprintf(fname, "video/mgs_frames/mgs_image_%0.3d.jpg", frameNumber++);
+            original.LoadFrame(fname);
+        }
 
-        camera.SetCurrentFrame(output);
-        //output.SaveFrame("images/test.jpg");
+        camera.SetCurrentFrame(original);
+        
         cout << "Frame Number: " << camera.GetFrameNumber() << endl;
         if(CxUtils::GetChar() == 27)
         {
             gExitFlag = true;
         }
-        Sleep(10);
+        Sleep(33);
     }
 
     return 0;

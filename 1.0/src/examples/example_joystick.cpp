@@ -115,22 +115,28 @@ int main(int argc, char *argv[])
                 cout << "Failure!\n";
                 return 0;
             }
+			else				
+			{
+				joystick.SetSubsystemToControl(10);
+			}
         }
     }
-    else if(!joystick.InitializeJoystick())
+    else if(joystick.InitializeJoystick())
+	{
+		joystick.SetSubsystemToControl(nodeID.mSubsystem);
+	}
+	else
     {
         cout << "Failure!\n";
         return 0;
     }
-    cout << "Success!\n";
-   
-    joystick.SetSubsystemToControl(nodeID.mSubsystem);
+    cout << "Success!\n";    
 
     // Transition the component from the standy by state, 
     // which is default after initialization to 
     // a ready state.
     joystick.SetPrimaryStatus(Component::Status::Ready);   
-
+    joystick.SetSubsystemToControl(10);
     while(!gExitFlag)
     {
         cout << "=====================================================\n";

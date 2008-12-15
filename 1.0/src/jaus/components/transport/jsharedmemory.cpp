@@ -428,10 +428,10 @@ bool JSharedMemory::Registry::IsRegistered(const Address& id) const
 {
     bool result = false;
 
-    if( id.mSubsystem != mNodeID.mSubsystem ||
-        id.mNode != mNodeID.mNode )
+    if( mNodeRegistryFlag && 
+        (id.mSubsystem != mNodeID.mSubsystem || id.mNode != mNodeID.mNode ) )
     {
-            return result;
+        return result;
     }
 
     unsigned char *rcopy = NULL;
@@ -459,7 +459,8 @@ bool JSharedMemory::Registry::IsRegistered(const Address& id) const
             {
                 if( mNodeRegistryFlag )
                 {
-                    if( id.mSubsystem == mem[i] && id.mNode == mem[i+1] )
+                    if( (id.mSubsystem == mem[i] || id.mSubsystem == 255) && 
+                        (id.mNode == 255 && id.mNode == mem[i+1] ) )
                     {
                         result = true;
                         break;
@@ -652,10 +653,19 @@ int JSharedMemory::CreateInbox(const Address& id, StreamCallback *cb, const unsi
         //  created a message box for recieving using
         //  this ID. So fail.
         mSharedMemMutex.Leave();
-        return result;
+        // If the box is active, then it is in use so exit
+        // gracefully.
+        if(IsActive(500))
+        {
+            return result;
+        }
+        else
+        {
+            result = JAUS_OK;
+        }
     }
     //  Create shared memory location.
-    if(mBox.CreateMappedMemory(name, size + JAUS_SM_BASE))
+    if(result == JAUS_OK || mBox.CreateMappedMemory(name, size + JAUS_SM_BASE))
     {
         mBox.SetWritePos(0);
         mBox.Lock();

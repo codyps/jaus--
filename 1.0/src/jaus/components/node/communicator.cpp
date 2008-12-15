@@ -116,12 +116,17 @@ void Communicator::DataLink::SetID(const Byte id)
 ///   is added for the data link <b>MUST</b> be stripped.
 ///
 ///   \param data Serialized JAUS message data received over the data link.
+///   \param additionalData Pointer to additional data that may be needed. This
+///                         could be an IP address or whatever and is application
+///                         specific.  For DefaultDataLink it is the IP address
+///                         of the sender of the message.
 ///
 ///   \return True if the message was processed/consumed by the communicator
 ///   and false if not.
 ///
 ////////////////////////////////////////////////////////////////////////////////////
-bool Communicator::DataLink::ProcessReceivedMessage(const Stream &data)
+bool Communicator::DataLink::ProcessReceivedMessage(const Stream &data,
+													void* additionalData)
 {
     bool result = false;
 
@@ -130,7 +135,7 @@ bool Communicator::DataLink::ProcessReceivedMessage(const Stream &data)
     if(mpCommunicator)
     {
         // Sends to node manager for routing.
-        result = mpCommunicator->ProcessDataLinkMessage(data);
+        result = mpCommunicator->ProcessDataLinkMessage(data, additionalData);
     }
     //mCommunicatorMutex.Leave();
 
@@ -215,6 +220,17 @@ bool Jaus::Communicator::DefaultDataLink::SetState(const DataLink::State state)
         mServer.Shutdown();
         mRecvThread.StopThread(100);
         mSubsystems.clear();
+        SharedMemoryMap::iterator sharedMemory;
+        for(sharedMemory = mSharedMemoryConnections.begin();
+            sharedMemory != mSharedMemoryConnections.end();
+            sharedMemory++)
+        {
+            if(sharedMemory->second)
+            {
+                delete sharedMemory->second;
+            }
+        }
+        mSharedMemoryConnections.clear();
         mSubsystemHeartbeatTimesMs.clear();
     }
     else if(state == On)
@@ -275,12 +291,15 @@ bool Communicator::DefaultDataLink::Transmit(const Stream& data)
             mTransportStream.Write((const unsigned char *)gNetworkHeader.c_str(), (unsigned int)gNetworkHeader.size());
             mTransportStream.Write(data);
             std::map<Byte, CxUtils::UdpClient>::iterator destination;
+            SharedMemoryMap::iterator sharedMemory;
             // If broadcast send to all subsystems.
             if(header.mDestinationID.IsBroadcast())
             {
                 // If using a hearbeat pulse message, treat differently by using
                 // UDP Multicast or Broadcast.
-                if(header.mCommandCode == JAUS_REPORT_HEARTBEAT_PULSE)
+                if(header.mCommandCode == JAUS_REPORT_HEARTBEAT_PULSE && 
+                    (header.mDestinationID.mSubsystem == GetSubsystemID() || header.mDestinationID.mSubsystem == 255) && \
+                    header.mDestinationID.mNode == 255 && header.mDestinationID.mComponent == 1 && header.mDestinationID.mInstance == 1)
                 {
                     if(mBroadcastFlag)
                     {
@@ -293,6 +312,17 @@ bool Communicator::DefaultDataLink::Transmit(const Stream& data)
                 }
                 else
                 {
+                    // Send to shared memory connections.
+                    for(sharedMemory = mSharedMemoryConnections.begin();
+                        sharedMemory != mSharedMemoryConnections.end();
+                        sharedMemory++)
+                    {
+                        if(sharedMemory->first.mSubsystem != GetSubsystemID())
+                        {
+                            // Don't need to send message with transport to shared memory.
+                            if(sharedMemory->second->EnqueueMessage(data) > 0) { result = true; }
+                        }
+                    }
                     for(destination = mSubsystems.begin();
                         destination != mSubsystems.end();
                         destination++)
@@ -306,10 +336,19 @@ bool Communicator::DefaultDataLink::Transmit(const Stream& data)
             }
             else
             {
-                destination = mSubsystems.find(header.mDestinationID.mSubsystem);
-                if(destination != mSubsystems.end())
+                sharedMemory = mSharedMemoryConnections.find(Address(header.mDestinationID.mSubsystem, header.mDestinationID.mNode, 1, 1));
+                if(sharedMemory != mSharedMemoryConnections.end())
                 {
-                    if(destination->second.Send(mTransportStream)) { result = true; }
+                    // Don't need to send message with transport to shared memory.
+                    if(sharedMemory->second->EnqueueMessage(data) > 0) { result = true; }
+                }
+                else
+                {
+                    destination = mSubsystems.find(header.mDestinationID.mSubsystem);
+                    if(destination != mSubsystems.end())
+                    {
+                        if(destination->second.Send(mTransportStream)) { result = true; }
+                    }
                 }
             }
         }
@@ -513,12 +552,31 @@ void Communicator::DefaultDataLink::RecvThread(void *arg)
                         connection = link->mSubsystems.find(header.mSourceID.mSubsystem);
                         if(connection == link->mSubsystems.end())
                         {
-                            // Create a new connection, but only do so if within the same network that
-                            // I'm allowed to receive on.
-                            link->mSubsystems[header.mSourceID.mSubsystem].InitializeSocket(source.c_str(), gNetworkPort);
+                            // See if we have a connection in shared memory.
+                            SharedMemoryMap::iterator smConnection = link->mSharedMemoryConnections.find(Address(header.mSourceID.mSubsystem, header.mSourceID.mNode, 1, 1));
+                            if(smConnection == link->mSharedMemoryConnections.end())
+                            {
+                                // Try connection through shared memory first.
+                                JSharedMemory* newSharedConnection = new JSharedMemory();
+                                if(newSharedConnection->OpenInbox(Address(header.mSourceID.mSubsystem, header.mSourceID.mNode, 1, 1)) == JAUS_OK)
+                                {
+                                    link->mSharedMemoryConnections[Address(header.mSourceID.mSubsystem, header.mSourceID.mNode, 1, 1)] = newSharedConnection;
+                                    newSharedConnection = NULL;
+                                }
+                                  
+                                // Create a new connection, but only do so if within the same network that
+                                // I'm allowed to receive on.
+                                link->mSubsystems[header.mSourceID.mSubsystem].InitializeSocket(source.c_str(), gNetworkPort);
+   
+                                if(newSharedConnection)
+                                {
+                                    delete newSharedConnection;
+                                    newSharedConnection = NULL;
+                                }
 #ifdef _JAUS_DEBUG
-                            cout << "Created Connection To " << header.mSourceID.ToString() << ", at: " << source << endl;
+                                cout << "Created Connection To " << header.mSourceID.ToString() << ", at: " << source << endl;
 #endif
+                            }
                         }
                         // If this is a hearbeat message, use it to update timestamps so we
                         // can maintain UDP unicast client connections (to reduce bandwidth).
@@ -531,7 +589,7 @@ void Communicator::DefaultDataLink::RecvThread(void *arg)
 
                         link->mRecvStream.SetReadPos(0);
                         // Process the data.
-                        link->ProcessReceivedMessage(link->mRecvStream);
+                        link->ProcessReceivedMessage(link->mRecvStream, &source);
                     }
                 }
             }
@@ -563,6 +621,25 @@ void Communicator::DefaultDataLink::RecvThread(void *arg)
                 }
                 timestampMs++;
             }
+            
+            // Delete old shared memory connections.
+            SharedMemoryMap::iterator smConnection;
+            smConnection = link->mSharedMemoryConnections.begin();
+            while(smConnection != link->mSharedMemoryConnections.end())
+            {
+                if(smConnection->second->IsActive() == false)
+                {
+                    smConnection->second->Close();
+                    delete smConnection->second;
+                    link->mSharedMemoryConnections.erase(smConnection);
+                    smConnection = link->mSharedMemoryConnections.begin();
+                }
+                else
+                {
+                    smConnection++;
+                }
+            }
+           
             link->mConnectionsMutex.Leave();
 
             CxUtils::SleepMs(1);
@@ -1117,17 +1194,25 @@ int Communicator::ProcessQueryMessage(const Message* msg)
 ///   will pass to the Node Manager for routing via the Node Connection Handler.
 ///
 ///   \param data Received JAUS message to process/route.
+///   \param additionalData Pointer to additional data that may be needed. This
+///                         could be an IP address or whatever and is application
+///                         specific.  For DefaultDataLink it is the IP address
+///                         of the sender of the message.
 ///
 ///   \return True on success, otherwise failure.
 ///
 ////////////////////////////////////////////////////////////////////////////////////
-bool Communicator::ProcessDataLinkMessage(const Stream &data)
+bool Communicator::ProcessDataLinkMessage(const Stream &data,
+                                          void* additionalData)
 {
     data.SetReadPos(0);
     if(mpNodeConnectionHandler)
     {
         mNodeConnectionHandlerMutex.Enter();
-        mpNodeConnectionHandler->ProcessStreamCallback(data, NULL, StreamCallback::Communicator);
+        mpNodeConnectionHandler->ProcessStreamCallback(data, 
+                                                       NULL, 
+                                                       StreamCallback::Communicator, 
+                                                       additionalData);
         mNodeConnectionHandlerMutex.Leave();
         return true;
     }

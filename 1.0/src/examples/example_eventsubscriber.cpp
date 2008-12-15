@@ -27,7 +27,7 @@
 ///      * Neither the name of the ACTIVE LAB, IST, UCF, nor the
 ///        names of its contributors may be used to endorse or promote products
 ///        derived from this software without specific prior written permission.
-/// 
+///
 ///  THIS SOFTWARE IS PROVIDED BY THE ACTIVE LAB''AS IS'' AND ANY
 ///  EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 ///  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -70,7 +70,7 @@ double gPeriodicRate = 2.0;
 class GlobalPoseEventSubscriber : public SubscriberComponent
 {
 public:
-    GlobalPoseEventSubscriber() 
+    GlobalPoseEventSubscriber()
     {
         mStartTimeMs = mUpdateTimeMs = mRecvCount = mTotalCount = 0;
     }
@@ -106,11 +106,11 @@ public:
                         mRecvCount++;
                         mTotalCount++;
                         // If we've received 10 messages, calculate the upate
-                        // rate, so we can verify we are getting information at 
+                        // rate, so we can verify we are getting information at
                         // the rate requested.
                         if(mRecvCount > gPeriodicRate*2)
                         {
-                            double fps = (mTotalCount - 1)*1000.0/(mUpdateTimeMs - mStartTimeMs);    
+                            double fps = (mTotalCount - 1)*1000.0/(mUpdateTimeMs - mStartTimeMs);
                             mRecvCount = 0;
                             mStartTimeMs = CxUtils::Timer::GetTimeMs();
                             mTotalCount = 0;
@@ -164,7 +164,6 @@ int main(int argc, char *argv[])
 {
     Address nodeID;     // ID of the node manager.
     GlobalPoseEventSubscriber subscriber;
-    EventManager* eventManager = NULL;
 
     cout << "Looking for node manager...";
     while(gExitFlag == false)
@@ -190,7 +189,7 @@ int main(int argc, char *argv[])
     // Initialize the component with any instance ID.
     for(Byte i = 1; i < 255; i++)
     {
-        if(subscriber.Initialize("Global Pose Subscriber", 
+        if(subscriber.Initialize("Global Pose Subscriber",
                                  Address(nodeID.mSubsystem, nodeID.mNode, 3, i)) == JAUS_OK)
         {
             break;
@@ -208,8 +207,8 @@ int main(int argc, char *argv[])
 
     Sleep(50);
 
-    // Transition the component from the standy by state, 
-    // which is default after initialization to 
+    // Transition the component from the standy by state,
+    // which is default after initialization to
     // a ready state.
     subscriber.SetPrimaryStatus(Component::Status::Ready);
     bool createdEvent = false;
@@ -221,7 +220,7 @@ int main(int argc, char *argv[])
         {
             // If no subscription has been made to any service provider, try create one.
             if(!createdEvent && subscriber.HaveEventSubscriptionsOfType(JAUS_REPORT_GLOBAL_POSE) == false)
-            {                
+            {
                 // Clear receive count information.
                 subscriber.mTotalCount = 0;
                 subscriber.mRecvCount = 0;
@@ -233,17 +232,17 @@ int main(int argc, char *argv[])
                 queryConfiguration.SetSourceID(subscriber.GetID());
                 queryConfiguration.SetDestinationID(nodeID);
                 queryConfiguration.SetQueryField(QueryConfiguration::Subsystem);
-                
+
                 // Get the configuration of the subsystem to see if a Global Pose Sensor
                 // is present.
                 if(subscriber.Send(&queryConfiguration, receipt) == JAUS_OK)
                 {
-                    const ReportConfiguration* reportConfiguration = 
+                    const ReportConfiguration* reportConfiguration =
                                                     dynamic_cast<const ReportConfiguration*>(receipt.GetResponseMessage());
                     if(reportConfiguration)
                     {
                         // Find a global pose sensors.
-                        Address::List sensors = 
+                        Address::List sensors =
                             reportConfiguration->GetConfiguration()->GetComponentsOfType((Byte)Service::GlobalPoseSensor);
 
                         if(sensors.size() > 0)
@@ -256,10 +255,10 @@ int main(int argc, char *argv[])
                             UShort presenceVector = 0;
                             CreateEventRequest createEvent;
                             QueryGlobalPose queryGlobalPose;
-                            
+
                             createEvent.SetSourceID(subscriber.GetID());
                             createEvent.SetDestinationID(sensors.front());
-                            createEvent.SetMessageCode(JAUS_REPORT_GLOBAL_POSE);                          
+                            createEvent.SetMessageCode(JAUS_REPORT_GLOBAL_POSE);
 
                             // Set the query options for the event. (we want latitude and longitude).
                             BitVector::SetBit(presenceVector, QueryGlobalPose::VectorBit::Latitude);
@@ -268,14 +267,14 @@ int main(int argc, char *argv[])
                             BitVector::SetBit(presenceVector, QueryGlobalPose::VectorBit::Roll);
                             BitVector::SetBit(presenceVector, QueryGlobalPose::VectorBit::Pitch);
                             BitVector::SetBit(presenceVector, QueryGlobalPose::VectorBit::Yaw);
-                            BitVector::SetBit(presenceVector, QueryGlobalPose::VectorBit::TimeStamp);                               
+                            BitVector::SetBit(presenceVector, QueryGlobalPose::VectorBit::TimeStamp);
                             queryGlobalPose.SetPresenceVector(presenceVector);
                             createEvent.SetQueryMessage(&queryGlobalPose);
-                            
+
                             // Depending on the instance ID of the subscriber, create events
                             // on any change, or periodic.  This is only done for testing purposes.
                             switch(subscriber.GetID().mInstance)
-                            {                            
+                            {
                             case 2:
                                 gUsePeriodicEvents = true;
                                 createEvent.SetEventType(CreateEventRequest::Periodic);
@@ -283,15 +282,15 @@ int main(int argc, char *argv[])
                                 createEvent.SetMinimumPeriodicUpdateRate(1.0);
                                 break;
                             case 3:
-                                createEvent.SetEventType(CreateEventRequest::EveryChange); 
+                                createEvent.SetEventType(CreateEventRequest::EveryChange);
                             case 4:
                                 gUsePeriodicEvents = true;
                                 createEvent.SetEventType(CreateEventRequest::Periodic);
                                 createEvent.SetRequestedPeriodicUpdateRate(gPeriodicRate);
                                 createEvent.SetMinimumPeriodicUpdateRate(1.0);
-                                break;                            
+                                break;
                             default:
-                                createEvent.SetEventType(CreateEventRequest::EveryChange);                                
+                                createEvent.SetEventType(CreateEventRequest::EveryChange);
                                 break;
                             };
                             // Request the event.
@@ -313,24 +312,24 @@ int main(int argc, char *argv[])
             }
             // If no subscription has been made to any service provider, try create one.
             if(!createdVelocityEvent && subscriber.HaveEventSubscriptionsOfType(JAUS_REPORT_VELOCITY_STATE) == false)
-            { 
+            {
                 QueryConfiguration queryConfiguration;
                 Receipt receipt;
 
                 queryConfiguration.SetSourceID(subscriber.GetID());
                 queryConfiguration.SetDestinationID(nodeID);
                 queryConfiguration.SetQueryField(QueryConfiguration::Subsystem);
-                
+
                 // Get the configuration of the subsystem to see if a Global Pose Sensor
                 // is present.
                 if(subscriber.Send(&queryConfiguration, receipt) == JAUS_OK)
                 {
-                    const ReportConfiguration* reportConfiguration = 
+                    const ReportConfiguration* reportConfiguration =
                                                     dynamic_cast<const ReportConfiguration*>(receipt.GetResponseMessage());
                     if(reportConfiguration)
                     {
                         // Find a global pose sensors.
-                        Address::List sensors = 
+                        Address::List sensors =
                             reportConfiguration->GetConfiguration()->GetComponentsOfType((Byte)Service::VelocityStateSensor);
 
                         if(sensors.size() > 0)
@@ -340,15 +339,14 @@ int main(int argc, char *argv[])
                             // Depending on the component instance of this component
                             // create a different kind of event.  This is done to
                             // show how to create (and test) the different types of events.
-                            UShort presenceVector = 0;
                             CreateEventRequest createEvent;
-                            
+
                             createEvent.SetSourceID(subscriber.GetID());
                             createEvent.SetDestinationID(sensors.front());
-                            createEvent.SetMessageCode(JAUS_REPORT_TRAVEL_SPEED);                          
-                                                     
+                            createEvent.SetMessageCode(JAUS_REPORT_TRAVEL_SPEED);
+
                             createEvent.SetEventType(CreateEventRequest::EveryChange);
-                            
+
                             // Request the event.
                             if(subscriber.RequestEvent(createEvent) == JAUS_OK)
                             {

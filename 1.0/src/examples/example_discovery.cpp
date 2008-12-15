@@ -139,7 +139,9 @@ class MyComponent : public SubscriberComponent
                 }
             }
         }
-        return JAUS_OK;
+
+        // Pass to parent in case it needs the data too.
+        return SubscriberComponent::ProcessDiscoveryEvent(subsystem, eventType);
     }
 };
 
@@ -199,7 +201,8 @@ int main(int argc, char *argv[])
     // this subsystem and subsystems 8.
     std::set<Byte> toDiscover;
     // We do not need to add our own subsystem
-    // number to this list, because it is added automatically.
+    // number to this list, because it is added automatically.  Pass
+    // a NULL value to discover all subssytems.
     toDiscover.insert(1);
     toDiscover.insert(8);
     toDiscover.insert(10);
