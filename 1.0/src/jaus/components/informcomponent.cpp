@@ -1362,7 +1362,7 @@ void InformComponent::SubscriptionsLoop()
     while(mPeriodicEventThread.QuitThreadFlag() == false)
     {
         // Only check once a second for lost/non-updating connections
-        if(Time::GetUtcTimeMs() - lastCheckTimeMs > 2500)
+        if(Time::GetUtcTimeMs() - lastCheckTimeMs > mDiscoveryTTL)
         {
             CheckServiceConnections();
             if(mPeriodicEventThread.QuitThreadFlag() == false)
@@ -1389,6 +1389,7 @@ void InformComponent::SubscriptionsLoop()
         {
             mEventManager.Lock();
             numEvents = (unsigned int)mEventManager.GetEventSubscriptions()->size();
+            numEvents = (unsigned int)mEventManager.GetProducedEvents()->size();
             mEventManager.Unlock();
         }
         // If we have no service connections or
@@ -1411,6 +1412,7 @@ void InformComponent::SubscriptionsLoop()
         usleep(500);
 #endif
     }
+
 }
 
 

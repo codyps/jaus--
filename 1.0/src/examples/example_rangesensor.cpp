@@ -1,12 +1,13 @@
 ////////////////////////////////////////////////////////////////////////////////////
 ///
-///  \file example_joystick.cpp
-///  \brief Example program showing how to use the JoystickDriver class
-///  to control a Primitive Driver component.
+///  \file example_rangesensor.cpp
+///  \brief Example program showing how to use the RangeSensor service class to
+///  create a Range Sensor.  This program simulates data that would come from
+///  something like a SICK LIDAR.  Data be visualized with the wxrangesensorclient
+///  program.
 ///
 ///  <br>Author(s): Daniel Barber
-///  <br>Created: 25 April 2008
-///  <br>Last Modified: 6 May 2008
+///  <br>Created: 19 December 2008
 ///  <br>Copyright (c) 2008
 ///  <br>Applied Cognition and Training in Immersive Virtual Environments
 ///  <br>(ACTIVE) Laboratory
@@ -26,7 +27,7 @@
 ///      * Neither the name of the ACTIVE LAB, IST, UCF, nor the
 ///        names of its contributors may be used to endorse or promote products
 ///        derived from this software without specific prior written permission.
-/// 
+///
 ///  THIS SOFTWARE IS PROVIDED BY THE ACTIVE LAB''AS IS'' AND ANY
 ///  EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 ///  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -41,27 +42,26 @@
 ////////////////////////////////////////////////////////////////////////////////////
 #include <iostream>
 #include <iomanip>
-#include "jaus/services/srvclib.h"
-#include <cxutils/cxutils.h>
+#include "jaus/jaus++.h"
+#include "jaus/services/rangesensor.h"
 #include <vector>
 #ifdef WIN32
-#include <conio.h>
+#include <vld.h>
 #endif
+
+#include <math.h>
 
 using namespace std;
 using namespace CxUtils;
 using namespace Jaus;
 
-bool gExitFlag = false;
-
-
 int main(int argc, char *argv[])
 {
     Address nodeID;     // ID of the node manager.
-    JoystickDriver joystick;
-    
+    RangeSensor sensor;
+
     cout << "Looking for node manager...";
-    while(gExitFlag == false)
+    while(true)
     {
         if(Component::IsNodeManagerPresent(&nodeID))
         {
@@ -69,6 +69,10 @@ int main(int argc, char *argv[])
             cout << "Node Manager ID is: ";
             nodeID.PrintID();
             break;
+        }
+        if(CxUtils::GetChar() == 27)
+        {
+            return 0;
         }
         Sleep(100);
     }
@@ -79,20 +83,10 @@ int main(int argc, char *argv[])
         return 0;
     }
 
-    cout << "Initializing Component for Discovery... ";
-     
+    cout << "Initializing Range Sensor Component...";
+
     // Initialize the component with any instance ID.
-    for(Byte i = 1; i < 255; i++)
-    {
-        if(joystick.Initialize("JoystickDriver", 
-                                Address(nodeID.mSubsystem, nodeID.mNode, 5, i)) == JAUS_OK)
-        {
-            joystick.AddSubsystemToDiscover(nodeID.mSubsystem);
-            break;
-        }
-    }
-  
-    if(joystick.IsInitialized())
+    if(sensor.Initialize(nodeID.mSubsystem, nodeID.mNode))
     {
         cout << "Success!\n";
     }
@@ -102,55 +96,73 @@ int main(int argc, char *argv[])
         return 0;
     }
 
-    Sleep(50);
-
-    cout << "Initializing Connection to Joystick...";
+    sensor.SetPrimaryStatus(Component::Status::Ready);
     
-    if(argc > 1)
+    ReportRelativeObjectPosition object;
+    double range = 0;;
+
+    cout << "Press Escape to Exit\n";
+    CxUtils::SleepMs(1500);
+    unsigned int scanNumber = 0;
+    // ReportSickLidar is a non-JAUS standard message, but 
+    // is useful to represent data from a SICK LIDAR.  If you use this
+    // in conjuction to the standard messages you will be OK.
+    ReportSickLidar reportLidar;
+    ReportSickLidar::Scan scan;
+    while(true)
     {
-        if(!joystick.InitializeJoystick(argv[1]))
+        // Generate fake range sensor data.  Bearing is around the local
+        // coordinate system, so a value of 0 is in front of the vehicle, a value
+        // of 45 degrees to the front right, and -45 degrees front left, etc.
+        // This simulates a 180 degree scan from left to right.
+
+        range = 8.0;
+        UShort objectID = 0;
+        bool decreaseRange = true;
+        scan.clear();
+        for(double bearing = -90.0; bearing <= 90.0; bearing += 0.5)
         {
-            if(!joystick.InitializeJoystick())
+            // Simulate SICK data with MM accuracy 180 degree scan half degree res.
+            scan.push_back(abs((UShort)(range*1000.0))); 
+
+            // Populate JAUS standard data (Report Relative Object Position).
+            object.SetRange(range);
+            object.SetBearing(JAUS_DEG2RAD(bearing));
+            object.SetInclination(0);
+            object.SetObjectID(objectID++);
+            object.SetTimeStamp(Jaus::Time::GetUtcTime());
+            sensor.SetRelativeObjectPosition(object);
+
+            if(decreaseRange)
             {
-                cout << "Failure!\n";
-                return 0;
+                range -= 0.2;
+                if(range < 5.0)
+                {
+                    decreaseRange = false;
+                }
             }
-			else				
-			{
-				joystick.SetSubsystemToControl(nodeID.mSubsystem);
-			}
+            else
+            {
+                range += 0.2;
+                if(range > 8.0)
+                {
+                    decreaseRange = true;
+                }
+            }
         }
-    }
-    else if(joystick.InitializeJoystick())
-	{
-		joystick.SetSubsystemToControl(nodeID.mSubsystem);
-	}
-	else
-    {
-        cout << "Failure!\n";
-        return 0;
-    }
-    cout << "Success!\n";    
 
-    // Transition the component from the standy by state, 
-    // which is default after initialization to 
-    // a ready state.
-    joystick.SetPrimaryStatus(Component::Status::Ready);   
+        reportLidar.SetScanData(scan, Jaus::Time::GetUtcTime(), ReportSickLidar::Millimeter, ReportSickLidar::OneEightyDegreesHalfRes);
+        // Save to sensor.
+        sensor.SetSickLidarData(reportLidar);
 
-    while(!gExitFlag)
-    {
-        cout << "=====================================================\n";
-        joystick.PrintWrenchEffort();
-        joystick.PrintCameraWrench();
+        cout << "Scan: " << scanNumber++ << endl;
+
         if(CxUtils::GetChar() == 27)
         {
-            gExitFlag = true;
+            break;
         }
-
-        Sleep(100);
+        CxUtils::SleepMs(15);
     }
-
-    joystick.Shutdown();
 
     return 0;
 }

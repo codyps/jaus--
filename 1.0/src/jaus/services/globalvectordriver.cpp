@@ -338,7 +338,12 @@ int GlobalVectorDriver::ProcessCommandMessage(const Message* msg, const Byte com
 
     if(result == JAUS_FAILURE)
     {
-        return CommandComponent::ProcessCommandMessage(msg, commandAuthority);
+        result = CommandComponent::ProcessCommandMessage(msg, commandAuthority);
+    }
+    else
+    {
+        // Always run parent process command in case it needs the data too.
+        CommandComponent::ProcessCommandMessage(msg, commandAuthority);
     }
     return result;
 }
@@ -391,7 +396,12 @@ int GlobalVectorDriver::ProcessQueryMessage(const Message* msg)
 
     if(result == JAUS_FAILURE)
     {
-        return CommandComponent::ProcessQueryMessage(msg);
+        result = CommandComponent::ProcessQueryMessage(msg);
+    }
+    else
+    {
+        // Always run parent process command in case it needs the data too.
+        CommandComponent::ProcessQueryMessage(msg);
     }
     return result;
 }
@@ -484,8 +494,16 @@ int GlobalVectorDriver::ProcessInformMessage(const Message* msg)
 
     // Still let parent class process (in case dynamic discovery is
     // enabled and parent class needs this data too.
-    return CommandComponent::ProcessInformMessage(msg);
-
+    if(result == JAUS_FAILURE)
+    {
+        result = CommandComponent::ProcessInformMessage(msg);
+    }
+    else
+    {
+        // Always run parent process command in case it needs the data too.
+        CommandComponent::ProcessInformMessage(msg);
+    }
+    return result;
 }
 
 

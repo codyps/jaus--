@@ -65,7 +65,7 @@ VisualSensor::VisualSensor()
     mCompressionNumber = 0;
     mCameraID = 1;
     this->SetHighPerformanceTimerThreshold(50);
-    mEnableSharedImageFlag = false;
+    mEnableSharedImageFlag = true;
     mJPEGQuality = -1;
 }
 
@@ -638,10 +638,36 @@ int VisualSensor::ProcessEventRequest(const Jaus::CreateEventRequest& command,
                             responseValue = RejectEventRequest::ConnectionRefused;
                             errorMessage = "Periodic Rate Not Supported";
                         }
-                    }  
+                    }
+                    else if(BitVector::IsBitSet(pv, CreateEventRequest::VectorBit::RequestedPeriodicRate))
+                    {
+                        if(mFrameRate >= command.GetRequestedPeriodicUpdateRate())                            
+                        {
+                            confirmedRate = command.GetRequestedPeriodicUpdateRate();
+                        }
+                        else
+                        {
+                            confirmedRate = mFrameRate;
+                        }
+                    }
+                    else if(BitVector::IsBitSet(pv, CreateEventRequest::VectorBit::RequestedMinimumPeriodicRate))
+                    {
+                        if(mFrameRate >= command.GetMinimumPeriodicRate())
+                        {
+                            confirmedRate = mFrameRate;
+                        }
+                        else
+                        {
+                            result = JAUS_FAILURE;
+                            responseValue = RejectEventRequest::ConnectionRefused;
+                            errorMessage = "Minimum Requested Periodic Rate Greater Than Max Update Rate";
+                        }
+                    }
                     else
                     {
-                        confirmedRate = mFrameRate;
+                        result = JAUS_FAILURE;
+                        responseValue = RejectEventRequest::InvalidEventSetup;
+                        errorMessage = "Event Configuration Invalid";
                     }
                 }
             }

@@ -307,7 +307,7 @@ ReportVelocityState VelocityStateSensor::GetVelocityState() const
 ////////////////////////////////////////////////////////////////////////////////////
 int VelocityStateSensor::ProcessQueryMessage(const Message* msg)
 {
-    int processed = JAUS_OK;
+    int result = JAUS_OK;
 
     switch(msg->GetCommandCode())
     {
@@ -316,7 +316,7 @@ int VelocityStateSensor::ProcessQueryMessage(const Message* msg)
             const QueryVelocityState* query = dynamic_cast<const QueryVelocityState*>(msg);
             if(query)
             {
-                processed = RespondToQuery(query);
+                result = RespondToQuery(query);
             }
         }
         break;
@@ -334,18 +334,29 @@ int VelocityStateSensor::ProcessQueryMessage(const Message* msg)
                 report.SetSpeed(mTravelSpeed);
                 mVelocityStateMutex.Leave();
 
-                processed = Send(&report);
+                result = Send(&report);
             }
         }
         break;
     default:
         // Let parent class process message.  That way we
         // respond to Core Messages, etc.
-        processed = InformComponent::ProcessQueryMessage(msg);
+        result = InformComponent::ProcessQueryMessage(msg);
         break;
     }
 
-    return processed;
+    // Still let parent class process (in case dynamic discovery is
+    // enabled and parent class needs this data too.
+    if(result == JAUS_FAILURE)
+    {
+        result = InformComponent::ProcessQueryMessage(msg);
+    }
+    else
+    {
+        // Always run parent process command in case it needs the data too.
+        InformComponent::ProcessQueryMessage(msg);
+    }
+    return result;
 }
 
 
@@ -514,9 +525,7 @@ int VelocityStateSensor::ProcessEventRequest(const Jaus::CreateEventRequest& com
                         }
                         else
                         {
-                            result = JAUS_FAILURE;
-                            responseValue = RejectEventRequest::ConnectionRefused;
-                            errorMessage = "Requested Periodic Rate Greater Than Max Update Rate";
+                            confirmedRate = mMaxUpdateRate;
                         }
                     }
                     else if(BitVector::IsBitSet(pv, CreateEventRequest::VectorBit::RequestedMinimumPeriodicRate))

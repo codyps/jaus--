@@ -26,7 +26,7 @@
 ///      * Neither the name of the ACTIVE LAB, IST, UCF, nor the
 ///        names of its contributors may be used to endorse or promote products
 ///        derived from this software without specific prior written permission.
-/// 
+///
 ///  THIS SOFTWARE IS PROVIDED BY THE ACTIVE LAB''AS IS'' AND ANY
 ///  EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 ///  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -428,7 +428,7 @@ bool JSharedMemory::Registry::IsRegistered(const Address& id) const
 {
     bool result = false;
 
-    if( mNodeRegistryFlag && 
+    if( mNodeRegistryFlag &&
         (id.mSubsystem != mNodeID.mSubsystem || id.mNode != mNodeID.mNode ) )
     {
         return result;
@@ -459,7 +459,7 @@ bool JSharedMemory::Registry::IsRegistered(const Address& id) const
             {
                 if( mNodeRegistryFlag )
                 {
-                    if( (id.mSubsystem == mem[i] || id.mSubsystem == 255) && 
+                    if( (id.mSubsystem == mem[i] || id.mSubsystem == 255) &&
                         (id.mNode == 255 && id.mNode == mem[i+1] ) )
                     {
                         result = true;
@@ -702,10 +702,6 @@ int JSharedMemory::Close()
     mSharedMemMutex.Enter();
     sharedMemName = mBox.GetMappedName();
     result = mBox.CloseMappedMemory();
-    if(sharedMemName.empty() == false)
-    {
-        CxUtils::MappedMemory::DeleteMappedMemory(sharedMemName.c_str());
-    }
     mSharedMemMutex.Leave();
     return result;
 }
@@ -760,7 +756,7 @@ int JSharedMemory::EnqueueMessage(const Stream &msg)
     {
         return SetJausError(ErrorCodes::BadPacket);
     }
-    
+
     if(mEnableMultiPacketCollectionFlag)
     {
         msg.Read(info);
@@ -773,9 +769,9 @@ int JSharedMemory::EnqueueMessage(const Stream &msg)
                 {
                     result = EnqueueMessage(*mpMergedStream);
                 }
-            }    
+            }
             return result;
-        }        
+        }
     }
     // Enter critical section.
     // This will protect the mapped memory object from
@@ -1247,22 +1243,22 @@ bool JSharedMemory::Exists(const Address &id)
 
 ////////////////////////////////////////////////////////////////////////////////////
 ///
-///   \brief If the message is for this component, and it is part of 
+///   \brief If the message is for this component, and it is part of
 ///   a multi-packet stream sequence, then this method will collect the
 ///   pieces.
 ///
-///   The individual packets in the stream are collected by this class in 
+///   The individual packets in the stream are collected by this class in
 ///   large data sets.  Once an entire stream has been collected, it is merged
 ///   and then saved to the 3rd parameter.
 ///
 ///   \param msg Message that is part of multi-packet stream sequence.
 ///   \param header The header for the message.
-///   \param merged Pointer to a Pointer to a Stream object for storing 
+///   \param merged Pointer to a Pointer to a Stream object for storing
 ///                 a merged Stream object if full sequence has been received.
 ///                 Don't forget to delete you data when done!
 ///
-///   \return JAUS_OK on processing success, JAUS_FAILURE otherwise.  If 
-///           JAUS_OK is returned, check the merged parameter for a 
+///   \return JAUS_OK on processing success, JAUS_FAILURE otherwise.  If
+///           JAUS_OK is returned, check the merged parameter for a
 ///           merged message stream.
 ///
 ////////////////////////////////////////////////////////////////////////////////////
@@ -1287,7 +1283,7 @@ int JSharedMemory::ProcessMultiPacketStream(const Stream& msg, const Header& hea
             delete *merged;
             *merged = NULL;
         }
-    }    
+    }
 
     // See if we can add to and exisiting data set, or
     // if we must create a new one.
@@ -1339,9 +1335,9 @@ int JSharedMemory::ProcessMultiPacketStream(const Stream& msg, const Header& hea
                 Time::GetUtcTimeMs() - mpstream->second->GetUpdateTimeMs() > 1000)
             {
                 delete mpstream->second;
-#ifdef WIN32     
+#ifdef WIN32
                 mpstream = mMultiPacketStreams.erase(mpstream);
-#else                
+#else
                 mMultiPacketStreams.erase(mpstream);
                 mpstream = mMultiPacketStreams.begin();
 #endif

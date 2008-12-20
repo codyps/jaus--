@@ -818,6 +818,7 @@ void Event::Clear()
 {
     if(mpConditions)
     {
+        mpConditions->Clear();
         delete mpConditions;
         mpConditions = NULL;
     }

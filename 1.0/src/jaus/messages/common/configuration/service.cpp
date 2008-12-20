@@ -350,6 +350,120 @@ void Service::ClearService()
     mOutputMessages.clear();
 }
 
+
+////////////////////////////////////////////////////////////////////////////////////
+///
+///  \brief Converts service type information to a string (e.g. 38 = "Global Pose
+///  Sensor").
+///
+///  \param[in] serviceType The service type to get string of.
+///
+///  \return String representing what the service type is.
+///
+////////////////////////////////////////////////////////////////////////////////////
+std::string Service::ToString(const Type serviceType)
+{
+    std::string str;
+    switch(serviceType)
+    {
+    case CoreMessageSupport:
+        str = "Core";
+        break;
+    case NodeManager:
+        str = "Node Manager";
+        break;
+    case SubsystemCommander:
+        str = "Subsystem Commander";
+        break;
+    case PrimitiveDriver:
+        str = "Primitive Driver";
+        break;
+    case GlobalVectorDriver:
+        str = "Global Vector Driver";
+        break;
+    case Communicator:
+        str = "Communicator";
+        break;
+    case VisualSensor:
+        str = "Visual Sensor";
+        break;
+    case GlobalPoseSensor:
+        str = "Global Pose Sensor";
+        break;
+    case SystemCommander:
+        str = "System Commander";
+        break;
+    case LocalPoseSensor:
+        str = "Local Pose Sensor";
+        break;
+    case VelocityStateSensor:
+        str = "Velocity State Sensor";
+        break;
+    case ReflexiveDriver:
+        str = "Reflexive Driver";
+        break;
+    case LocalVectorDriver:
+        str = "Local Vector Driver";
+        break;
+    case GlobalWaypointDriver:
+        str = "Global Vector Driver";
+        break;
+    case LocalWaypointDriver:
+        str = "Local Waypoint Driver";
+        break;
+    case GlobalPathSegmentDriver:
+        str = "Global Path Segment Driver";
+        break;
+    case LocalPathSegmentDriver:
+        str = "Local Path Segment Driver";
+        break;
+    case PrimitiveManipulator:
+        str = "Primitive Manipulator";
+        break;
+    case RangeSensor:
+        str = "Range Sensor";
+        break;
+    case ManipulatorJointPositionSensor:
+        str = "Manipulator Joint Position Sensor";
+        break;
+    case ManipulatorJointVelocitySensor:
+        str = "Manipulator Joint Velocity Sensor";
+        break;
+    case ManipulatorJointForceTorqueSensor:
+        str = "Manipulator Joint Force Torque Sensor";
+        break;
+    case ManipulatorJointPositionsDriver:
+        str = "Manipulator Joint Positions Driver";
+        break;
+    case ManipulatorEndEffectorPoseDriver:
+        str = "Manipulator End Effector Pose Driver";
+        break;
+    case ManipulatorJointVelocitiesDriver:
+        str = "Manipulator Joint Velocities Driver";
+        break;
+    case ManipulatorEndEffectorVelocityStateDriver:
+        str = "Manipulator End Effector Velocity State Driver";
+        break;
+    case ManipulatorJointMoveDriver:
+        str = "Manipulator Joint Move Driver";
+        break;
+    case ManipulatorEndEffectorDiscretePoseDriver:
+        str = "Manipulator End Effector Discrete Pose Driver";
+        break;
+    default:
+        if((Byte)serviceType >= 2 && (Byte)serviceType <= 31)
+        {
+            str = "User Defined";
+        }
+        else
+        {
+            str = "Core";
+        }
+        break;
+    }
+    return str;
+}
+
 ////////////////////////////////////////////////////////////////////////////////////
 ///
 ///  \brief Sets all input messages and output messages to the core set of

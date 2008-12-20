@@ -48,11 +48,14 @@
 
 #define TIMER_ID 1000
 
+#define DISCONNECT_ID 1001
+
 // specialized definese used in wxwidgets programming
 BEGIN_EVENT_TABLE(VideoClientFrame, wxFrame)
     EVT_MENU(wxID_ABOUT, VideoClientFrame::OnAbout)
     EVT_MENU(wxID_NEW, VideoClientFrame::OnSelectVisualSensor)
     EVT_MENU(wxID_EXIT, VideoClientFrame::OnQuit)
+    EVT_MENU(DISCONNECT_ID, VideoClientFrame::OnDisconnect)
     EVT_TIMER(TIMER_ID, VideoClientFrame::OnTimer)
 END_EVENT_TABLE()
 
@@ -88,7 +91,8 @@ VideoClientFrame::VideoClientFrame(wxWindow* parent,
 
     mpFileMenu = new wxMenu;
     mpFileMenu->Append(wxID_NEW, wxT("Select &Sensor\tAlt-S"), wxT("Select Visual Sensor"));
-    mpFileMenu->Append(wxID_ABOUT, wxT("&About Client\tAtl-A"), wxT("About Video Client"));
+    mpFileMenu->Append(DISCONNECT_ID, wxT("&Disconnect\tAtl-A"), wxT("Disconnect from Sensor"));
+    mpFileMenu->Append(wxID_ABOUT, wxT("&About Client\tAtl-A"), wxT("About Video Client"));    
     mpFileMenu->Append(wxID_EXIT, wxT("E&xit\tAlt-X"), wxT("Exit Program"));
     
     mpMenuBar = new wxMenuBar();
@@ -241,22 +245,6 @@ void VideoClientFrame::OnAbout(wxCommandEvent& event)
     text.Clear();
 
     info.SetWebSite(TEXT_TYPE("http://active.ist.ucf.edu"));
-
-    //text.Append(TEXT_TYPE("GNU LESSER GENERAL PUBLIC LICENSE\n"));
-    //text.Append(TEXT_TYPE("This library is free software; you can redistribute it and/or\n"));
-    //text.Append(TEXT_TYPE("modify it under the terms of the GNU Lesser General Public\n"));
-    //text.Append(TEXT_TYPE("License as published by the Free Software Foundation; either\n"));
-    //text.Append(TEXT_TYPE("version 2.1 of the License, or (at your option) any later version.\n"));
-    //text.Append(TEXT_TYPE("\n"));
-    //text.Append(TEXT_TYPE("This library is distributed in the hope that it will be useful,\n"));
-    //text.Append(TEXT_TYPE("but WITHOUT ANY WARRANTY; without even the implied warranty of\n"));
-    //text.Append(TEXT_TYPE("MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU\n"));
-    //text.Append(TEXT_TYPE("Lesser General Public License for more details.\n"));
-    //text.Append(TEXT_TYPE("\n"));
-    //text.Append(TEXT_TYPE("You should have received a copy of the GNU Lesser General Public\n"));
-    //text.Append(TEXT_TYPE("License along with this library; if not, write to the Free Software\n"));
-    //text.Append(TEXT_TYPE("Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA\n"));
-    //info.SetLicence(text);
     
     wxImage logo;
     if(logo.LoadFile(wxString("logo/jaus++_logo_100x100.gif", wxConvUTF8)))
@@ -271,6 +259,30 @@ void VideoClientFrame::OnAbout(wxCommandEvent& event)
 
 ////////////////////////////////////////////////////////////////////////////////////
 ///
+///  \brief Disconnects from visual sensor.
+///
+////////////////////////////////////////////////////////////////////////////////////
+void VideoClientFrame::OnDisconnect(wxCommandEvent& event)
+{
+    Jaus::Address id;
+    mMutex.Enter();
+    id = mVisualSensorID;
+    mVisualSensorID(0, 0, 0, 0);
+
+    // Load the default image.
+    wxImage image;
+    image.LoadFile(wxT("images/please_stand_by.png"));
+    mpImagePanel->SetClientSize(wxSize(image.GetWidth(), image.GetHeight()));
+    mpImagePanel->SetImage(image);
+    SetClientSize(mpImagePanel->GetBestSize());
+    mFrameNumber = 0;
+    mMutex.Leave();
+
+    mClient.CancelEvents(id);
+}
+
+////////////////////////////////////////////////////////////////////////////////////
+///
 ///  \brief When the select visual sensor menu option is selected this method
 ///         asks the user for JAUS ID information and then attempts to create
 ///         a video subscription.
@@ -279,13 +291,26 @@ void VideoClientFrame::OnAbout(wxCommandEvent& event)
 void VideoClientFrame::OnSelectVisualSensor(wxCommandEvent& event)
 {
     Jaus::Address id;
+    mMutex.Enter();
+    id = mVisualSensorID;
+    mVisualSensorID(0, 0, 0, 0);
+
+    // Load the default image.
+    wxImage image;
+    image.LoadFile(wxT("images/please_stand_by.png"));
+    mpImagePanel->SetClientSize(wxSize(image.GetWidth(), image.GetHeight()));
+    mpImagePanel->SetImage(image);
+    SetClientSize(mpImagePanel->GetBestSize());
     mFrameNumber = 0;
+    mMutex.Leave();
 
     // Cancel previous events.
-    if(mVisualSensorID.IsValid())
+    if(id.IsValid())
     {
         mClient.CancelEvents(mVisualSensorID);
     }
+
+    id(0, 0, 0, 0);
 
     wxNumberEntryDialog subsystemDialog(this, 
                                         wxT("Enter Subsystem ID"), 
@@ -379,7 +404,8 @@ void VideoClientFrame::OnTimer(wxTimerEvent& event)
     if(!mShutdownFlag &&
         mCurrentImage.Width() > 0 &&
         mCurrentImage.Height() > 0 &&
-        mCurrentImage.ImageData() != NULL)
+        mCurrentImage.ImageData() != NULL &&
+        mVisualSensorID.IsValid())
     {
         mpImagePanel->SetImage(wxImage(mCurrentImage.Width(),
                                                mCurrentImage.Height(),
@@ -409,7 +435,7 @@ void VideoClientFrame::OnTimer(wxTimerEvent& event)
     // If we haven't received an image in a while, and
     // have a valid visual sensor ID, try re-create subscription.
     if( mVisualSensorID.IsValid() &&
-        Jaus::Time::GetUtcTimeMs() - mFrameUpdateTimeMs > 500 )
+        Jaus::Time::GetUtcTimeMs() - mFrameUpdateTimeMs > 1000 )
     {
         if(mClient.HaveEventSubscription(mVisualSensorID, Jaus::JAUS_REPORT_IMAGE))
         {

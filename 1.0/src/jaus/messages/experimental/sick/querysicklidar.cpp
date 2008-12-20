@@ -1,18 +1,18 @@
 ////////////////////////////////////////////////////////////////////////////////////
 ///
-///  \file nodemanagerapp.cpp
-///  \brief wxWidgets program for JAUS++ Library Node Manager.
+///  \file querysicklidar.cpp
+///  \brief This file contains a custom experimental message to query a 
+///  SICK LIDAR sensor.
 ///
-///  <br>Author(s): Bo Sun
-///  <br>Created: 15 January 2008
-///  <br>Last Modified: 1 April 2008
+///  <br>Author(s): Daniel Barber
+///  <br>Created: 19 December 2008
 ///  <br>Copyright (c) 2008
 ///  <br>Applied Cognition and Training in Immersive Virtual Environments
 ///  <br>(ACTIVE) Laboratory
-///  <br>Institute for Simulation and Training (IST)node
+///  <br>Institute for Simulation and Training (IST)
 ///  <br>University of Central Florida (UCF)
 ///  <br>All rights reserved.
-///  <br>Email: bsun@ist.ucf.edu
+///  <br>Email: dbarber@ist.ucf.edu
 ///  <br>Web:  http://active.ist.ucf.edu
 ///
 ///  Redistribution and use in source and binary forms, with or without
@@ -38,77 +38,52 @@
 ///  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ///
 ////////////////////////////////////////////////////////////////////////////////////
-#include <wx/app.h>
-#include <wx/cmdline.h>
-#include "wxnodemanager/nodemanagerframe.h"
-#ifdef WIN32
-#include <vld.h>
-#endif
+#include "jaus/messages/experimental/sick/querysicklidar.h"
+#include "jaus/messages/experimental/experimentalcodes.h"
 
-#ifdef _WIN32_WCE
-#define TEXT_TYPE _T
-#else
-#define TEXT_TYPE wxT
-#endif
+using namespace Jaus;
 
 
 ////////////////////////////////////////////////////////////////////////////////////
 ///
-///  \class NodeManagerApp
-///  \breif Creates a JAUS++ Node Manager and its GUI.
+///   \brief Constructor.
 ///
 ////////////////////////////////////////////////////////////////////////////////////
-class NodeManagerApp : public wxApp
+QuerySickLidar::QuerySickLidar() : Message(JAUS_QUERY_SICK_LIDAR)
 {
-public:
-    virtual bool OnInit();
-    Jaus::NodeManager* GetNodeManager() { return mpNode; }
-private:
-    Jaus::NodeManager* mpNode;      ///<  Main component that speaks "JAUS", a pointer is passed to mpFrame
-    NodeManagerFrame* mpFrame;      ///<  Main wxFrame derivative that contain GUI components
-};
-
-DECLARE_APP(NodeManagerApp)
-
-IMPLEMENT_APP(NodeManagerApp)
+}
 
 
 ////////////////////////////////////////////////////////////////////////////////////
 ///
-///  \brief Called when NodeManagerApp is initialized.
-///
-///  Creates and Initializes NodeManager and wxFrame.
+///   \brief Copy constructor.
 ///
 ////////////////////////////////////////////////////////////////////////////////////
-bool NodeManagerApp::OnInit()
+QuerySickLidar::QuerySickLidar(const QuerySickLidar& query) : Message(JAUS_QUERY_SICK_LIDAR)
 {
-    mpNode = new Jaus::NodeManager();
+    *this = query;
+}
 
-    if(argc == 1)
-    {
-        mpNode->Initialize("settings/nodesettings.xml");
-    }
-    else
-    {
-        wxString file = argv[1];
-        mpNode->Initialize(file.ToAscii().data());
-    }
 
-#ifdef _WIN32_WCE
-    mpFrame = new NodeManagerFrame(mpNode, TEXT_TYPE("JAUS Node Manager"));
-#else
-    mpFrame = new NodeManagerFrame(mpNode,
-                                   this->GetTopWindow(),
-                                   wxID_ANY, TEXT_TYPE("JAUS Node Manager"),
-                                   wxDefaultPosition,
-                                   wxSize(375,450),
-                                   wxDEFAULT_FRAME_STYLE);
-#endif
-    mpNode = NULL;
-    mpFrame->SetDisplay();
-    mpFrame->Show(true);
+////////////////////////////////////////////////////////////////////////////////////
+///
+///   \brief Destructor.
+///
+////////////////////////////////////////////////////////////////////////////////////
+QuerySickLidar::~QuerySickLidar()
+{
+}
 
-    return true;
+
+////////////////////////////////////////////////////////////////////////////////////
+///
+///   \brief Sets equal to.
+///
+////////////////////////////////////////////////////////////////////////////////////
+QuerySickLidar& QuerySickLidar::operator=(const QuerySickLidar& query)
+{
+    CopyHeaderData(&query);
+    return *this;
 }
 
 /*  End of File */

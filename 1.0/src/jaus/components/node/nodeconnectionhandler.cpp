@@ -45,6 +45,7 @@
 #include "jaus/messages/inform/informcodes.h"
 #include "jaus/messages/inform/communications/reportheartbeatpulse.h"
 #include "jaus/messages/common/configuration/service.h"
+#include "jaus/messages/query/configuration/queryconfiguration.h"
 #include "jaus/components/node/serviceconnectionmanager.h"
 #include "jaus/components/node/nodemanager.h"
 #include "jaus/components/transport/net.h"
@@ -1419,6 +1420,11 @@ int NodeConnectionHandler::SendStream(const Stream& msg)
         SetJausError(ErrorCodes::BadPacket);
         return JAUS_FAILURE;
     }
+    // Don't allow sending to yourself.
+    if(header.mSourceID == mComponentID && header.mDestinationID == mComponentID)
+    {
+        return JAUS_OK;
+    }
 
     // Check to see if this message needs to be split
     // into a large data set.
@@ -2326,6 +2332,7 @@ void NodeConnectionHandler::DiscoveryThread(void *arg)
     unsigned int heartbeatTime = 0;
     unsigned int componentCheckTime = 0;
     unsigned int nodeCheckTime = 0;
+    unsigned int queryConfigTimeMs = 0;
     bool haveCallback = false;
 
     Address::Set::iterator id;
@@ -2349,6 +2356,12 @@ void NodeConnectionHandler::DiscoveryThread(void *arg)
         //  Check to see if we need to send out a heartbeat pulse message.
         if( Time::GetUtcTimeMs() - heartbeatTime >= 1000 )
         {
+            // Tell Node Manager to update subsystem list.
+            if(handler->mpNodeManager)
+            {
+                handler->mpNodeManager->CheckSubsystemList();
+            }
+
             heartBeatMessage.SetSequenceNumber(heartBeatMessage.GetSequenceNumber() + 1);
 
             if(handler->mSubsystemDiscoverFlag)
@@ -2373,6 +2386,29 @@ void NodeConnectionHandler::DiscoveryThread(void *arg)
             heartbeatTime = Time::GetUtcTimeMs();
         }
 
+        if( Time::GetUtcTimeMs() - queryConfigTimeMs > 5000)
+        {
+            Configuration::Subsystem subsystemConfig = handler->mpNodeManager->GetSubsystemConfiguration();
+            // If any of the nodes show only 1 component (the node) send
+            // and additional query just in case.
+            Configuration::Node::Map::iterator node;
+            for(node = subsystemConfig.mNodes.begin();
+                node != subsystemConfig.mNodes.end();
+                node++)
+            {
+                if(node->first != handler->mpNodeManager->GetNodeID().mNode &&
+                    node->second.mComponents.size() <= 1)
+                {
+                    QueryConfiguration queryConfig;
+                    queryConfig.SetSourceID(handler->mpNodeManager->GetNodeID());
+                    queryConfig.SetDestinationID(Address(subsystemConfig.mSubsystemID, node->first, 1, 1));
+                    queryConfig.SetQueryField(QueryConfiguration::Node);
+                    handler->mpNodeManager->Send(&queryConfig);
+                }
+            }
+            queryConfigTimeMs = Time::GetUtcTimeMs();
+        }
+
         // Check for changes in component connections.
         if( Time::GetUtcTimeMs() - componentCheckTime > 100 )
         {
@@ -2387,7 +2423,7 @@ void NodeConnectionHandler::DiscoveryThread(void *arg)
             handler->CheckNodes(newNodeConnections,
                                 lostNodeConnections);
             nodeCheckTime = Time::GetUtcTimeMs();
-        }
+        }        
 
         // Get a copy of any new components that may have
         // been discovered.

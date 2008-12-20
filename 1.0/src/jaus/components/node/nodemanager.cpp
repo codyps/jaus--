@@ -70,7 +70,7 @@ using namespace Jaus;
 ////////////////////////////////////////////////////////////////////////////////////
 NodeManager::NodeManager() : mpConnectionHandler(NULL),
                              mpMessageHandler(NULL),
-                             mSubsystemDiscoveryFlag(false),
+                             mSubsystemDiscoveryFlag(true),
                              mConnectionEventTimeMs(0)
 
 {
@@ -423,6 +423,10 @@ int NodeManager::Initialize(const std::string& settingsFileXML)
             broadcastValue == "y" || broadcastValue == "Y")
         {
             EnableSubsystemConfigDiscovery(true);
+        }
+        else
+        {
+            EnableSubsystemConfigDiscovery(false);
         }
     }
 
@@ -1279,22 +1283,38 @@ int NodeManager::ProcessInformMessage(const Message* msg)
     case JAUS_REPORT_HEARTBEAT_PULSE:
         {
             // If subsystem hearbeat pulse...
-            if( msg->GetDestinationID() == Address( 255, 255, 1, 1 ) )
+            if( msg->GetSourceID().IsValid() && 
+                msg->GetDestinationID() == Address( 255, 255, 1, 1 ) )
             {
                 bool subsystemListEvent = false;
                 mNodeMutex.Enter();
                 // If we are broadcasting to 255.255.1.1 then
                 // add ourselves to list always.
-                if(mSubsystemDiscoveryFlag)
+                if(mSubsystemDiscoveryFlag && mNodeID.IsValid())
                 {
                     mSubsystemList.insert(mNodeID);
                 }
+
+                Address::Set::iterator id;
+                // Only add one entry for a subsystem to the list.
+                bool inList = false;
+                for(id = mSubsystemList.begin();
+                    id != mSubsystemList.end();
+                    id++)
+                {
+                    if(id->mSubsystem == msg->GetSourceID().mSubsystem)
+                    {
+                        inList = true;
+                        mSubsystemHeartbeatTimes[msg->GetSourceID().mSubsystem] = Time::GetUtcTimeMs();
+                    }
+                }
                 // Add to our subsystem if not already in it
-                if(mSubsystemList.find(msg->GetSourceID()) == mSubsystemList.end())
+                if(!inList)
                 {
                     subsystemListEvent = true;
                     mSubsystemList.insert( msg->GetSourceID() );
                     mConnectionEventTimeMs = Time::GetUtcTimeMs();
+                    mSubsystemHeartbeatTimes[msg->GetSourceID().mSubsystem] = Time::GetUtcTimeMs();
                 }
 
                 mNodeMutex.Leave();
@@ -1311,7 +1331,7 @@ int NodeManager::ProcessInformMessage(const Message* msg)
                 msg->GetDestinationID().mNode == 255 &&
                 msg->GetDestinationID().mComponent == 1 &&
                 msg->GetDestinationID().mInstance == 1 &&
-                msg->GetSourceID().mSubsystem == mNodeID.mSubsystem)
+                msg->GetSourceID() != mNodeID)
             {
                 //  See if we have an event subscription for
                 //  this nodes configuration, and if not, create one.
@@ -1750,7 +1770,11 @@ Configuration::Subsystem NodeManager::GetSubsystemConfiguration() const
 {
     Configuration::Subsystem config;
     mNodeMutex.Enter();
-    config = *mSystemConfiguration.GetSubsystem(mNodeID.mSubsystem);
+    Configuration::Subsystem* ptr = mSystemConfiguration.GetSubsystem(mNodeID.mSubsystem);
+    if(ptr)
+    {
+        config = *ptr;
+    }
     mNodeMutex.Leave();
     return config;
 }
@@ -2138,7 +2162,7 @@ void NodeManager::ReportSubsystemListEvent(const bool lockNode, const bool lockE
 
     if(lockNode) { mNodeMutex.Enter(); }
 
-    if(mSubsystemDiscoveryFlag)
+    if(mSubsystemDiscoveryFlag && mNodeID.IsValid())
     {
         mSubsystemList.insert(mNodeID);
     }
@@ -2382,6 +2406,64 @@ void NodeManager::MessageCallbackFunction(const Message* msg, void* args)
             }
         }
     }
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////
+///
+///   \brief Method goes through the subsystem list and makes sure it is up
+///          to date.
+///
+////////////////////////////////////////////////////////////////////////////////////
+void NodeManager::CheckSubsystemList()
+{
+    bool subsystemListEvent = false;
+
+    mNodeMutex.Enter();
+
+    // If we are broadcasting to 255.255.1.1 then
+    // add ourselves to list always.
+    if(mSubsystemDiscoveryFlag && mNodeID.IsValid())
+    {
+        mSubsystemList.insert(mNodeID);
+    }
+
+    Address::Set::iterator id;
+    // Delete any OLD heartbeat messages.
+    std::map<Byte, unsigned int>::iterator updateTimeMs;
+    updateTimeMs = mSubsystemHeartbeatTimes.begin();
+    while(updateTimeMs != mSubsystemHeartbeatTimes.end())
+    {
+        if(Time::GetUtcTimeMs() - updateTimeMs->second > 3000)
+        {
+            // Delete ID.
+            for(id = mSubsystemList.begin();
+                id != mSubsystemList.end();
+                id++)
+            {
+                if(id->mSubsystem == updateTimeMs->first)
+                {
+                    mSubsystemList.erase(id);
+                    mConnectionEventTimeMs  = Time::GetUtcTimeMs();
+                    break;
+                }
+            }
+            mSubsystemHeartbeatTimes.erase(updateTimeMs);
+            updateTimeMs = mSubsystemHeartbeatTimes.begin();
+        }
+        else
+        {
+            updateTimeMs++;
+        }
+    }
+
+    mNodeMutex.Leave();
+
+    if(subsystemListEvent)
+    {
+        ReportSubsystemListEvent(true, true);
+    }
+
 }
 
 /*  End of File */

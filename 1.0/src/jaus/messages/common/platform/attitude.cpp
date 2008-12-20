@@ -43,6 +43,7 @@
 #include "jaus/messages/common/platform/attitude.h"
 #include <iostream>
 #include <assert.h>
+#include <math.h>
 
 using namespace Jaus;
 using namespace std;
@@ -389,69 +390,43 @@ Attitude &Attitude::operator =(const Attitude &att)
 ////////////////////////////////////////////////////////////////////////////////////
 double Attitude::GetHeadingDifferance(const double currentAngle, const double desiredAngle, const bool degrees) 
 {
-    double result = 0;
+    double curAngleRadians = currentAngle;
+    double desAngleRadians = desiredAngle;
+
+    double desPos = 0;
+    double desNeg = 0;
+
+    double errPos = 0;
+    double errNeg = 0;
+
     if(degrees) {
-
-        if(currentAngle > 180 || currentAngle < -180 || desiredAngle > 180 || desiredAngle < -180)
-            return result;
-
-        if( currentAngle >= 90 && currentAngle <= 180 && desiredAngle >= -180 && desiredAngle <= -90 ) 
-        {
-            result = 360 + (desiredAngle - currentAngle);
-        }
-        else if (desiredAngle >= 90 && desiredAngle <= 180 && currentAngle >= -180 && currentAngle <= -90 ) 
-        {
-            result = (desiredAngle - currentAngle) - 360;
-        }
-        else if( currentAngle < 0 && desiredAngle < 0 ) 
-        {
-            result = -currentAngle + desiredAngle;
-        }
-        else if( currentAngle >= 0 && desiredAngle >= 0 ) 
-        {
-            result = desiredAngle - currentAngle;
-        }
-        else 
-        {
-            result = desiredAngle - currentAngle;
-            if( result > 180 )
-                result = 360 - result;
-            else if( result < -180 )
-                result+= 360;
-        }
+        curAngleRadians = JAUS_DEG2RAD(currentAngle);
+        desAngleRadians = JAUS_DEG2RAD(desiredAngle);
     }
-    else 
+
+    if(desAngleRadians > 0)
     {
-        if(currentAngle > JAUS_PI || currentAngle < -JAUS_PI || desiredAngle > JAUS_PI || desiredAngle < -JAUS_PI)
-            return result;
-
-        if( currentAngle >= JAUS_HALF_PI && currentAngle <= JAUS_PI && desiredAngle >= -JAUS_PI && desiredAngle <= -JAUS_HALF_PI ) 
-        {
-            result = JAUS_TWO_PI + (desiredAngle - currentAngle);
-        }
-        else if (desiredAngle >= JAUS_HALF_PI && desiredAngle <= JAUS_PI && currentAngle >= -JAUS_PI && currentAngle <= -JAUS_HALF_PI ) 
-        {
-            result = (desiredAngle - currentAngle) - JAUS_TWO_PI;
-        }
-        else if( currentAngle < 0 && desiredAngle < 0 ) 
-        {
-            result = -currentAngle + desiredAngle;
-        }
-        else if( currentAngle >= 0 && desiredAngle >= 0 ) 
-        {
-            result = desiredAngle - currentAngle;
-        }
-        else 
-        {
-            result = desiredAngle - currentAngle;
-            if( result > JAUS_PI )
-                result = JAUS_TWO_PI - result;
-            else if( result < -JAUS_PI )
-                result += JAUS_TWO_PI;
-        }
+        desPos = desAngleRadians;
+        desNeg = desAngleRadians - 2 * JAUS_PI;
+    }
+    else
+    {
+        desPos = desAngleRadians + 2 * JAUS_PI;
+        desNeg = desAngleRadians;
     }
 
-    return result;
+    errPos = desPos - curAngleRadians;
+    errNeg = desNeg - curAngleRadians;
+
+    if(fabs(errPos) < fabs(errNeg))
+    {
+        return errPos;
+    }
+    else
+    {
+        return errNeg;
+    }
+
 }
 
 

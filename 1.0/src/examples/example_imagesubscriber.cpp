@@ -42,7 +42,7 @@
 #include <iostream>
 #include <vector>
 #include <vld.h>
-#include "jaus/jaus++.h"
+#include "jaus/video/videosubscriber.h"
 
 #ifdef WIN32
 #include <conio.h>
@@ -52,74 +52,13 @@ using namespace std;
 using namespace Jaus;
 
 bool gExitFlag = false;
-Image::Format gImageFormat = Image::JPEG;
+unsigned int gFrameCount = 0;
 
-////////////////////////////////////////////////////////////////////////////////////
-///
-///   \class VideoSubscriber
-///   \brief Simple component whith the purpose of requesting events
-///   from a Visual Sensor components.
-///
-///   This example shows how to use the SubscriberComponent class to create
-///   a new class which requests services and events from another component.
-///
-////////////////////////////////////////////////////////////////////////////////////
-class VideoSubscriber : public SubscriberComponent
+void ImageCallback(const Address& source, const Image& rawImage, void* args)
 {
-public:
-    VideoSubscriber()
-    {
-        mStartTimeMs = mUpdateTimeMs = mRecvCount = mTotalCount = 0;
-    }
-    ~VideoSubscriber()
-    {
-    }
-    // Overload the method for processing Inform Messages recevied
-    // by the class.
-    virtual int ProcessInformMessage(const Message* msg)
-    {
-        int processed = JAUS_OK;
-        switch(msg->GetCommandCode())
-        {
-        case JAUS_REPORT_IMAGE:
-            {
-                const Jaus::ReportImage* report = dynamic_cast<const ReportImage*>(msg);
-                if(report)
-                {
-                    // Decompress the image data.
-                    Image decompressed;
+    cout << "Frame Number: " << gFrameCount++ << endl; 
+}
 
-                    if(decompressed.Decompress(report->GetImageData(), report->GetDataSize(), gImageFormat))
-                    {
-                        if(mTotalCount == 0)
-                        {
-                            mStartTimeMs = mUpdateTimeMs = CxUtils::Timer::GetTimeMs();
-                        }
-                        else
-                        {
-                            mUpdateTimeMs = CxUtils::Timer::GetTimeMs();
-                        }
-                        mRecvCount++;
-                        mTotalCount++;
-                        cout << "Frame Number: " << mRecvCount << endl;
-                    }
-                }
-            }
-            break;
-        default:
-            // Let the parent class process the message.  It will
-            // process a lot of messages for us. ALWAYS DO THIS!
-            processed = SubscriberComponent::ProcessInformMessage(msg);
-            break;
-        };
-        return processed;
-    }
-    ReportImage mReportImage;               ///<  The last global pose message received.
-    volatile double mStartTimeMs;           ///<  Time of first message received.
-    volatile double mUpdateTimeMs;          ///<  The last time in ms that a Report Global Pose message was received.
-    volatile unsigned int mRecvCount;       ///<  The number of Report Global Pose in between FPS calculations.
-    volatile unsigned int mTotalCount;      ///<  Total number of messages received.
-};
 
 int main(int argc, char *argv[])
 {
@@ -137,7 +76,7 @@ int main(int argc, char *argv[])
             nodeID.PrintID();
             break;
         }
-        Sleep(100);
+        CxUtils::SleepMs(100);
     }
     if(nodeID.IsValid() == false)
     {
@@ -160,7 +99,7 @@ int main(int argc, char *argv[])
     {
         if(subscriber.Initialize("Video Subscriber",
                                  Address(nodeID.mSubsystem, nodeID.mNode, 15, i),
-                                 JAUS_VISUAL_SENSOR_MESSAGE_BOX_SIZE) == JAUS_OK)
+                                 JAUS_VIDEO_SUBSCRIBER_MESSAGE_BOX_SIZE) == JAUS_OK)
         {
             break;
         }
@@ -175,69 +114,51 @@ int main(int argc, char *argv[])
         return 0;
     }
 
-    Sleep(50);
+    Address visualSensorID;
+    if(argc > 1)
+    {
+        int a, b, c, d;
+        if(sscanf(argv[1], "%d.%d.%d.%d", &a, &b, &c, &d) == 4)
+        {
+            visualSensorID((Byte)a, (Byte)b, (Byte)c, (Byte)d);
+        }
+    }
+
+    CxUtils::SleepMs(50);
+
+    // Set a callback to get the data as it arrives.  The other method
+    // to get image data is to inherit from VideoSubscriber and overload
+    // the ProcessImage method.
+    subscriber.RegisterVideoCallback(ImageCallback, NULL);
 
     // Transition the component from the standy by state,
     // which is default after initialization to
     // a ready state.
     subscriber.SetPrimaryStatus(Component::Status::Ready);
-    bool createdEvent = false;
+    bool createdSubscription = false;
     while(!gExitFlag)
     {
         // If connected to Node Manager...
         if(subscriber.IsConnected())
         {
-            // If no subscription has been made to any service provider, try create one.
-            if(!createdEvent && subscriber.HaveEventSubscriptionsOfType(JAUS_REPORT_IMAGE) == false)
+            if(createdSubscription == false)
             {
-                // Clear receive count information.
-                subscriber.mTotalCount = 0;
-                subscriber.mRecvCount = 0;
-                subscriber.mUpdateTimeMs = subscriber.mStartTimeMs = 0;
-
-                QueryConfiguration queryConfiguration;
-                Receipt receipt;
-
-                queryConfiguration.SetSourceID(subscriber.GetID());
-                queryConfiguration.SetDestinationID(nodeID);
-                queryConfiguration.SetQueryField(QueryConfiguration::Subsystem);
-
-                // Get the configuration of the subsystem to see if a Global Pose Sensor
-                // is present.
-                if(subscriber.Send(&queryConfiguration, receipt) == JAUS_OK)
+                bool foundSensor = false;
+                if(visualSensorID.IsValid())
                 {
-                    const ReportConfiguration* reportConfiguration =
-                                                    dynamic_cast<const ReportConfiguration*>(receipt.GetResponseMessage());
-                    if(reportConfiguration)
+                    foundSensor = subscriber.FindVisualSensors(visualSensorID.mSubsystem);
+                }
+                else
+                {
+                    foundSensor = subscriber.FindVisualSensors(subscriber.GetID().mSubsystem);
+                }
+
+                if(foundSensor)
+                {
+                    VideoSubscriber::SensorInfo info = subscriber.GetVisualSensorInfo(0);
+                    if(subscriber.CreateVideoSubscription(info.mID))
                     {
-                        // Find a visual sensor.
-                        Address::List sensors =
-                            reportConfiguration->GetConfiguration()->GetComponentsOfType((Byte)Service::VisualSensor);
-
-                        if(sensors.size() > 0)
-                        {
-                            cout << "Create Event from Visual Sensor " << sensors.front().ToString() << "...";
-                            CreateEventRequest createEvent;
-
-                            createEvent.SetSourceID(subscriber.GetID());
-                            createEvent.SetDestinationID(sensors.front());
-                            createEvent.SetMessageCode(JAUS_REPORT_IMAGE);
-                            createEvent.SetEventType(CreateEventRequest::EveryChange);
-
-                            // Request the event.
-                            if(subscriber.RequestEvent(createEvent) == JAUS_OK)
-                            {
-                                cout << "Success!\n";
-                                createdEvent = true;
-                                // At this point Global Pose data should start
-                                // arriving to our component, and will be passed
-                                // to the ProcessInformMessage function.
-                            }
-                            else
-                            {
-                                cout << "Failure!\n";
-                            }
-                        }
+                        createdSubscription = true;
                     }
                 }
             }
@@ -246,8 +167,10 @@ int main(int argc, char *argv[])
         {
             gExitFlag = true;
         }
-        Sleep(100);
+        CxUtils::SleepMs(100);
     }
+
+    subscriber.CancelVideoSubscription();
 
     return 0;
 }

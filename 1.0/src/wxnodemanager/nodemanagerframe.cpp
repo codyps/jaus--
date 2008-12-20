@@ -277,6 +277,11 @@ void NodeManagerFrame::OnTimer(wxTimerEvent& event)
 
     if(mpNode)
     {
+        if(mpNode->IsLogOpen())
+        {
+            mpLogButton->SetLabel(TEXT_TYPE("End Log"));
+        }
+
         unsigned int connectionUpdateTimeMs = mpNode->GetConnectionEventTimeMs();
         Jaus::Configuration system;
         Jaus::Configuration::Subsystem::Map::iterator ss;
@@ -311,22 +316,27 @@ void NodeManagerFrame::OnTimer(wxTimerEvent& event)
             subListID = mpNodesTreeCtrl->AppendItem(rootID, wxString("Subsystem List", wxConvUTF8), 1, 1);
 
             ss = system.mSubsystems.find(mpNode->GetNodeID().mSubsystem);
-
+            // Display configuration of the subsystem the node is part of.
             if(ss != system.mSubsystems.end())
             {
                 addresses = ss->second.GetAddresses();
                 for( id = addresses.begin(); id != addresses.end(); id++)
                 {
-                    mpNodesTreeCtrl->AppendItem(configID, wxString(id->ToString().c_str(), wxConvUTF8), 1, 1);
+                    mpNodesTreeCtrl->AppendItem(configID, 
+                                                wxString(id->ToString().c_str(), wxConvUTF8) + 
+                                                wxString(" - ", wxConvUTF8) + 
+                                                wxString(Jaus::Service::ToString((Jaus::Service::Type)(id->mComponent)).c_str(), wxConvUTF8), 
+                                                1, 
+                                                1);
                 }
             }
-
+            // List nodes
             addressSet = ((Jaus::NodeConnectionHandler*)(mpNode->GetConnectionHandler()))->GetNodeConnections();
             for( setID = addressSet.begin(); setID != addressSet.end(); setID++)
             {
                 mpNodesTreeCtrl->AppendItem(nodeListID, wxString(setID->ToString().c_str(), wxConvUTF8), 1, 1);
             }
-
+            // Subsystem list.
             addressSet = mpNode->GetSubsystemList();
             for(setID = addressSet.begin(); setID != addressSet.end(); setID++)
             {

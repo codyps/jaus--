@@ -126,13 +126,16 @@ class MyComponent : public SubscriberComponent
                     id != sensors.end();
                     id++)
                 {
-                    if(HaveServiceConnection(*id, JAUS_REPORT_GLOBAL_POSE))
+                    if(HaveEventSubscription(*id, JAUS_REPORT_GLOBAL_POSE))
                         continue;
 
-                    if(CreateInformServiceConnection(*id, 
-                                                     JAUS_REPORT_GLOBAL_POSE,
-                                                     pv,
-                                                     5))
+                    Jaus::CreateEventRequest command;
+					command.SetSourceID(GetID());
+					command.SetDestinationID(*id);
+					command.SetMessageCode(Jaus::JAUS_REPORT_GLOBAL_POSE);
+					command.SetEventType(Jaus::CreateEventRequest::Periodic);
+					command.SetRequestedPeriodicUpdateRate(30);
+                    if(RequestEvent(command))
                     {
                         break;
                     }
@@ -206,7 +209,11 @@ int main(int argc, char *argv[])
     toDiscover.insert(1);
     toDiscover.insert(8);
     toDiscover.insert(10);
-    subscriber.EnableSubsystemDiscovery(true, &toDiscover);
+    // If you want to only discover information about
+    // specific subsystms, then pass a pointer to a list
+    // of subsystems (e.g. subscriber.EnableSubsystemDiscovery(true, &toDiscover)), otherwise NULL.
+    // In this example, we try everything.
+    subscriber.EnableSubsystemDiscovery(true, NULL);
 
 	Platform::Map platforms;
     while(!gExitFlag)

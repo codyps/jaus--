@@ -177,6 +177,10 @@ UShort MessageCreator::GetResponseCodes(const UShort mcode, std::set<UShort>* re
 
             // Planning Subgroup
 
+            // Experimental
+            case JAUS_QUERY_SICK_LIDAR:
+                rcode = JAUS_REPORT_SICK_LIDAR;
+                break;
             default:
                 rcode = 0;
                 break;
@@ -382,6 +386,10 @@ UShort MessageCreator::GetInformQueryType(const UShort informCode)
             code = JAUS_QUERY_MISSION_STATUS;
             break;
 
+        // Experimental
+        case JAUS_REPORT_SICK_LIDAR:
+            code = JAUS_QUERY_SICK_LIDAR;
+            break;
         // Default Output
         default:
             code = 0;
@@ -1395,11 +1403,11 @@ std::string MessageCreator::GetExperimentalMessageString(const UShort code)
     switch(code)
     {
     //  User defined messages
-    case JAUS_QUERY_VISUAL_RSTA:
-         str = "Query Visual RSTA";
+    case JAUS_QUERY_SICK_LIDAR:
+         str = "Query SICK LIDAR";
          break;
-    case JAUS_REPORT_VISUAL_RSTA:
-        str = "Report Visual RSTA";
+    case JAUS_REPORT_SICK_LIDAR:
+        str = "Report SICK_LIDAR";
         break;
     //  COULD NOT FIND MESSAGE!
     default:
@@ -2051,11 +2059,11 @@ Message* MessageCreator::CreateExperimentalMessage(const UShort code)
     switch(code)
     {
     //  User defined messages
-    case JAUS_QUERY_VISUAL_RSTA:
-         msg = NULL;/*new QueryVisualRSTA();*/
+    case JAUS_QUERY_SICK_LIDAR:
+         msg = new QuerySickLidar(); 
          break;
-    case JAUS_REPORT_VISUAL_RSTA:
-        msg = NULL; /*new ReportVisualRSTA();*/
+    case JAUS_REPORT_SICK_LIDAR:
+        msg = new ReportSickLidar();
         break;
     //  COULD NOT FIND MESSAGE!
     default:

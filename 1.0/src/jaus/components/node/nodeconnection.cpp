@@ -41,7 +41,7 @@
 ////////////////////////////////////////////////////////////////////////////////////
 #include "jaus/components/node/nodeconnection.h"
 #include "jaus/messages/time.h"
-
+#include <iostream>
 using namespace Jaus;
 
 
@@ -124,6 +124,9 @@ int NodeConnection::CreateConnection(const Address& id,
             }
             else
             {
+#ifndef WIN32
+                std::cout << "FAILED TO CREATE UDP CLIENT\n";
+#endif
                 delete mpUDP;
                 mpUDP = false;
             }

@@ -56,13 +56,10 @@
 #include "jaus/messages/inform/configuration/reportidentification.h"
 #include "jaus/components/transport/net.h"
 
-
 //#define _JAUS_DEBUG
 
-#ifdef _JAUS_DEBUG
 #include <iostream>
 using namespace std;
-#endif
 
 using namespace Jaus;
 
@@ -290,7 +287,7 @@ bool Communicator::DefaultDataLink::Transmit(const Stream& data)
         {
             mTransportStream.Write((const unsigned char *)gNetworkHeader.c_str(), (unsigned int)gNetworkHeader.size());
             mTransportStream.Write(data);
-            std::map<Byte, CxUtils::UdpClient>::iterator destination;
+            std::map<Key, CxUtils::UdpClient>::iterator destination;
             SharedMemoryMap::iterator sharedMemory;
             // If broadcast send to all subsystems.
             if(header.mDestinationID.IsBroadcast())
@@ -298,7 +295,7 @@ bool Communicator::DefaultDataLink::Transmit(const Stream& data)
                 // If using a hearbeat pulse message, treat differently by using
                 // UDP Multicast or Broadcast.
                 if(header.mCommandCode == JAUS_REPORT_HEARTBEAT_PULSE && 
-                    (header.mDestinationID.mSubsystem == GetSubsystemID() || header.mDestinationID.mSubsystem == 255) && \
+                    (header.mDestinationID.mSubsystem == GetSubsystemID() || header.mDestinationID.mSubsystem == 255) && 
                     header.mDestinationID.mNode == 255 && header.mDestinationID.mComponent == 1 && header.mDestinationID.mInstance == 1)
                 {
                     if(mBroadcastFlag)
@@ -327,9 +324,19 @@ bool Communicator::DefaultDataLink::Transmit(const Stream& data)
                         destination != mSubsystems.end();
                         destination++)
                     {
-                        if(destination->first != GetSubsystemID())
+                        if(destination->first.mSubsystem != GetSubsystemID())
                         {
-                            if(destination->second.Send(mTransportStream)) { result = true; }
+                            if(destination->second.Send(mTransportStream)) 
+                            { 
+                                result = true; 
+                            }
+                            else
+                            {
+                                // If we failed to send, delete the connection
+                                destination->second.Shutdown();
+                                mSubsystems.erase(destination);
+                                break;
+                            }
                         }
                     }
                 }
@@ -344,13 +351,40 @@ bool Communicator::DefaultDataLink::Transmit(const Stream& data)
                 }
                 else
                 {
-                    destination = mSubsystems.find(header.mDestinationID.mSubsystem);
+                    // Try lookup a specific node with a communicator we can send to.
+                    destination = mSubsystems.find(Key(header.mDestinationID.mSubsystem, header.mDestinationID.mNode));
                     if(destination != mSubsystems.end())
                     {
                         if(destination->second.Send(mTransportStream)) { result = true; }
                     }
-                }
-            }
+                    // If we couldn't find a node connection, find any node on the subsystem to send to.
+                    else
+                    {
+                        for(destination = mSubsystems.begin();
+                            destination != mSubsystems.end();
+                            destination++)
+                        {
+                            if(destination->first.mSubsystem == header.mDestinationID.mSubsystem)
+                            {
+                                if(destination->second.Send(mTransportStream)) 
+                                { 
+                                    result = true; 
+                                }
+                                else
+                                {
+                                    // If we failed to send, delete the connection
+                                    destination->second.Shutdown();
+                                    mSubsystems.erase(destination);
+#ifdef _JAUS_DEBUG
+                                    cout << "Deleted connection to: " << header.mDestinationID.ToString() << endl;
+#endif
+                                }
+                                break;
+                            }
+                        }
+                    } // If node connection, else any node on subsystem.
+                }// If shared memory, else send using UDP
+            } // Send to non-broadcast destination.
         }
     }
 
@@ -462,45 +496,6 @@ bool Communicator::DefaultDataLink::SetNetworkInterface(const std::string& addre
 
 ////////////////////////////////////////////////////////////////////////////////////
 ///
-///   \brief Creates a unicast connection to a subsystem that is not subject to
-///   dynamic discovery operations (can't be dynamically removed).
-///
-///   If an existing Unicast UDP connection exists, this method will fail.
-///
-///   \param subsystemID The ID of the subsystem to create connection to.
-///   \param host The IP address/hostname of the subsystems data link.
-///
-///   \return True on success, false on failure.
-///
-////////////////////////////////////////////////////////////////////////////////////
-bool Communicator::DefaultDataLink::AddSubsystem(const Byte subsystemID, const std::string& host)
-{
-    bool result = false;
-    std::map<Byte, CxUtils::UdpClient>::iterator unicast;
-    mConnectionsMutex.Enter();
-    unicast = mSubsystems.find(subsystemID);
-    // If we don't already have an exisiting connection.
-    if(unicast == mSubsystems.end())
-    {
-        if(mSubsystems[subsystemID].InitializeSocket(host.c_str(), gNetworkPort) > 0)
-        {
-            result = true;
-            mFixedConnections.insert(subsystemID);
-        }
-        else
-        {
-            unicast = mSubsystems.find(subsystemID);
-            mSubsystems.erase(unicast);
-        }
-    }
-    mConnectionsMutex.Leave();
-
-    return result;
-}
-
-
-////////////////////////////////////////////////////////////////////////////////////
-///
 ///   \brief A thread which continuously receives UDP data over a socket.
 ///
 ///   Depending on the state of the data link (Off, On, Standby) UDP messages
@@ -517,8 +512,8 @@ void Communicator::DefaultDataLink::RecvThread(void *arg)
     Communicator::DefaultDataLink *link = (Communicator::DefaultDataLink*)(arg);
     unsigned int count = 0;
     std::string source;
-    std::map<Byte, CxUtils::UdpClient>::iterator connection;
-    std::map<Byte, unsigned int>::iterator timestampMs;
+    std::map<Key, CxUtils::UdpClient>::iterator connection;
+    std::map<Key, unsigned int>::iterator timestampMs;
 
     while(link->mRecvThread.QuitThreadFlag() == false)
     {
@@ -549,24 +544,52 @@ void Communicator::DefaultDataLink::RecvThread(void *arg)
                         cout << "Received Message From: " << header.mSourceID.ToString() << endl;
 #endif
                         link->mConnectionsMutex.Enter();
-                        connection = link->mSubsystems.find(header.mSourceID.mSubsystem);
-                        if(connection == link->mSubsystems.end())
+                        connection = link->mSubsystems.find(Key(header.mSourceID.mSubsystem,header.mSourceID.mNode));
+                        // Check if we have a connection, but don't connect to yourself.
+                        if( header.mSourceID != Address(link->mpCommunicator->GetID().mSubsystem, link->mpCommunicator->GetID().mNode, 1, 1) &&
+                            connection == link->mSubsystems.end())
                         {
                             // See if we have a connection in shared memory.
                             SharedMemoryMap::iterator smConnection = link->mSharedMemoryConnections.find(Address(header.mSourceID.mSubsystem, header.mSourceID.mNode, 1, 1));
                             if(smConnection == link->mSharedMemoryConnections.end())
                             {
+                                bool success = false;
                                 // Try connection through shared memory first.
                                 JSharedMemory* newSharedConnection = new JSharedMemory();
                                 if(newSharedConnection->OpenInbox(Address(header.mSourceID.mSubsystem, header.mSourceID.mNode, 1, 1)) == JAUS_OK)
                                 {
+                                    success = true; 
                                     link->mSharedMemoryConnections[Address(header.mSourceID.mSubsystem, header.mSourceID.mNode, 1, 1)] = newSharedConnection;
                                     newSharedConnection = NULL;
                                 }
                                   
                                 // Create a new connection, but only do so if within the same network that
                                 // I'm allowed to receive on.
-                                link->mSubsystems[header.mSourceID.mSubsystem].InitializeSocket(source.c_str(), gNetworkPort);
+                                if(link->mSubsystems[Key(header.mSourceID.mSubsystem, header.mSourceID.mNode)].InitializeSocket(source.c_str(), gNetworkPort) == 0)
+                                {
+#ifndef WIN32
+                                    cout << "ERROR INITIALIZING SOCKET!\n";
+                                    FILE* fp;
+                                    fp = fopen("error.log.txt", "a");
+                                    if(!fp)
+                                    {
+                                        fp = fopen("error.log.txt", "w");
+                                    }
+                                    if(fp)
+                                    {
+                                        fprintf(fp, "%d - Communicator::DefaultDataLink::ERROR INITIALIZING SOCKET!\n", Jaus::Time::GetUtcTimeMs());
+                                        fflush(fp);
+                                        fclose(fp);
+                                    }
+#endif
+                                    std::map<Key, CxUtils::UdpClient>::iterator toDelete;
+                                    toDelete = link->mSubsystems.find(Key(header.mSourceID.mSubsystem, header.mSourceID.mNode));
+                                    link->mSubsystems.erase(toDelete);
+                                }
+                                else
+                                {
+                                    success = true;
+                                }
    
                                 if(newSharedConnection)
                                 {
@@ -574,22 +597,67 @@ void Communicator::DefaultDataLink::RecvThread(void *arg)
                                     newSharedConnection = NULL;
                                 }
 #ifdef _JAUS_DEBUG
-                                cout << "Created Connection To " << header.mSourceID.ToString() << ", at: " << source << endl;
+                                if(success)
+                                {
+                                    cout << "Created Connection To " << header.mSourceID.ToString() << ", at: " << source << endl;
+                                }
 #endif
                             }
                         }
                         // If this is a hearbeat message, use it to update timestamps so we
                         // can maintain UDP unicast client connections (to reduce bandwidth).
                         if(header.mCommandCode == JAUS_REPORT_HEARTBEAT_PULSE &&
-                            header.mDestinationID.mSubsystem == 255 && header.mDestinationID.mNode == 255)
+                            header.mDestinationID.mNode == 255 && 
+                            header.mDestinationID.mComponent == 1 && 
+                            header.mDestinationID.mInstance == 1)
                         {
-                            link->mSubsystemHeartbeatTimesMs[header.mSourceID.mSubsystem] = Time::GetUtcTimeMs();
+                            link->mSubsystemHeartbeatTimesMs[Key(header.mSourceID.mSubsystem, header.mSourceID.mNode)] = Time::GetUtcTimeMs();
                         }
                         link->mConnectionsMutex.Leave();
 
                         link->mRecvStream.SetReadPos(0);
-                        // Process the data.
-                        link->ProcessReceivedMessage(link->mRecvStream, &source);
+                        // If the message came from a different subsystem, and is not intended for
+                        // our subsystem, we must either ignore it, or check to see if the subsystem is running
+                        // on the same computer, and if so, see if we have a connection through shared memory and
+                        // pass it on.
+                        if(header.mSourceID.mSubsystem != link->mpCommunicator->GetID().mSubsystem &&
+                            header.mDestinationID.mSubsystem == 255 || header.mDestinationID.mSubsystem != link->mpCommunicator->GetID().mSubsystem)
+                        {
+                            // Don't send heartbeat pulse messages because they are multicast/broadcast.
+                            if(header.mCommandCode != JAUS_REPORT_HEARTBEAT_PULSE)
+                            {
+                                SharedMemoryMap::iterator smConnection;
+                                if(header.mDestinationID.IsBroadcast())
+                                {
+                                    for(smConnection = link->mSharedMemoryConnections.begin();
+                                        smConnection != link->mSharedMemoryConnections.end();
+                                        smConnection++)
+                                    {
+                                        if( (header.mDestinationID.mSubsystem == 255 || header.mDestinationID.mSubsystem == smConnection->first.mSubsystem) &&
+                                            (header.mDestinationID.mNode == 255 || header.mDestinationID.mNode == smConnection->first.mNode) )
+                                        {
+                                            smConnection->second->EnqueueMessage(link->mRecvStream);
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    smConnection = link->mSharedMemoryConnections.find(Address(header.mDestinationID.mSubsystem, header.mDestinationID.mNode, 1, 1));
+                                    if(smConnection != link->mSharedMemoryConnections.end())
+                                    {
+                                        smConnection->second->EnqueueMessage(link->mRecvStream);
+                                    }
+                                }
+                            }
+#ifdef _JAUS_DEBUG
+                            //cout << "Dumped Message To: " << header.mDestinationID.ToString() << ", from: " << source << endl;
+#endif
+                        }
+                        else
+                        {
+                            // Process the data.
+                            link->ProcessReceivedMessage(link->mRecvStream, &source);
+                        }
                     }
                 }
             }
@@ -597,6 +665,9 @@ void Communicator::DefaultDataLink::RecvThread(void *arg)
 
         if(++count == 50)
         {
+#ifdef _JAUS_DEBUG
+            cout << "Start Check" << endl;
+#endif
             // Delete old client connections.
             link->mConnectionsMutex.Enter();
             timestampMs = link->mSubsystemHeartbeatTimesMs.begin();
@@ -607,14 +678,16 @@ void Communicator::DefaultDataLink::RecvThread(void *arg)
                     connection = link->mSubsystems.find(timestampMs->first);
                     if(connection != link->mSubsystems.end())
                     {
+                        connection->second.Shutdown();
                         link->mSubsystems.erase(connection);
 #ifdef _JAUS_DEBUG
-                        cout << "Removed Connection To Subsystem: " << (int)timestampMs->first << endl;
+                        cout << "Removed Connection To Subsystem: " << (int)timestampMs->first.mSubsystem << endl;
 #endif
                     }
 #ifdef WIN32
                     timestampMs = link->mSubsystemHeartbeatTimesMs.erase(timestampMs);
 #else
+                    link->mSubsystemHeartbeatTimesMs.erase(timestampMs);
                     timestampMs = link->mSubsystemHeartbeatTimesMs.begin();
 #endif
                     continue;
@@ -642,10 +715,18 @@ void Communicator::DefaultDataLink::RecvThread(void *arg)
            
             link->mConnectionsMutex.Leave();
 
+#ifdef _JAUS_DEBUG
+            cout << "Finished Check" << endl;
+#endif
             CxUtils::SleepMs(1);
             count = 0;
         }
     }
+#ifdef _JAUS_DEBUG
+    cout << "==================================================\n";
+    cout << "EXITING COMMUNICATOR DEFAULT DATALINK RECEIVE THREAD" << endl;
+    cout << "==================================================\n";
+#endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////////

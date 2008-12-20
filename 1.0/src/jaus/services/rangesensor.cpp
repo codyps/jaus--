@@ -40,6 +40,8 @@
 ///
 ////////////////////////////////////////////////////////////////////////////////////
 #include "jaus/services/rangesensor.h"
+#include "jaus/messages/experimental/sick/querysicklidar.h"
+#include <iostream>
 
 using namespace Jaus;
 
@@ -106,6 +108,28 @@ int RangeSensor::Initialize(const Byte subsystem,
                                            instance));
     }
 }
+
+
+////////////////////////////////////////////////////////////////////////////////////
+///
+///   \brief Initializes the component as supporting the Range Sensor service.
+///
+///   \return JAUS_OK on success, otherwise JAUS_FAILURE.
+///
+////////////////////////////////////////////////////////////////////////////////////
+int RangeSensor::SetupService()
+{
+    Service service;
+
+    service.SetType(Service::RangeSensor);
+    service.AddInputMessage(JAUS_QUERY_RELATIVE_OBJECT_POSITION, MessageCreator::GetPresenceVectorMask(JAUS_QUERY_RELATIVE_OBJECT_POSITION));
+    service.AddOutputMessage(JAUS_REPORT_RELATIVE_OBJECT_POSITION, MessageCreator::GetPresenceVectorMask(JAUS_REPORT_RELATIVE_OBJECT_POSITION));
+    service.AddInputMessage(JAUS_QUERY_SICK_LIDAR, MessageCreator::GetPresenceVectorMask(JAUS_QUERY_SICK_LIDAR));
+    service.AddOutputMessage(JAUS_REPORT_SICK_LIDAR, MessageCreator::GetPresenceVectorMask(JAUS_REPORT_SICK_LIDAR));
+
+    return AddService(service);
+}
+
 ////////////////////////////////////////////////////////////////////////////////////
 ///
 ///   \brief Set the current Range Sensor data for reporting.
@@ -134,8 +158,9 @@ int RangeSensor::SetRelativeObjectPosition(const ReportRelativeObjectPosition& s
 
     if(result == JAUS_OK)
     {
-        // Now that we've set the pose, lets see if we need
-        // to generate any events.
+        // Now that we've updated our internal data, lets see if we
+        // need to generate any events.
+
         Event::Set myEvents;
         Event::Set::iterator e;
 
@@ -164,36 +189,59 @@ int RangeSensor::SetRelativeObjectPosition(const ReportRelativeObjectPosition& s
 
     return result;
 }
+
+
 ////////////////////////////////////////////////////////////////////////////////////
 ///
-///   \brief Sends a report relative object position message in response to the 
-///   query.
+///   \brief Sets the current LIDAR scan data for reporting.
 ///
-///   \param query The query for relative object position.
+///   \param lidarScan LIDAR Scan data to report.
 ///
 ///   \return JAUS_OK on success, otherwise JAUS_FAILURE.
 ///
 ////////////////////////////////////////////////////////////////////////////////////
-int RangeSensor::RespondToQuery(const QueryRelativeObjectPosition* query)
-{
-    ReportRelativeObjectPosition report;
-    
-    mRangeSensorMutex.Enter();
-    report = mRelativeObjectPosition;
-    mRangeSensorMutex.Leave();
-    //  Set the ID values for the message.
-    report.SetSourceID(GetID());
-    report.SetDestinationID(query->GetSourceID());
-    // Remove the fields not being requested.
-    report.ClearFields( ~query->GetPresenceVector() );
-    // Now if the presence vector matches, send the response.
-    if(Send(&report))
+int RangeSensor::SetSickLidarData(const ReportSickLidar& lidarScan)
+{   
+    if(lidarScan.GetScanData()->size() == 0)
     {
-        return JAUS_OK;       
+        return JAUS_FAILURE;
     }
-    
-    return JAUS_FAILURE;
+
+    mRangeSensorMutex.Enter();
+    mSickLidarData = lidarScan;
+    mRangeSensorMutex.Leave();
+
+    // Now that we've updated our internal data, lets see if we
+    // need to generate any events.
+
+    Event::Set myEvents;
+    Event::Set::iterator e;
+
+    mEventManager.Lock();
+    myEvents = mEventManager.GetProducedEventsOfType(JAUS_REPORT_SICK_LIDAR);
+    for(e = myEvents.begin();
+        e != myEvents.end();
+        e++)
+    {
+        // Periodic events and one time events are generated
+        // for us by the parent class (InformComponent), so don't
+        // double generate.  Also, this implementation of
+        // a Range Sensor only supports Periodic, OneTime and
+        // EveryChange events of this type.
+        if((*e)->GetEventType() == Event::EveryChange)
+        {
+            GenerateEvent(*e);
+            // Update sequence number and timestamp.
+            (*e)->SetSequenceNumber((*e)->GetSequenceNumber() + 1);
+            (*e)->SetTimeStampMs(Time::GetUtcTimeMs());
+        }
+    }
+
+    mEventManager.Unlock();
+
+    return OK;
 }
+
 
 ////////////////////////////////////////////////////////////////////////////////////
 ///
@@ -211,7 +259,7 @@ int RangeSensor::RespondToQuery(const QueryRelativeObjectPosition* query)
 ////////////////////////////////////////////////////////////////////////////////////
 int RangeSensor::ProcessQueryMessage(const Message* msg)
 {
-    int processed = JAUS_OK;
+    int processed = JAUS_FAILURE;
 
     switch(msg->GetCommandCode())
     {
@@ -220,8 +268,31 @@ int RangeSensor::ProcessQueryMessage(const Message* msg)
             const QueryRelativeObjectPosition* query = dynamic_cast<const QueryRelativeObjectPosition*>(msg);
             if(query)
             {
-                processed = RespondToQuery(query);
+                ReportRelativeObjectPosition report;    
+                mRangeSensorMutex.Enter();
+                report = mRelativeObjectPosition;
+                mRangeSensorMutex.Leave();
+                //  Set the ID values for the message.
+                report.SetSourceID(GetID());
+                report.SetDestinationID(query->GetSourceID());
+                // Remove the fields not being requested.
+                report.ClearFields( ~query->GetPresenceVector() );
+                // Now if the presence vector matches, send the response.
+                Send(&report);
+                processed = JAUS_OK;
             }
+        }
+        break;
+    case JAUS_QUERY_SICK_LIDAR:
+        {
+            ReportSickLidar report = GetSickLidarData();
+            if(report.GetScanData()->size() > 0)
+            {
+                report.SetSourceID(GetID());
+                report.SetDestinationID(msg->GetSourceID());
+                Send(&report);
+            }
+            processed = JAUS_OK;
         }
         break;
     default:
@@ -259,13 +330,22 @@ int RangeSensor::GenerateEvent(const Event* eventInfo)
 
         if(eventInfo->GetQueryMessage())
         {
-            const QueryRelativeObjectPosition* query = dynamic_cast<const QueryRelativeObjectPosition*>(eventInfo->GetQueryMessage());
+            const QueryRelativeObjectPosition* query = dynamic_cast<const QueryRelativeObjectPosition*>(eventInfo->GetQueryMessage());          
             if(query)
             {
                 // Remove fields not being requested.
                 report.ClearFields(~query->GetPresenceVector());
-            }
-            // Send event message to everyone.
+            }            
+        }
+        // Send event message to everyone.
+        EventManager::GenerateEvent(eventInfo, &report, GetConnectionHandler());
+        result = JAUS_OK;
+    }
+    else if(eventInfo->GetMessageCode() == JAUS_REPORT_SICK_LIDAR)
+    {
+        ReportSickLidar report = GetSickLidarData();
+        if(report.GetScanData()->size() > 0)
+        {
             EventManager::GenerateEvent(eventInfo, &report, GetConnectionHandler());
             result = JAUS_OK;
         }
@@ -314,7 +394,8 @@ int RangeSensor::ProcessEventRequest(const Jaus::CreateEventRequest& command,
     int result = JAUS_FAILURE;
    
     // Currently only supports events for global pose.
-    if(command.GetMessageCode() == JAUS_REPORT_RELATIVE_OBJECT_POSITION)
+    if(command.GetMessageCode() == JAUS_REPORT_RELATIVE_OBJECT_POSITION ||
+        command.GetMessageCode() == JAUS_REPORT_SICK_LIDAR)
     {
         // Initialize the response value to something.
         responseValue = RejectEventRequest::MessageNotSupported;
@@ -368,14 +449,34 @@ int RangeSensor::ProcessEventRequest(const Jaus::CreateEventRequest& command,
                                                 confirmedRate,
                                                 errorMessage);
 }
+
+
 ////////////////////////////////////////////////////////////////////////////////////
 ///
 ///   \brief Returns a copy of the relative object position.
 ///
 ////////////////////////////////////////////////////////////////////////////////////
-ReportRelativeObjectPosition RangeSensor::GetRelativeObjectPosition()
+ReportRelativeObjectPosition RangeSensor::GetRelativeObjectPosition() const
 {
+    mRangeSensorMutex.Enter();
     ReportRelativeObjectPosition ret = mRelativeObjectPosition;
+    mRangeSensorMutex.Leave();
     return ret;
 }
+
+
+////////////////////////////////////////////////////////////////////////////////////
+///
+///   \brief Returns a copy of the SICK LIDAR message data.
+///
+////////////////////////////////////////////////////////////////////////////////////
+ReportSickLidar RangeSensor::GetSickLidarData() const
+{
+    mRangeSensorMutex.Enter();
+    ReportSickLidar ret = mSickLidarData;
+    mRangeSensorMutex.Leave();
+    return ret;
+}
+
+
 /*  End of File */

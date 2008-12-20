@@ -1,12 +1,11 @@
 ////////////////////////////////////////////////////////////////////////////////////
 ///
-///  \file example_joystick.cpp
-///  \brief Example program showing how to use the JoystickDriver class
-///  to control a Primitive Driver component.
+///  \file example_systemcommander.cpp
+///  \brief Example program demonstrating basic use of System Commander 
+///  interface.
 ///
 ///  <br>Author(s): Daniel Barber
-///  <br>Created: 25 April 2008
-///  <br>Last Modified: 6 May 2008
+///  <br>Created: 19 December 2008
 ///  <br>Copyright (c) 2008
 ///  <br>Applied Cognition and Training in Immersive Virtual Environments
 ///  <br>(ACTIVE) Laboratory
@@ -54,12 +53,11 @@ using namespace Jaus;
 
 bool gExitFlag = false;
 
-
 int main(int argc, char *argv[])
 {
     Address nodeID;     // ID of the node manager.
-    JoystickDriver joystick;
-    
+    SystemCommander systemCommander;
+
     cout << "Looking for node manager...";
     while(gExitFlag == false)
     {
@@ -79,20 +77,11 @@ int main(int argc, char *argv[])
         return 0;
     }
 
-    cout << "Initializing Component for Discovery... ";
-     
-    // Initialize the component with any instance ID.
-    for(Byte i = 1; i < 255; i++)
-    {
-        if(joystick.Initialize("JoystickDriver", 
-                                Address(nodeID.mSubsystem, nodeID.mNode, 5, i)) == JAUS_OK)
-        {
-            joystick.AddSubsystemToDiscover(nodeID.mSubsystem);
-            break;
-        }
-    }
-  
-    if(joystick.IsInitialized())
+    cout << "Initializing Component for Discovery...";
+
+    systemCommander.Initialize(nodeID.mSubsystem, nodeID.mNode, 0);
+
+    if(systemCommander.IsInitialized())
     {
         cout << "Success!\n";
     }
@@ -104,53 +93,32 @@ int main(int argc, char *argv[])
 
     Sleep(50);
 
-    cout << "Initializing Connection to Joystick...";
-    
-    if(argc > 1)
-    {
-        if(!joystick.InitializeJoystick(argv[1]))
-        {
-            if(!joystick.InitializeJoystick())
-            {
-                cout << "Failure!\n";
-                return 0;
-            }
-			else				
-			{
-				joystick.SetSubsystemToControl(nodeID.mSubsystem);
-			}
-        }
-    }
-    else if(joystick.InitializeJoystick())
-	{
-		joystick.SetSubsystemToControl(nodeID.mSubsystem);
-	}
-	else
-    {
-        cout << "Failure!\n";
-        return 0;
-    }
-    cout << "Success!\n";    
-
     // Transition the component from the standy by state, 
     // which is default after initialization to 
     // a ready state.
-    joystick.SetPrimaryStatus(Component::Status::Ready);   
+    systemCommander.SetPrimaryStatus(Component::Status::Ready);
 
+	Platform::Map platforms;
+    Platform::Map::iterator p;
     while(!gExitFlag)
     {
-        cout << "=====================================================\n";
-        joystick.PrintWrenchEffort();
-        joystick.PrintCameraWrench();
+		// Get a copy of system configuration discovered.
+		platforms = systemCommander.GetSystemConfiguration();
+        for(p = platforms.begin();
+            p != platforms.end();
+            p++)
+        {
+            p->second.Print();
+        }
+
         if(CxUtils::GetChar() == 27)
         {
             gExitFlag = true;
         }
-
-        Sleep(100);
+        Sleep(200);
     }
 
-    joystick.Shutdown();
+    systemCommander.Shutdown();
 
     return 0;
 }

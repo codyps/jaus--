@@ -56,33 +56,7 @@ using namespace Jaus;
 SubscriberComponent::SubscriberComponent() : mSystemDiscoveryFlag(false),
                                              mSubsystemsToDiscover(NULL)
 {
-    Service core;
-    core.LoadCoreMessageSupport();
-
-    // Dynamic configuration messages.
-    core.AddInputMessage(JAUS_QUERY_SERVICES, 0);
-    core.AddInputMessage(JAUS_QUERY_IDENTIFICATION, 0);
-    core.AddInputMessage(JAUS_REPORT_CONFIGURATION, 0);
-    core.AddInputMessage(JAUS_REPORT_SUBSYSTEM_LIST, 0);
-    core.AddOutputMessage(JAUS_REPORT_SERVICES, 0);
-    core.AddOutputMessage(JAUS_REPORT_IDENTIFICATION, 0);
-    core.AddOutputMessage(JAUS_QUERY_SUBSYSTEM_LIST, 0);
-    core.AddOutputMessage(JAUS_QUERY_CONFIGURATION, 0);
-
-    // Add messages for events.
-    core.AddInputMessage(JAUS_CREATE_EVENT, 0xFF);
-    core.AddInputMessage(JAUS_UPDATE_EVENT, 0xFF);
-    core.AddInputMessage(JAUS_CANCEL_EVENT, 0x03);
-    core.AddInputMessage(JAUS_REJECT_EVENT_REQUEST, 0x01);
-    core.AddInputMessage(JAUS_CONFIRM_EVENT_REQUEST, 0x01);
-    core.AddOutputMessage(JAUS_CREATE_EVENT, 0xFF);
-    core.AddOutputMessage(JAUS_UPDATE_EVENT, 0xFF);
-    core.AddOutputMessage(JAUS_CANCEL_EVENT, 0x03);
-    core.AddOutputMessage(JAUS_REJECT_EVENT_REQUEST, 0x01);
-    core.AddOutputMessage(JAUS_CONFIRM_EVENT_REQUEST, 0x01);
-    core.AddOutputMessage(JAUS_EVENT, 0);
-
-    AddService(core);
+    mDiscoveryTTL = 5000;
 }
 
 
@@ -1729,6 +1703,75 @@ void SubscriberComponent::CheckDiscoveryEvents()
     }
     else
     {
+        // Query our current subsystem configuration.
+        QueryConfiguration queryConfiguration;
+        queryConfiguration.SetSourceID(GetID());
+        queryConfiguration.SetDestinationID(Address(GetID().mSubsystem,
+                                                    GetID().mNode,
+                                                    1,
+                                                    1));
+        queryConfiguration.SetQueryField(QueryConfiguration::Subsystem);
+        Send(&queryConfiguration);
+
+        if(mSystemDiscoveryFlag)
+        {
+            // Query the current subsystem list data
+            QuerySubsystemList querySubsystemList;
+            querySubsystemList.SetSourceID(GetID());
+            querySubsystemList.SetDestinationID(Address(GetID().mSubsystem,
+                                                        GetID().mNode,
+                                                        1,
+                                                        1));
+            // Send the query.
+            Send(&querySubsystemList);
+
+            // Go through the subsystem list and verify we have
+            // all the data we need.
+            Platform::Map::iterator platform;
+            Address::Set::iterator id;
+
+            mSubsystemsMutex.Enter();
+            for(platform = mSubsystems.begin();
+                platform != mSubsystems.end();
+                platform++)
+            {
+                // If we don't have identification data yet, or we don't
+                // have complete subsystem identification send a query.
+                if(platform != mSubsystems.end() &&
+                    platform->second.HaveIdentification() == false ||
+                    (platform->second.HaveIdentification() &&
+                        platform->second.GetIdentification()->GetIdentification().empty() ||
+                        platform->second.GetIdentification()->GetType() != ReportIdentification::Subsystem))
+                {
+                    for(id = mSubsystemList.begin();
+                        id != mSubsystemList.end();
+                        id++)
+                    {
+                        if(id->mSubsystem == platform->second.GetSubsystemID())
+                        {
+                            QueryIdentification queryIdent;
+                            queryIdent.SetSourceID(GetID());
+                            queryIdent.SetDestinationID(*id);
+                            queryIdent.SetQueryType(QueryIdentification::Subsystem);                    
+                            Send(&queryIdent);
+                        }
+                    }
+                }
+            }
+            for(id = mSubsystemList.begin();
+                id != mSubsystemList.end();
+                id++)
+            {
+                // We automatically query oursevles, don't do it twice.
+                if(id->mSubsystem != GetID().mSubsystem)
+                {
+                    queryConfiguration.SetDestinationID(*id);
+                    Send(&queryConfiguration);
+                }
+            }
+            mSubsystemsMutex.Leave();
+        }
+#if 0
         Event* eventInfo = NULL;
         QueryEvents query;
         Receipt receipt;            
@@ -1887,6 +1930,7 @@ void SubscriberComponent::CheckDiscoveryEvents()
             }
         }
         mSubsystemsMutex.Leave();
+#endif
     }
 }
 
@@ -2089,16 +2133,17 @@ void SubscriberComponent::UpdateSubsystemList(const ReportSubsystemList* report)
             platform = mSubsystems.find(id->mSubsystem);
             // If we don't have identification data yet, or we don't
             // have complete subsystem identification send a query.
-            if(platform != mSubsystems.end() &&
-                platform->second.HaveIdentification() == false ||
-                (platform->second.HaveIdentification() &&
-                    platform->second.GetIdentification()->GetIdentification().empty() ||
-                    platform->second.GetIdentification()->GetType() != ReportIdentification::Subsystem))
+            if(platform != mSubsystems.end())
             {
-                queryIdent.SetDestinationID(*id);
-                Send(&queryIdent);
+                if(platform->second.HaveIdentification() == false ||
+                    (platform->second.HaveIdentification() &&
+                        platform->second.GetIdentification()->GetIdentification().empty() ||
+                        platform->second.GetIdentification()->GetType() != ReportIdentification::Subsystem))
+                {
+                    queryIdent.SetDestinationID(*id);
+                    Send(&queryIdent);
+                }
             }
-
             mSubsystemsMutex.Leave();            
         }
     }
@@ -2358,7 +2403,7 @@ void SubscriberComponent::SubscriptionsLoop()
     while(mPeriodicEventThread.QuitThreadFlag() == false)
     {
         // Only check once a second for lost/non-updating connections
-        if(Time::GetUtcTimeMs() - lastCheckTimeMs > 2500)
+        if(Time::GetUtcTimeMs() - lastCheckTimeMs > mDiscoveryTTL)
         {
             CheckServiceConnections();
             if(mPeriodicEventThread.QuitThreadFlag() == false)
@@ -2388,6 +2433,9 @@ void SubscriberComponent::SubscriptionsLoop()
             mLostEvents.size() == 0 &&
             mSystemDiscoveryFlag == false)
         {
+            mEventManager.Lock();
+            mEventManager.DeleteAllEvents();
+            mEventManager.Unlock();
             break;
         }
         
@@ -2398,6 +2446,10 @@ void SubscriberComponent::SubscriptionsLoop()
             CxUtils::SleepMs(1);
         }
     }
+
+    mEventManager.Lock();
+    mEventManager.DeleteAllEvents();
+    mEventManager.Unlock();
 }
 
 

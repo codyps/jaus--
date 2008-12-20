@@ -95,7 +95,8 @@ int SharedImage::CreateSharedImage(const Address& src, const unsigned int size)
                                                   src.mNode,
                                                   src.mComponent,
                                                   src.mInstance);
-        if( mImageBuffer.CreateMappedMemory(sname, size + JAUS_SHARED_IMAGE_HEADER_SIZE) )
+        if( mImageBuffer.CreateMappedMemory(sname, size + JAUS_SHARED_IMAGE_HEADER_SIZE) ||
+            mImageBuffer.OpenMappedMemory(sname, CX_MAPPED_MEMORY_READ_WRITE, size + JAUS_SHARED_IMAGE_HEADER_SIZE))
         {
             UInt tstamp, number;
             UShort width = 0, height = 0;
@@ -357,6 +358,34 @@ bool SharedImage::IsOpen() const
     }
     return false;
 }
+
+
+////////////////////////////////////////////////////////////////////////////////////
+///
+///  \brief Method checks to see if the shared image buffer is being updated or
+///  not.
+///
+///  \return True if active, otherwise false.
+///
+////////////////////////////////////////////////////////////////////////////////////
+bool SharedImage::IsActive(const unsigned int timeout) const
+{
+    if(mImageBuffer.IsOpen())
+    {
+        UInt imgTimeStamp = 0;
+        mImageBuffer.Lock();
+        mImageBuffer.SetReadPos(0);
+        mImageBuffer.Read(imgTimeStamp);
+        mImageBuffer.Unlock();
+
+        if(Jaus::Time::GetUtcTimeMs() - imgTimeStamp < timeout)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////////
 ///

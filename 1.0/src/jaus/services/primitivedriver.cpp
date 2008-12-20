@@ -159,9 +159,17 @@ int PrimitiveDriver::ProcessCommandMessage(const Message* msg,
             break;
         }
     }
-    else
+
+    // Give parent class a chance to process data too in case
+    // it needs it.
+    if(result == JAUS_FAILURE)
     {
         result = CommandComponent::ProcessCommandMessage(msg, commandAuthority);
+    }
+    else
+    {
+        // Always run parent process command in case it needs the data too.
+        CommandComponent::ProcessCommandMessage(msg, commandAuthority);
     }
 
     return result;
@@ -196,6 +204,18 @@ int PrimitiveDriver::ProcessQueryMessage(const Message* msg)
     default:
         result = CommandComponent::ProcessQueryMessage(msg);
         break;
+    }
+
+    // Still let parent class process (in case dynamic discovery is
+    // enabled and parent class needs this data too.
+    if(result == JAUS_FAILURE)
+    {
+        result = InformComponent::ProcessQueryMessage(msg);
+    }
+    else
+    {
+        // Always run parent process command in case it needs the data too.
+        InformComponent::ProcessQueryMessage(msg);
     }
 
     return result;

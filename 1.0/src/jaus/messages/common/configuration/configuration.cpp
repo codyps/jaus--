@@ -536,7 +536,7 @@ void Configuration::Subsystem::RemoveComponent(const Byte nid,
 void Configuration::Subsystem::Print() const
 {
     std::cout << "========================================\n";
-    std::cout << "SubSystem Configuration - " << (int)mSubsystemID << ":\n";
+    std::cout << "Subsystem Configuration - " << (int)mSubsystemID << ":\n";
     std::cout << "========================================\n";
     
     Configuration::Node::Map::const_iterator node;
@@ -550,7 +550,7 @@ void Configuration::Subsystem::Print() const
             comp != node->second.mComponents.end();
             comp++)
         {
-            std::cout << "        [" << (int)comp->mID << "," << (int)comp->mInstance << "]\n";
+            std::cout << "        [" << (int)comp->mID << "," << (int)comp->mInstance << "] = " << Service::ToString((Service::Type)comp->mID) << "\n";
         }
     }
 }

@@ -1,18 +1,17 @@
 ////////////////////////////////////////////////////////////////////////////////////
 ///
-///  \file nodemanagerapp.cpp
-///  \brief wxWidgets program for JAUS++ Library Node Manager.
+///  \file rangesensorapp.cpp
+///  \brief WxWidgets program for JAUS++ Library Range Sensor.
 ///
-///  <br>Author(s): Bo Sun
-///  <br>Created: 15 January 2008
-///  <br>Last Modified: 1 April 2008
+///  <br>Author(s): Daniel Barber
+///  <br>Created: 18 December 2008
 ///  <br>Copyright (c) 2008
 ///  <br>Applied Cognition and Training in Immersive Virtual Environments
 ///  <br>(ACTIVE) Laboratory
 ///  <br>Institute for Simulation and Training (IST)node
 ///  <br>University of Central Florida (UCF)
 ///  <br>All rights reserved.
-///  <br>Email: bsun@ist.ucf.edu
+///  <br>Email: dbarber@ist.ucf.edu
 ///  <br>Web:  http://active.ist.ucf.edu
 ///
 ///  Redistribution and use in source and binary forms, with or without
@@ -40,75 +39,59 @@
 ////////////////////////////////////////////////////////////////////////////////////
 #include <wx/app.h>
 #include <wx/cmdline.h>
-#include "wxnodemanager/nodemanagerframe.h"
-#ifdef WIN32
 #include <vld.h>
-#endif
 
-#ifdef _WIN32_WCE
-#define TEXT_TYPE _T
-#else
-#define TEXT_TYPE wxT
-#endif
-
+#include "wxrangesensor/rangesensorframe.h"
 
 ////////////////////////////////////////////////////////////////////////////////////
 ///
-///  \class NodeManagerApp
-///  \breif Creates a JAUS++ Node Manager and its GUI.
+///  \class RangeSensorApp
+///  \brief Creates a JAUS++ Node Manager and its GUI.
 ///
 ////////////////////////////////////////////////////////////////////////////////////
-class NodeManagerApp : public wxApp
+class RangeSensorApp : public wxApp
 {
 public:
     virtual bool OnInit();
-    Jaus::NodeManager* GetNodeManager() { return mpNode; }
-private:
-    Jaus::NodeManager* mpNode;      ///<  Main component that speaks "JAUS", a pointer is passed to mpFrame
-    NodeManagerFrame* mpFrame;      ///<  Main wxFrame derivative that contain GUI components
 };
 
-DECLARE_APP(NodeManagerApp)
+DECLARE_APP(RangeSensorApp)
 
-IMPLEMENT_APP(NodeManagerApp)
+IMPLEMENT_APP(RangeSensorApp)
 
 
 ////////////////////////////////////////////////////////////////////////////////////
 ///
-///  \brief Called when NodeManagerApp is initialized.
+///  \brief Called when RangeSensorApp is initialized.
 ///
-///  Creates and Initializes NodeManager and wxFrame.
+///  Creates and Initializes a RangeSensorFrame object.
 ///
 ////////////////////////////////////////////////////////////////////////////////////
-bool NodeManagerApp::OnInit()
+bool RangeSensorApp::OnInit()
 {
-    mpNode = new Jaus::NodeManager();
-
-    if(argc == 1)
+    RangeSensorFrame* client = new RangeSensorFrame(NULL,
+                                                    wxID_ANY,
+                                                    wxT("JAUS++ Range Sensor"),
+                                                    wxPoint(0,0),
+                                                    wxSize(640, 640),
+                                                    wxDEFAULT_FRAME_STYLE);
+    
+    if(client->Initialize())
     {
-        mpNode->Initialize("settings/nodesettings.xml");
+        client->Show();   
+        if(this->argc > 1)
+        {
+            wxString argString(this->argv[1]);
+            int s, n, c, i;
+            if(sscanf(argString.ToAscii().data(), "%d.%d.%d.%d", &s, &n, &c, &i))
+            {
+                Jaus::Address id((Jaus::Byte)s, (Jaus::Byte)n, (Jaus::Byte)c, (Jaus::Byte)i);
+                client->SetRangeSensorID(id);
+            }
+        }
+        return true;
     }
-    else
-    {
-        wxString file = argv[1];
-        mpNode->Initialize(file.ToAscii().data());
-    }
-
-#ifdef _WIN32_WCE
-    mpFrame = new NodeManagerFrame(mpNode, TEXT_TYPE("JAUS Node Manager"));
-#else
-    mpFrame = new NodeManagerFrame(mpNode,
-                                   this->GetTopWindow(),
-                                   wxID_ANY, TEXT_TYPE("JAUS Node Manager"),
-                                   wxDefaultPosition,
-                                   wxSize(375,450),
-                                   wxDEFAULT_FRAME_STYLE);
-#endif
-    mpNode = NULL;
-    mpFrame->SetDisplay();
-    mpFrame->Show(true);
-
-    return true;
+    return false;
 }
 
 /*  End of File */

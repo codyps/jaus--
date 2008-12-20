@@ -172,7 +172,7 @@ int JoystickDriver::InitializeJoystick(const std::string& settingsXML)
             result = JAUS_OK;
         }
     }
-
+    
     TiXmlElement* element;
 
     element = docHandle.FirstChild("Jaus").FirstChild("JoystickDriverComponent").FirstChild("Axes").FirstChild("WrenchEffort").ToElement();
@@ -318,18 +318,21 @@ int JoystickDriver::InitializeJoystick(const std::string& settingsXML)
         MapButtonToFunction(atoi(node->FirstChild()->Value()), ResetCameraPose);
     }
 
+    result = JAUS_OK;
+
     return result;
 }
 
 
 ////////////////////////////////////////////////////////////////////////////////////
 ///
-///   \brief Shutsdown the component.
+///   \brief Shutsdown the the joystick, releasing control of any primitive 
+///   drivers or cameras being operated with it.
 ///
 ///   \return JAUS_OK on success, otherwise JAUS_FAILURE.
 ///
 ////////////////////////////////////////////////////////////////////////////////////
-int JoystickDriver::Shutdown()
+int JoystickDriver::ShutdownJoystick()
 {
     mTakeDriveControlFlag = false;
     if(mDriverID.IsValid() &&
@@ -350,6 +353,20 @@ int JoystickDriver::Shutdown()
     memset(mButtonValues, 0, sizeof(int)*32);
     mTakeDriveControlFlag = false;
     mTakeCameraControlFlag = false;
+
+    return JAUS_OK;
+}
+
+////////////////////////////////////////////////////////////////////////////////////
+///
+///   \brief Shutsdown the component.
+///
+///   \return JAUS_OK on success, otherwise JAUS_FAILURE.
+///
+////////////////////////////////////////////////////////////////////////////////////
+int JoystickDriver::Shutdown()
+{
+    ShutdownJoystick();
     return CommandComponent::Shutdown();
 }
 
