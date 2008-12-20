@@ -64,7 +64,7 @@ namespace Jaus
         AckNackMessage(const UShort messageCode) : Message(messageCode) {}
         AckNackMessage(const Header& header) : Message(header.mCommandCode) { CopyFromHeader(header); }
         AckNackMessage(const AckNackMessage& acknack) : Message(acknack.GetCommandCode()) { *this = acknack; }
-        ~AckNackMessage() {}
+        virtual ~AckNackMessage() {}
         int SetAckNack(const UShort ack)
         {
             if(ack == Header::AckNack::Ack || ack == Header::AckNack::Nack)

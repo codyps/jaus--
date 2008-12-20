@@ -96,7 +96,7 @@ namespace Jaus
         };
         QueryGlobalVector();
         QueryGlobalVector(const QueryGlobalVector& query);
-        ~QueryGlobalVector() {}
+        virtual ~QueryGlobalVector() {}
         void SetPresenceVector(const Byte pv) { mPresenceVector = pv; }
         Byte GetPresenceVector() const { return mPresenceVector; }
         virtual int WriteMessageBody(Stream& msg,

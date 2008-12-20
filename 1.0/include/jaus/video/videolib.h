@@ -44,6 +44,7 @@
 #include "jaus/video/videolibdll.h"
 #include "jaus/video/image.h"
 #include "jaus/video/visualsensor.h"
+#include "jaus/video/videosubscriber.h"
 
 #endif
 /*  End of File */

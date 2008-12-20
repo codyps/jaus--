@@ -116,7 +116,7 @@ namespace Jaus
         };
         SetGlobalVector();
         SetGlobalVector(const SetGlobalVector& vector);
-        ~SetGlobalVector();
+        virtual ~SetGlobalVector();
         int SetSpeed(const double value);
         int SetElevation(const double value);
         int SetHeading(const double value);

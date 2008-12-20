@@ -136,7 +136,7 @@ namespace Jaus
         int CloseLogFile();
         // Sets the subsystem identification.
         int SetSubsystemIdentification(const Identification& ident);
-        // Enables discovery of subsystem configuration data.
+        // Enables discovery of subsystem configuration data (send heartbeat pulse messages to 255.255.1.1)
         int EnableSubsystemConfigDiscovery(const bool enable);
         // Sets the system configuration.
         int SetSystemConfiguration(const Configuration& config);
@@ -144,7 +144,7 @@ namespace Jaus
         bool IsLogOpen() const;
         // Check if node has been initialized.
         bool IsInitialized() const;    
-        // Check if subsystem configuration discovery is enabled.
+        // Check if broadcasting to 255.255.1.1 is enabled or disabled (subsystem discovery).
         bool IsSubsystemConfigDiscoveryEnabled() const { return mSubsystemDiscoveryFlag; } 
         // Gets the subsystem identification the node knows about.
         Identification GetSubsystemIdentification() const;
@@ -167,6 +167,7 @@ namespace Jaus
         // Use this to find the ID of a node running on the system.
         static bool IsNodeManagerPresent(Address* id = NULL);
         static int GetNodeManagerAddresses(Address::List &id);
+        void CheckSubsystemList();                          ///<  Checks to see if subsystem list is up to date.
     protected:
         void ReportNodeConfiguration(const Address& dest, const bool lockNode = true);
         void ReportNodeConfiguration(const Event* eventInfo, const bool lockNode = true);
@@ -178,7 +179,7 @@ namespace Jaus
         void ReportSubsystemConfigurationEvent(const bool lockNode = true, const bool lockEvents = true);
         void ReportSubsystemListEvent(const bool lockNode = true, const bool lockEvents = true);
         static void ProcessConnectionEvent(const Byte type, const Address& id, void *args);
-        static void MessageCallbackFunction(const Message*, void *);        
+        static void MessageCallbackFunction(const Message*, void *);               
         bool mInitializedFlag;                              ///<  Indicates node manager is initialized.
         CxUtils::Mutex mNodeMutex;                          ///<  Mutex to protect node manager data.
         Address mNodeID;                                    ///<  Node ID.
@@ -193,7 +194,8 @@ namespace Jaus
         MessageHandler *mpMessageHandler;                   ///<  Handles all message processing for node.
         volatile bool mSubsystemDiscoveryFlag;              ///<  Enable subsystem configuration discovery.
         volatile unsigned int mConnectionEventTimeMs;       ///<  Time of last connection event in ms.
-        std::map<Byte, unsigned int> mNodeRequestTimeMs;    ///<  The last time the manager requested events/configuration from node in subsystem.
+        std::map<Byte, unsigned int> mSubsystemHeartbeatTimes;///<  The times when heart pulse messages were received (used to maintain subsystem list).
+        std::map<Byte, unsigned int> mNodeRequestTimeMs;      ///<  The last time the manager requested events/configuration from node in subsystem.
     };
 }
 

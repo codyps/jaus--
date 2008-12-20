@@ -84,7 +84,7 @@ namespace Jaus
         };
         QueryIdentification();
         QueryIdentification(const QueryIdentification &msg);
-        ~QueryIdentification();
+        virtual ~QueryIdentification();
         int SetQueryType(const Byte type);
         inline Byte GetQueryType() const { return mQueryType; }
         virtual int WriteMessageBody(Stream &msg, const UShort version) const;

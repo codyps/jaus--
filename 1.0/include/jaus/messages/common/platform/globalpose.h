@@ -132,7 +132,7 @@ namespace Jaus
         };
         GlobalPose();
         GlobalPose(const GlobalPose& pose);
-        ~GlobalPose();
+        virtual ~GlobalPose();
 
         virtual int SetLatitude(const double lat);
         virtual int SetLongitude(const double lon);

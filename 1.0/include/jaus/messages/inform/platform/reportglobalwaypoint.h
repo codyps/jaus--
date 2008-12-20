@@ -117,7 +117,7 @@ namespace Jaus
         };
         ReportGlobalWaypoint();
         ReportGlobalWaypoint(const ReportGlobalWaypoint &msg);
-        ~ReportGlobalWaypoint();
+        virtual ~ReportGlobalWaypoint();
 
         virtual int SetPresenceVector(const Byte val);
         virtual Byte GetPresenceVector()const;

@@ -74,7 +74,7 @@ namespace Jaus
         };
         ReportLocalVector();
         ReportLocalVector(const ReportLocalVector &msg);
-        ~ReportLocalVector();
+        virtual ~ReportLocalVector();
 
         virtual int SetSpeed(const double val);
         virtual int SetHeading(const double val);

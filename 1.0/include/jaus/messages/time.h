@@ -83,6 +83,8 @@ namespace Jaus
         Time& SetCurrentTime();      
         static Time GetUtcTime();
         static unsigned int GetUtcTimeMs();    
+        unsigned int ToMilliseconds() const;
+        double ToSeconds() const;
         operator UInt() const { return ToUInt(); }
         Time &operator=(const Time &t);
         bool operator==(const Time &t) const;

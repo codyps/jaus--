@@ -53,6 +53,7 @@ namespace Jaus
 {
     ////////////////////////////////////////////////////////////////////////////////////
     ///
+    ///   \class Communicator
     ///   \brief The Communicator component is used to send and receive messages 
     ///   between other subsystems.  All JAUS message data that transfered between
     ///   subsystems travels through the Communicator similar to how all data within
@@ -72,6 +73,7 @@ namespace Jaus
     public:
         ////////////////////////////////////////////////////////////////////////////////////
         ///
+        ///   \class DataLink
         ///   \brief The DataLink class is used to define to Data Links used by the
         ///   Communicator for communication between subsystems.
         ///
@@ -135,13 +137,14 @@ namespace Jaus
             Byte GetSubsystemID() const;
             // Gets the state of the data link.
             virtual State GetState() const = 0;
-        private:
+        protected:
             CxUtils::Mutex mCommunicatorMutex; ///<  Mutex for communicator callback interface.
             Byte mID;                          ///<  Data link ID.
             Communicator* mpCommunicator;      ///<  Pointer to communicator.
         };
         ////////////////////////////////////////////////////////////////////////////////////
         ///
+        ///   \class DefaultDataLink
         ///   \brief The DefaultDataLink is the default communication link used by
         ///   the Communicator class and enables communication over UDP to other 
         ///   subsystems.  It does not use any encryption.
@@ -161,9 +164,45 @@ namespace Jaus
             bool SetNetworkInterface(const int num);
             bool SetNetworkInterface(const std::string& address);
             std::string GetMulticastAddress() const { return mMulticastAddress; }
-            bool AddSubsystem(const Byte subsystemID, const std::string& host);
             Byte GetMulticastTTL() const { return mMulticastTTL; }
         protected:
+            ////////////////////////////////////////////////////////////////////////////////////
+            ///
+            ///   \class Key
+            ///   \brief Simple key structure for sorting connections.
+            ///
+            ////////////////////////////////////////////////////////////////////////////////////
+            class JAUS_CMP_DLL Key
+            {
+            public:
+                Key(const Byte subsystem = 0, const Byte node = 0) : mSubsystem(subsystem), mNode(node) {}
+                ~Key() {}
+                bool operator=(const Key& key)
+                {
+                    if(mSubsystem == key.mSubsystem && mNode == key.mNode) { return true; }
+                    return false;
+                }
+                bool operator<=(const Key& key) const
+                {
+                    UShort left = mSubsystem, right = key.mSubsystem;
+                    left <<= 8;
+                    left |= mNode;
+                    right <<= 8;
+                    right |= key.mNode;
+                    return left <= right;
+                }
+                bool operator<(const Key& key) const
+                {
+                    UShort left = mSubsystem, right = key.mSubsystem;
+                    left <<= 8;
+                    left |= mNode;
+                    right <<= 8;
+                    right |= key.mNode;
+                    return left < right;
+                }
+                Byte mSubsystem;    ///<  Subsystem ID.
+                Byte mNode;         ///<  Node ID.
+            };
             typedef std::map<Address, JSharedMemory*> SharedMemoryMap; ///< Connections in shared memory.
             static void RecvThread(void *arg);      ///<  Method run in thread for receiving UDP traffic.
             State mLinkState;                       ///<  State of the link.
@@ -177,8 +216,8 @@ namespace Jaus
             int mNetworkInterface;                  ///<  Network interface to use.
             unsigned char mMulticastTTL;            ///<  Time To Live (TTL) for multicast transmissions.
             std::set<Byte> mFixedConnections;       ///<  Unicast connections that can't be dynamically removed.
-            std::map<Byte, CxUtils::UdpClient> mSubsystems;          ///<  Known subsystems and connections to them for sending unicast traffic.
-            std::map<Byte, unsigned int> mSubsystemHeartbeatTimesMs; ///<  Time at which a heartbeat message was received from a subsystem.
+            std::map<Key, CxUtils::UdpClient> mSubsystems;           ///<  Known subsystems and connections to them for sending unicast traffic.
+            std::map<Key, unsigned int> mSubsystemHeartbeatTimesMs;  ///<  Time at which a heartbeat message was received from a subsystem.
             Stream mTransportStream;                                 ///<  Stream used for transmitting data over UDP.
             Stream mRecvStream;                                      ///<  Buffer for receiving data on.
             SharedMemoryMap mSharedMemoryConnections;                ///<  Connections to subsystems through shared memory.

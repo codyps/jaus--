@@ -108,7 +108,7 @@ namespace Jaus
         };
         QueryCameraFormatOptions();
         QueryCameraFormatOptions(const QueryCameraFormatOptions &msg);
-        ~QueryCameraFormatOptions() {}
+        virtual ~QueryCameraFormatOptions() {}
         int SetCameraID(const Byte id);
         int SetPresenceVector(const Byte pv);
         Byte GetCameraID() const { return mCameraID; }

@@ -64,7 +64,7 @@ namespace Jaus
     public:
         ActivateServiceConnection();
         ActivateServiceConnection(const ActivateServiceConnection &msg);
-        ~ActivateServiceConnection();
+        virtual ~ActivateServiceConnection();
         UShort GetMessageCode() const { return mScCommandCode; }
         Byte GetInstanceID() const { return mInstanceID; }
         int SetMessageCode(const UShort code);

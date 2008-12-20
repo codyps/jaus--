@@ -120,7 +120,7 @@ namespace Jaus
         };
         ReportGlobalPathSegment();
         ReportGlobalPathSegment(const ReportGlobalPathSegment &msg);
-        ~ReportGlobalPathSegment();
+        virtual ~ReportGlobalPathSegment();
 
         int SetPresenceVector(const Byte pv);
         int SetPathSegmentNumber(const UInt val);

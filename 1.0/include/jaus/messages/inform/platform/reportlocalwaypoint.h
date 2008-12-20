@@ -125,7 +125,7 @@ namespace Jaus
         };
         ReportLocalWaypoint();
         ReportLocalWaypoint(const ReportLocalWaypoint &msg);
-        ~ReportLocalWaypoint();
+        virtual ~ReportLocalWaypoint();
         
         virtual int SetPresenceVector(const Byte pv);
         virtual int SetWaypointNumber(const UInt val);

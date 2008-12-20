@@ -130,7 +130,7 @@ namespace Jaus
         };
         QueryPlatformSpecifications();
         QueryPlatformSpecifications(const QueryPlatformSpecifications &msg);
-        ~QueryPlatformSpecifications();
+        virtual ~QueryPlatformSpecifications();
         int SetPresenceVector(const UShort pv);
         UInt GetPresenceVector() const { return mPresenceVector; }
         virtual int WriteMessageBody(Stream& msg, const UShort version) const;

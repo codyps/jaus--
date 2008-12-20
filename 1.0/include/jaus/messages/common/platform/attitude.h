@@ -77,7 +77,7 @@ namespace Jaus
                   const double pitch,
                   const double yaw);
         Attitude(const Attitude &att);
-        ~Attitude();
+        virtual ~Attitude();
         virtual int SetAttitude(const double roll,
                                 const double pitch,
                                 const double yaw);

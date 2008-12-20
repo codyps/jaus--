@@ -67,7 +67,7 @@ namespace Jaus
         };
         SetSelectedDataLinkState();
         SetSelectedDataLinkState(const SetSelectedDataLinkState &msg);
-        ~SetSelectedDataLinkState();
+        virtual ~SetSelectedDataLinkState();
         void SetState(const Byte state);
         void SetDataLinkID(const Byte id);        
         Byte GetState() const { return mState; }

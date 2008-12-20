@@ -105,7 +105,7 @@ namespace Jaus
         };   
         QueryLocalPose();
         QueryLocalPose(const QueryLocalPose &msg);
-        ~QueryLocalPose();
+        virtual ~QueryLocalPose();
         int SetPresenceVector(const Byte pv);
         UShort GetPresenceVector() const { return mPresenceVector; }
         virtual int WriteMessageBody(Stream& msg, const UShort version) const;

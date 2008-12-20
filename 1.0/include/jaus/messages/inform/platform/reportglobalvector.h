@@ -116,7 +116,7 @@ namespace Jaus
         };
         ReportGlobalVector();
         ReportGlobalVector(const ReportGlobalVector& vector);
-        ~ReportGlobalVector();
+        virtual ~ReportGlobalVector();
         int SetSpeed(const double value);
         int SetElevation(const double value);
         int SetHeading(const double value);

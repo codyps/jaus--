@@ -97,7 +97,7 @@ namespace Jaus
     
         QueryDiscreteDevices();
         QueryDiscreteDevices(const QueryDiscreteDevices &msg);
-        ~QueryDiscreteDevices();
+        virtual ~QueryDiscreteDevices();
         int SetPresenceVector(const Byte pv);
         Byte GetPresenceVector() const { return mPresenceVector; }
         virtual int WriteMessageBody(Stream& msg, const UShort version) const;

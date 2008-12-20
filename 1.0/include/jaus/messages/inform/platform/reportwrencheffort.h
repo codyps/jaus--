@@ -111,7 +111,7 @@ namespace Jaus
         };
         ReportWrenchEffort();
         ReportWrenchEffort(const ReportWrenchEffort& msg);
-        ~ReportWrenchEffort();
+        virtual ~ReportWrenchEffort();
         int SetPropulsiveLinearEffortX(const double percent);
         int SetPropulsiveLinearEffortY(const double percent);
         int SetPropulsiveLinearEffortZ(const double percent);

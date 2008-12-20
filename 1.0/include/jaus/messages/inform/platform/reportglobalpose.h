@@ -130,7 +130,7 @@ namespace Jaus
         };
         ReportGlobalPose();
         ReportGlobalPose(const ReportGlobalPose &gp);
-        ~ReportGlobalPose();
+        virtual ~ReportGlobalPose();
         int GetGlobalPose(GlobalPose &p) { p = (GlobalPose)(*this); return JAUS_OK; }
         void SetGlobalPose(const GlobalPose &p) { CopyFrom(p); }
         GlobalPose GetGlobalPose() const { return (GlobalPose)(*this); }

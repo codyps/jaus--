@@ -115,6 +115,8 @@ namespace Jaus
         int InitializeJoystick(const unsigned int i = UINT_MAX);
         // Initialize joystick interface and configuration from XML file
         int InitializeJoystick(const std::string& settingsXML);
+        // Shutsdown the joystick interface.
+        int ShutdownJoystick();
         // Shutdown the component.
         virtual int Shutdown();
          // If discovery is enabled, this function is called when an event happens.

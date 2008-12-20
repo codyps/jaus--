@@ -258,7 +258,7 @@ namespace Jaus
         Stream* mpQueryMessageBody; ///< Query message body/data.
         Message* mpQueryMessage;    ///< Query message structure.
         Address mEventProvider;     ///< Provider of the event.
-        Address::Set mSubscribers;    ///< Event subscribers.
+        Address::Set mSubscribers;  ///< Event subscribers.
     };    
 }
 

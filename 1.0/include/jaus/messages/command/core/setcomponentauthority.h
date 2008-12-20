@@ -70,7 +70,7 @@ namespace Jaus
     public:
         SetComponentAuthority();
         SetComponentAuthority(const SetComponentAuthority &msg);
-        ~SetComponentAuthority();
+        virtual ~SetComponentAuthority();
         Byte GetAuthorityCode() const;
         int SetAuthorityCode(const Byte code);
         virtual int RunTestCase() const;

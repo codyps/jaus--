@@ -64,7 +64,7 @@ namespace Jaus
     public:
         SuspendServiceConnection();
         SuspendServiceConnection(const SuspendServiceConnection &msg);
-        ~SuspendServiceConnection();
+        virtual ~SuspendServiceConnection();
         UShort GetMessageCode() const { return mScCommandCode; }
         Byte GetInstanceID() const { return mInstanceID; }
         int SetMessageCode(const UShort code);

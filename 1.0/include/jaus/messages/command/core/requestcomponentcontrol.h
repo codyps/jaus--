@@ -68,7 +68,7 @@ namespace Jaus
     public:
         RequestComponentControl();
         RequestComponentControl(const RequestComponentControl &msg);
-        ~RequestComponentControl();
+        virtual ~RequestComponentControl();
         Byte GetAuthorityCode() const { return mAuthorityCode; }
         int SetAuthorityCode(const Byte code);
         virtual int WriteMessageBody(Stream& msg, const UShort version) const;

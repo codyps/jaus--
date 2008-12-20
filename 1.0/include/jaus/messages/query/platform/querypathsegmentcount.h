@@ -60,7 +60,7 @@ namespace Jaus
     public:
         QueryPathSegmentCount();
         QueryPathSegmentCount(const QueryPathSegmentCount &msg);
-        ~QueryPathSegmentCount();
+        virtual ~QueryPathSegmentCount();
         virtual int WriteMessageBody(Stream& msg, const UShort version) const;
         virtual int ReadMessageBody(const Stream& msg, const UShort version);
         virtual void ClearMessageBody();

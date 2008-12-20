@@ -95,7 +95,7 @@ namespace Jaus
         };
         QueryTime();
         QueryTime(const QueryTime &msg);
-        ~QueryTime();
+        virtual ~QueryTime();
         int SetPresenceVector(const Byte pv);
         Byte GetPresenceVector() const { return mPresenceVector; }
         virtual int WriteMessageBody(Stream& msg, const UShort version) const;

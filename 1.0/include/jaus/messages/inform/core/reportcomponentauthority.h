@@ -62,7 +62,7 @@ namespace Jaus
     public:
         ReportComponentAuthority();
         ReportComponentAuthority(const ReportComponentAuthority &msg);
-        ~ReportComponentAuthority();
+        virtual ~ReportComponentAuthority();
         Byte GetAuthorityCode() const;
         int SetAuthorityCode(const Byte code);
         virtual int WriteMessageBody(Stream& msg, const UShort version) const;

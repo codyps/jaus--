@@ -93,7 +93,7 @@ namespace Jaus
         };
         CreateVectorKnowledgeStoreObjects();
         CreateVectorKnowledgeStoreObjects(const CreateVectorKnowledgeStoreObjects& msg);
-        ~CreateVectorKnowledgeStoreObjects();
+        virtual ~CreateVectorKnowledgeStoreObjects();
         int SetMessageProperties(const Byte properties);
         int SetLocalRequestID(const Byte id);
         int AddObject(const Object& object);

@@ -92,6 +92,7 @@ namespace Jaus
         UInt GetFrameNumber() const;
         unsigned int GetBufferSize() const { return mImageBuffer.Size(); }
         bool IsOpen() const;
+        bool IsActive(const unsigned int timeout = 1000) const;
         inline Address GetSourceID() const { return mSourceID; }
     protected:
         static void SharedImageUpdate(void *args);

@@ -49,6 +49,8 @@
 #include "jaus/services/joystickdriver.h"
 #include "jaus/services/velocitystatesensor.h"
 #include "jaus/services/globalvectordriver.h"
+#include "jaus/services/globalwaypointdriver.h"
+#include "jaus/services/systemcommander.h"
 
 #endif
 /*  End of File */

@@ -108,7 +108,7 @@ namespace Jaus
         };
         RejectEventRequest();
         RejectEventRequest(const RejectEventRequest& msg);
-        ~RejectEventRequest();
+        virtual ~RejectEventRequest();
         
         int SetRequestID(const Byte id);
         int SetResponseCode(const RejectEventRequest::ResponseCode code);

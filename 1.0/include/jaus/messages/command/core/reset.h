@@ -64,7 +64,7 @@ namespace Jaus
     public:
         Reset();
         Reset(const Reset &msg);
-        ~Reset();
+        virtual ~Reset();
         virtual int WriteMessageBody(Stream& msg, const UShort version) const { return 0; }
         virtual int ReadMessageBody(const Stream& msg, const UShort version) { return 0; }
         virtual Message* Clone() const { return new Reset(*this); }

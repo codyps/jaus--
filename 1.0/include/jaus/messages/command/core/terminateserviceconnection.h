@@ -63,7 +63,7 @@ namespace Jaus
     public:
         TerminateServiceConnection();
         TerminateServiceConnection(const TerminateServiceConnection &msg);
-        ~TerminateServiceConnection();
+        virtual ~TerminateServiceConnection();
         UShort GetMessageCode() const { return mScCommandCode; }
         Byte GetInstanceID() const { return mInstanceID; }
         int SetMessageCode(const UShort code);

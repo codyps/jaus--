@@ -170,7 +170,7 @@ namespace Jaus
 
         SetCameraFormatOptions();
         SetCameraFormatOptions(const SetCameraFormatOptions& msg);
-        ~SetCameraFormatOptions();
+        virtual ~SetCameraFormatOptions();
 
         int SetCameraID(const Byte id);
         int SetAudioFormat(const Byte value);

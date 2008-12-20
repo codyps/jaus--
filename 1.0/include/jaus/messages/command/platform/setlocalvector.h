@@ -75,7 +75,7 @@ namespace Jaus
         };
         SetLocalVector();
         SetLocalVector(const SetLocalVector& vector);
-        ~SetLocalVector();
+        virtual ~SetLocalVector();
 
         int SetSpeed(const double value);
         int SetHeading(const double value);

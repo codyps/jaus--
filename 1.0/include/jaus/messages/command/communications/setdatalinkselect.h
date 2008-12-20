@@ -60,7 +60,7 @@ namespace Jaus
     public:
         SetDataLinkSelect();
         SetDataLinkSelect(const SetDataLinkSelect &msg);
-        ~SetDataLinkSelect();
+        virtual ~SetDataLinkSelect();
         void SetDataLinkID(const Byte id);
         Byte GetDataLinkID() const { return mDataLinkID; }
         virtual int WriteMessageBody(Stream& msg, const UShort version) const;

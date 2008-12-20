@@ -125,7 +125,7 @@ namespace Jaus
 
         SetLocalWaypoint();
         SetLocalWaypoint(const SetLocalWaypoint& vector);
-        ~SetLocalWaypoint();
+        virtual ~SetLocalWaypoint();
 
         int SetWaypointNumber(const UShort value);
         int SetX(const double value);

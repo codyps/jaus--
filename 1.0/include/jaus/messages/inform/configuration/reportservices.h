@@ -69,7 +69,7 @@ namespace Jaus
     public:
         ReportServices();
         ReportServices(const ReportServices &msg);
-        ~ReportServices();        
+        virtual ~ReportServices();        
         void SetServices(const Service::Set& services);
         Service::Set* GetServices() const;
         virtual int WriteMessageBody(Stream& msg, const UShort version) const;

@@ -151,7 +151,7 @@ namespace Jaus
         };
         UpdateEvent();
         UpdateEvent(const UpdateEvent& msg);
-        ~UpdateEvent();
+        virtual ~UpdateEvent();
         
         int SetRequestID(const Byte id);
         int SetMessageCode(const UShort code);

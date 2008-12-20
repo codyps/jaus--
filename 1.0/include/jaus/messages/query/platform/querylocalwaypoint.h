@@ -72,7 +72,7 @@ namespace Jaus
         };
         QueryLocalWaypoint();
         QueryLocalWaypoint(const QueryLocalWaypoint &msg);
-        ~QueryLocalWaypoint();
+        virtual ~QueryLocalWaypoint();
         virtual int SetWaypointNumber(const UInt val);
         virtual UInt GetWaypointNumber()const;
         virtual int WriteMessageBody(Stream& msg, const UShort version) const;

@@ -119,7 +119,7 @@ namespace Jaus
         };
         SetWrenchEffort();
         SetWrenchEffort(const SetWrenchEffort& msg);
-        ~SetWrenchEffort();
+        virtual ~SetWrenchEffort();
         int SetPropulsiveLinearEffortX(const double percent);
         int SetPropulsiveLinearEffortY(const double percent);
         int SetPropulsiveLinearEffortZ(const double percent);

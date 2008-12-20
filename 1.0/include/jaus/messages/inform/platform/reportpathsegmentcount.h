@@ -72,7 +72,7 @@ namespace Jaus
         };
         ReportPathSegmentCount();
         ReportPathSegmentCount(const ReportPathSegmentCount &msg);
-        ~ReportPathSegmentCount();
+        virtual ~ReportPathSegmentCount();
         
         virtual int SetPathSegmentCount(const UShort val){ mPathSegmentCount = val; return JAUS_OK;}
         virtual UInt GetPathSegmentCount()const{return mPathSegmentCount;}

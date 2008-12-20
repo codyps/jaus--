@@ -129,7 +129,7 @@ namespace Jaus
 
         ReportRelativeObjectPosition();
         ReportRelativeObjectPosition(const ReportRelativeObjectPosition &msg);
-        ~ReportRelativeObjectPosition();
+        virtual ~ReportRelativeObjectPosition();
 
         int SetTimeStamp(const Time value);
         int SetRange(const double value);

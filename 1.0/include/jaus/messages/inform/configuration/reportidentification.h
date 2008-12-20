@@ -89,7 +89,7 @@ namespace Jaus
         };
         ReportIdentification();
         ReportIdentification(const ReportIdentification &msg);
-        ~ReportIdentification();
+        virtual ~ReportIdentification();
         void SetQueryType(const Byte query);
         void SetIdentification(const Identification& ident);
         Byte GetQueryType() const { return mQueryType; }

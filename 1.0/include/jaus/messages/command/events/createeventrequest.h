@@ -156,7 +156,7 @@ namespace Jaus
         };
         CreateEventRequest();
         CreateEventRequest(const CreateEventRequest& msg);
-        ~CreateEventRequest();
+        virtual ~CreateEventRequest();
         
         int SetRequestID(const Byte id);
         int SetMessageCode(const UShort code);

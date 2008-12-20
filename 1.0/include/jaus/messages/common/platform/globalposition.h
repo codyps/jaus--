@@ -82,7 +82,7 @@ namespace Jaus
                        const double lon, 
                        const double elev);
         GlobalPosition(const GlobalPosition& pos);
-        ~GlobalPosition();
+        virtual ~GlobalPosition();
         virtual int SetPosition(const double lat,
                                 const double lon,
                                 const double elev);

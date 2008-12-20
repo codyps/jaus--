@@ -41,7 +41,7 @@
 #ifndef _JAUS_TYPES_H
 #define _JAUS_TYPES_H
 #include <limits.h>
-
+#include <cxutils/math/cxmath.h>
 #include "msglibdll.h"
 
 #if defined(WIN32) || (defined(_WIN32_WCE))
@@ -174,14 +174,14 @@ namespace Jaus
     const UInt JAUS_ULONG_BITS               = 64;         ///<  Size in bits of ULong.
     const UInt JAUS_LONG_FLOAT_BITS          = 64;         ///<  Size in bits of LongFloat.
     
-    const double JAUS_EPSILON        = .00000000000000000000001;      ///<  Used to prevent divide by 0.
+    const double JAUS_EPSILON        = CxUtils::CX_EPSILON;         ///<  Used to prevent divide by 0.
 
-    const double JAUS_PI                = 3.14159265;    ///<  Value of PI.
-    const double JAUS_HALF_PI           = 1.57079633;    ///<  PI divided by 2.0
-    const double JAUS_FOURTH_PI         = 0.7853981625;  ///<  PI divided by 4.0   
-    const double JAUS_PI_OVER_180       = 0.0174532925;  ///<  PI divided by 180.0
-    const double JAUS_180_OVER_PI       = 57.2957795;    ///<  180 divided by PI.
-    const double JAUS_TWO_PI            = 6.28318531;    ///<  PI * 2.
+    const double JAUS_PI                = CxUtils::CX_PI;           ///<  Value of PI.
+    const double JAUS_HALF_PI           = CxUtils::CX_HALF_PI;      ///<  PI divided by 2.0
+    const double JAUS_FOURTH_PI         = CxUtils::CX_FOURTH_PI;    ///<  PI divided by 4.0   
+    const double JAUS_PI_OVER_180       = CxUtils::CX_PI_OVER_180;  ///<  PI divided by 180.0
+    const double JAUS_180_OVER_PI       = CxUtils::CX_180_OVER_PI;  ///<  180 divided by PI.
+    const double JAUS_TWO_PI            = CxUtils::CX_TWO_PI;       ///<  PI * 2.
 }
 
 ////////////////////////////////////////////////////////////////////////////////////

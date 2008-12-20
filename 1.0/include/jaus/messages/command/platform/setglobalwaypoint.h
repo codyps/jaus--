@@ -123,10 +123,10 @@ namespace Jaus
             const static double MaxAngle;       ///< Minimum angle:                     Pi radians
 
         };
-
+       
         SetGlobalWaypoint();
         SetGlobalWaypoint(const SetGlobalWaypoint& vector);
-        ~SetGlobalWaypoint();
+        virtual ~SetGlobalWaypoint();
 
         int SetWaypointNumber(const UShort value);
         int SetLatitude(const double value);

@@ -111,7 +111,7 @@ namespace Jaus
 
         QueryCameraPose();
         QueryCameraPose(const QueryCameraPose &msg);
-        ~QueryCameraPose();
+        virtual ~QueryCameraPose();
 
         int SetPresenceVector(const UShort pv);
         int SetCameraID(const Byte id);

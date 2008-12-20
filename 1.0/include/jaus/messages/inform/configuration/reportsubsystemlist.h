@@ -65,7 +65,7 @@ namespace Jaus
     public:
         ReportSubsystemList();
         ReportSubsystemList(const ReportSubsystemList &msg);
-        ~ReportSubsystemList();        
+        virtual ~ReportSubsystemList();        
         void SetSubsystemList(const Address::Set& subsystems);
         Address::Set* GetSubsystemList() const;
         virtual int WriteMessageBody(Stream& msg, const UShort version) const;

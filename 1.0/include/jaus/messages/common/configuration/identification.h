@@ -66,7 +66,7 @@ namespace Jaus
     public:
         Identification();
         Identification(const Identification &msg);
-        ~Identification();        
+        virtual ~Identification();        
         int SetType(const UShort type);
         int SetAuthority(const Byte authority);    
         int SetIdentification(const std::string& ident);        

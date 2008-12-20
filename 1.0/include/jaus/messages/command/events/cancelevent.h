@@ -91,7 +91,7 @@ namespace Jaus
         };
         CancelEvent();
         CancelEvent(const CancelEvent& msg);
-        ~CancelEvent();
+        virtual ~CancelEvent();
         
         int SetRequestID(const Byte id);
         int SetMessageCode(const UShort code);

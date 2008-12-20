@@ -157,7 +157,7 @@ namespace Jaus
         };
         ReportCameraFormatOptions();
         ReportCameraFormatOptions(const ReportCameraFormatOptions &msg);
-        ~ReportCameraFormatOptions();
+        virtual ~ReportCameraFormatOptions();
         int SetCameraID(const Byte id);
         int SetAudioFormat1(const Byte value);
         int SetAudioFormat2(const Byte value);

@@ -124,7 +124,7 @@ namespace Jaus
 
         ReportCameraPose();
         ReportCameraPose(const ReportCameraPose &msg);
-        ~ReportCameraPose();
+        virtual ~ReportCameraPose();
 
         int SetCameraID(const Byte id);
         int SetCameraName(const std::string name);

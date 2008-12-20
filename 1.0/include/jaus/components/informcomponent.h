@@ -142,7 +142,7 @@ namespace Jaus
         {
         public:
             HighPerformanceTimer();
-            ~HighPerformanceTimer();
+            virtual ~HighPerformanceTimer();
             void ProcessTimerEvent(const unsigned int id);
             ServiceConnection* mpServiceConnection;  ///<  Service connection to use for events.
             Event::Key* mpEventKey;                  ///<  Event key to use for event generation.

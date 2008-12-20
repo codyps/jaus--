@@ -45,6 +45,7 @@
 
 #ifdef __cplusplus
 
+#include <string>
 #include <set>
 #include <map>
 #include <vector>
@@ -110,6 +111,7 @@ namespace Jaus
         enum Type
         {
             CoreMessageSupport = 0,
+            NodeManager,
             SubsystemCommander = 32,
             PrimitiveDriver,
             GlobalVectorDriver,
@@ -171,6 +173,7 @@ namespace Jaus
         void ClearService();
         bool operator<(const Service& s) const { return mServiceType < s.mServiceType ? true : false; }
         Service& operator=(const Service& info);
+        static std::string ToString(const Type serviceType);
     protected:
         UShort mServiceType;        ///<  The service type.
         Service::Message::Map mInputMessages;  ///<  Input messages associated with the service.

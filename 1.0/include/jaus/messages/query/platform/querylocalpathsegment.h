@@ -104,7 +104,7 @@ namespace Jaus
         };
         QueryLocalPathSegment();
         QueryLocalPathSegment(const QueryLocalPathSegment &msg);
-        ~QueryLocalPathSegment();
+        virtual ~QueryLocalPathSegment();
         int SetPresenceVector(const Byte pv);
         int SetPathSegmentNumber(const UInt val);
         Byte GetPresenceVector() const { return mPresenceVector; }

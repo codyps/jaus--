@@ -81,7 +81,7 @@ namespace Jaus
     {
     public:
         MessageHandler();
-        ~MessageHandler();
+        virtual ~MessageHandler();
         // Add message to internal queue for processing outside of current thread.
         int AddToMessageQueue(const Stream& msg, const Header* info = NULL);
         // Add a callback for serialized messages.

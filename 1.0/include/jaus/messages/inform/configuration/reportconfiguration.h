@@ -64,7 +64,7 @@ namespace Jaus
     public:
         ReportConfiguration();
         ReportConfiguration(const ReportConfiguration& msg);
-        ~ReportConfiguration();
+        virtual ~ReportConfiguration();
         void SetConfiguration(const Configuration::Subsystem& config);
         void AddToConfiguration(Configuration& config) const;
         void SetConfiguration(const Byte subsystemID, const Configuration::Node& config);

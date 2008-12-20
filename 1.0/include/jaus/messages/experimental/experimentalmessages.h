@@ -41,6 +41,8 @@
 #ifndef __JAUS_EXPERIMENTAL_MESSAGES_INCLUDE__H
 #define __JAUS_EXPERIMENTAL_MESSAGES_INCLUDE__H
 
+#include "jaus/messages/experimental/sick/querysicklidar.h"
+#include "jaus/messages/experimental/sick/reportsicklidar.h"
 
 #endif
 /*  End of File */

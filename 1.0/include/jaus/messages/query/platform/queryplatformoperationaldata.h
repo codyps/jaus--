@@ -99,7 +99,7 @@ namespace Jaus
     public:
         QueryPlatformOperationalData();
         QueryPlatformOperationalData(const QueryPlatformOperationalData &msg);
-        ~QueryPlatformOperationalData();
+        virtual ~QueryPlatformOperationalData();
         int SetPresenceVector(const Byte pv);
         Byte GetPresenceVector() const { return mPresenceVector; }
         virtual int WriteMessageBody(Stream& msg, const UShort version) const;

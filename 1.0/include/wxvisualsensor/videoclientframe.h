@@ -70,6 +70,7 @@ public:
     void OnAbout(wxCommandEvent& event);
     void OnSelectVisualSensor(wxCommandEvent& event);
     void OnTimer(wxTimerEvent& event);
+    void OnDisconnect(wxCommandEvent& event);
     bool SetVisualSensor(const Jaus::Address& id);
     static void ProcessMessageCallback(const Jaus::Message*, void*);
 private:

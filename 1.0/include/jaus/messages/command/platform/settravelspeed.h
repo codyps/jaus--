@@ -68,7 +68,7 @@ namespace Jaus
         };
         SetTravelSpeed();
         SetTravelSpeed(const SetTravelSpeed& vector);
-        ~SetTravelSpeed();
+        virtual ~SetTravelSpeed();
         int SetSpeed(const double value);
         double GetSpeed() const { return mSpeed; }     
         virtual void Print() const;

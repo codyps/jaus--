@@ -84,7 +84,7 @@ namespace Jaus
         };
         CreateServiceConnection();
         CreateServiceConnection(const CreateServiceConnection &msg);
-        ~CreateServiceConnection();
+        virtual ~CreateServiceConnection();
         double GetPeriodicUpdateRate() const;
         UShort GetMessageCode() const { return mScCommandCode; }        
         UInt GetPresenceVector() const { return mPresenceVector; }

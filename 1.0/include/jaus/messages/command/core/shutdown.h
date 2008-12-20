@@ -64,7 +64,7 @@ namespace Jaus
     public:
         Shutdown();
         Shutdown(const Shutdown &msg);
-        ~Shutdown();
+        virtual ~Shutdown();
         virtual int WriteMessageBody(Stream& msg, const UShort version) const { return 0; }
         virtual int ReadMessageBody(const Stream& msg, const UShort version) { return 0; }
         virtual Message* Clone() const { return new Shutdown(*this); }

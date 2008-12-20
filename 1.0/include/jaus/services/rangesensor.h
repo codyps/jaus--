@@ -43,9 +43,10 @@
 #define __JAUS_RANGE_SENSOR__H
 
 #include "jaus/components/informcomponent.h"
+#include "jaus/messages/experimental/sick/reportsicklidar.h"
 #include "jaus/services/srvclibdll.h"
 #include <cxutils/mutex.h>
-
+#include <map>
 
 namespace Jaus
 {
@@ -64,21 +65,32 @@ namespace Jaus
     public:
         RangeSensor();
         ~RangeSensor();
+        // Overloaded/simplified initialize method.
         virtual int Initialize(const Byte subsystem,
                                const Byte node,
                                const Byte instance = 0);
+        // Sets up service for Range Sensor.
+        virtual int SetupService();
+        // Set a single relative object position.
         int SetRelativeObjectPosition(const ReportRelativeObjectPosition& state);
-        ReportRelativeObjectPosition GetRelativeObjectPosition();
+        // Sets a NON-STANDARD MESSAGE used for SICK LIDAR (use in conjuction with standard messages for interoperability).
+        int SetSickLidarData(const ReportSickLidar& lidarScan);
+        // Gets a specifc objects information.
+        ReportRelativeObjectPosition GetRelativeObjectPosition() const;
+        // Gets SICK LIDAR scan information if present.
+        ReportSickLidar GetSickLidarData() const;
+        // Responds to queries.
         virtual int ProcessQueryMessage(const Message* msg);
+        // Generates events.
         virtual int GenerateEvent(const Event* eventInfo);
+        // Method called when events are requested.
         virtual int ProcessEventRequest(const Jaus::CreateEventRequest& command,
                                         Byte& responseValue,
                                         double& confirmedRate,
                                         std::string& errorMessage) const;
-
     protected:
-        int RespondToQuery(const QueryRelativeObjectPosition* query);
         ReportRelativeObjectPosition mRelativeObjectPosition;   ///< Range sensor data
+        ReportSickLidar mSickLidarData;                         ///< SICK Lidar range data.
         CxUtils::Mutex mRangeSensorMutex;                       ///< This is the mutex for range sensor data
     };
 }

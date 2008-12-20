@@ -119,7 +119,7 @@ namespace Jaus
         };
         ReportVelocityState();
         ReportVelocityState(const ReportVelocityState& msg);
-        ~ReportVelocityState();
+        virtual ~ReportVelocityState();
         int SetVelocityX(const double value);
         int SetVelocityY(const double value);
         int SetVelocityZ(const double value);

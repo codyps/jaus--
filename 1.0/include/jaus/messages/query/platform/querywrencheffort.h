@@ -111,7 +111,7 @@ namespace Jaus
         };
         QueryWrenchEffort();
         QueryWrenchEffort(const QueryWrenchEffort &msg);
-        ~QueryWrenchEffort();
+        virtual ~QueryWrenchEffort();
         int SetPresenceVector(const UShort pv);
         UShort GetPresenceVector() const { return mPresenceVector; }
         virtual int WriteMessageBody(Stream& msg, const UShort version) const;

@@ -123,7 +123,7 @@ namespace Jaus
 
         SetCameraPose();
         SetCameraPose(const SetCameraPose& msg);
-        ~SetCameraPose();
+        virtual ~SetCameraPose();
         int SetCameraID(const Byte id);
         int SetXDisplacementOrLinearRate(const double value, const bool displacementRate);
         int SetYDisplacementOrLinearRate(const double value, const bool displacementRate);

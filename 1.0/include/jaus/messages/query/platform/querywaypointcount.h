@@ -59,7 +59,7 @@ namespace Jaus
     public:   
         QueryWaypointCount();
         QueryWaypointCount(const QueryWaypointCount &msg);
-        ~QueryWaypointCount();
+        virtual ~QueryWaypointCount();
         virtual int WriteMessageBody(Stream& msg, const UShort version) const;
         virtual int ReadMessageBody(const Stream& msg, const UShort version);
         virtual void ClearMessageBody();

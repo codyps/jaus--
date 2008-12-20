@@ -59,7 +59,7 @@ namespace Jaus
     public:   
         ReportWaypointCount();
         ReportWaypointCount(const ReportWaypointCount &msg);
-        ~ReportWaypointCount();
+        virtual ~ReportWaypointCount();
 
         int SetWaypointCount(const UInt val){mWaypointCount = val; return JAUS_OK;}
         UInt GetWaypointCount()const{return mWaypointCount;}

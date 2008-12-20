@@ -117,7 +117,7 @@ namespace Jaus
     public:
         ReportPlatformOperationalData();
         ReportPlatformOperationalData(const ReportPlatformOperationalData& msg);
-        ~ReportPlatformOperationalData();
+        virtual ~ReportPlatformOperationalData();
 
         int SetPresenceVector(const Byte pv);
         int SetEngineTemperature(const double val);

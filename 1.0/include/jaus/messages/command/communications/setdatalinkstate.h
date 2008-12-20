@@ -67,7 +67,7 @@ namespace Jaus
         };
         SetDataLinkState();
         SetDataLinkState(const SetDataLinkState &msg);
-        ~SetDataLinkState();
+        virtual ~SetDataLinkState();
         void SetState(const Byte state);
         Byte GetState() const { return mState; }
         virtual int WriteMessageBody(Stream& msg, const UShort version) const;

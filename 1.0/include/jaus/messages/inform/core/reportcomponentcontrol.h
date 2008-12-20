@@ -64,7 +64,7 @@ namespace Jaus
     public:
         ReportComponentControl();
         ReportComponentControl(const ReportComponentControl& query);
-        ~ReportComponentControl();
+        virtual ~ReportComponentControl();
         int SetControllerID(const Address& id);
         int SetControllerAuthorityCode(const Byte code);
         Byte GetControllerAuthorityCode() const { return mAuthorityCode; }

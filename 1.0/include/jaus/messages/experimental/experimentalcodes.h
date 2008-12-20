@@ -64,8 +64,8 @@ namespace Jaus
         return false;
     }
 
-    const UShort JAUS_QUERY_VISUAL_RSTA                                 =   0xD000;
-    const UShort JAUS_REPORT_VISUAL_RSTA                                =   0xD001;
+    const UShort JAUS_QUERY_SICK_LIDAR                                  =   0xD300;
+    const UShort JAUS_REPORT_SICK_LIDAR                                 =   0xD900;
 }
 
 #endif

@@ -63,7 +63,7 @@ namespace Jaus
     public:
         SelectCamera();
         SelectCamera(const SelectCamera& msg);
-        ~SelectCamera();
+        virtual ~SelectCamera();
         int SetCameraID(const Byte id);
         Byte GetCameraID() const { return mCameraID; }
         virtual int WriteMessageBody(Stream& msg, const UShort version) const;

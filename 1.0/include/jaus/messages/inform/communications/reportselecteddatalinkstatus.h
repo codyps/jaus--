@@ -58,7 +58,7 @@ namespace Jaus
     public:
         ReportSelectedDataLinkStatus();
         ReportSelectedDataLinkStatus(const ReportSelectedDataLinkStatus &msg);
-        ~ReportSelectedDataLinkStatus();
+        virtual ~ReportSelectedDataLinkStatus();
         void SetDataLinkID(const Byte id);        
         Byte GetDataLinkID() const { return mDataLinkID; }
         virtual int WriteMessageBody(Stream& msg, const UShort version) const;

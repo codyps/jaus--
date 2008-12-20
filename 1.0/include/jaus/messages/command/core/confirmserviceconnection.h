@@ -122,7 +122,7 @@ namespace Jaus
         };
         ConfirmServiceConnection();
         ConfirmServiceConnection(const ConfirmServiceConnection &msg);
-        ~ConfirmServiceConnection();
+        virtual ~ConfirmServiceConnection();
         double GetConfirmedPeriodicUpdateRate() const;
         UShort GetMessageCode() const { return mScCommandCode; }        
         Byte GetInstanceID() const { return mInstanceID; }

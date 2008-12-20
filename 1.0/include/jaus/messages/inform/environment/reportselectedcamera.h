@@ -57,7 +57,7 @@ namespace Jaus
     public:
          ReportSelectedCamera();
         ReportSelectedCamera(const ReportSelectedCamera &msg);
-        ~ReportSelectedCamera();
+        virtual ~ReportSelectedCamera();
 
         int SetCameraID(const Byte value);
         Byte GetCameraID() const { return mCameraID; }

@@ -248,7 +248,7 @@ namespace Jaus
         {
         public:
             ComponentConnectionHandler();
-            ~ComponentConnectionHandler();
+            virtual ~ComponentConnectionHandler();
             int Initialize(const Address& id, const unsigned int mbsize);
             virtual int Shutdown();
             virtual int SendStream(const Stream& msg);

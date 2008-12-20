@@ -161,7 +161,7 @@ namespace Jaus
         };
         SetDiscreteDevices();
         SetDiscreteDevices(const SetDiscreteDevices& msg);
-        ~SetDiscreteDevices() {}
+        virtual ~SetDiscreteDevices() {}
         int SetMainPropulsionField(const Byte value);
         int SetParkingBrakeAndHornField(const Byte value);
         int SetGearField(const Byte value);

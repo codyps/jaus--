@@ -104,7 +104,7 @@ namespace Jaus
 
         QueryRelativeObjectPosition();
         QueryRelativeObjectPosition(const QueryRelativeObjectPosition &msg);
-        ~QueryRelativeObjectPosition();
+        virtual ~QueryRelativeObjectPosition();
 
         int SetPresenceVector(const Byte pv);
         Byte GetPresenceVector() const { return mPresenceVector; }

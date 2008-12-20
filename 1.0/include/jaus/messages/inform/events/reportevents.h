@@ -101,7 +101,7 @@ namespace Jaus
         };
         ReportEvents();
         ReportEvents(const ReportEvents& msg);
-        ~ReportEvents();
+        virtual ~ReportEvents();
         int SetEvents(const Event::List& events);
         Event::List* GetEvents() const;
         virtual int WriteMessageBody(Stream& msg, const UShort version) const;

@@ -122,7 +122,7 @@ namespace Jaus
 
         SetGlobalPathSegment();
         SetGlobalPathSegment(const SetGlobalPathSegment& vector);
-        ~SetGlobalPathSegment();
+        virtual ~SetGlobalPathSegment();
 
         int SetPathSegmentNumber(const UShort value);
         int SetP1Latitude(const double value);

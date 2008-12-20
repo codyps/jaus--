@@ -104,7 +104,7 @@ namespace Jaus
         };
         ConfirmEventRequest();
         ConfirmEventRequest(const ConfirmEventRequest& msg);
-        ~ConfirmEventRequest();
+        virtual ~ConfirmEventRequest();
         
         int SetRequestID(const Byte id);
         int SetMessageCode(const UShort code);

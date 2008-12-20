@@ -109,7 +109,7 @@ namespace Jaus
         };
         QueryEvents();
         QueryEvents(const QueryEvents& msg);
-        ~QueryEvents();
+        virtual ~QueryEvents();
         
         int SetMessageCode(const UShort code);
         int SetEventType(const QueryEvents::EventType type);

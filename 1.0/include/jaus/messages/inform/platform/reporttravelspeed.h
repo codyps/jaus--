@@ -68,7 +68,7 @@ namespace Jaus
         };
         ReportTravelSpeed();
         ReportTravelSpeed(const ReportTravelSpeed& vector);
-        ~ReportTravelSpeed();
+        virtual ~ReportTravelSpeed();
         int SetSpeed(const double value);
         double GetSpeed() const { return mSpeed; }     
         virtual void Print() const;

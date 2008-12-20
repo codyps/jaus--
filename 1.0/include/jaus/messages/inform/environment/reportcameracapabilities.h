@@ -225,7 +225,7 @@ namespace Jaus
 
         ReportCameraCapabilities();
         ReportCameraCapabilities(const ReportCameraCapabilities &msg);
-        ~ReportCameraCapabilities();
+        virtual ~ReportCameraCapabilities();
 
         int SetCameraID(const Byte value);
         int SetDescription(const std::string& value);

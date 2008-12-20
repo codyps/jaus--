@@ -61,7 +61,7 @@ namespace Jaus
     public:
         EventMessage();
         EventMessage(const EventMessage& msg);
-        ~EventMessage();
+        virtual ~EventMessage();
         int SetEventID(const Byte id);
         int SetEventMessageCode(const UShort mcode);
         int SetEventSequenceNumber(const Byte sn);

@@ -65,7 +65,7 @@ namespace Jaus
     public:
         RejectComponentControl();
         RejectComponentControl(const RejectComponentControl &msg);
-        ~RejectComponentControl();
+        virtual ~RejectComponentControl();
         virtual int WriteMessageBody(Stream& msg, const UShort version) const { return 0; }
         virtual int ReadMessageBody(const Stream& msg, const UShort version) { return 0; }
         virtual Message* Clone() const { return new RejectComponentControl(*this); }

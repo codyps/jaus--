@@ -224,7 +224,7 @@ namespace Jaus
 
         SetCameraCapabilities();
         SetCameraCapabilities(const SetCameraCapabilities& msg);
-        ~SetCameraCapabilities();
+        virtual ~SetCameraCapabilities();
 
         int SetCameraID(const Byte id);
         int SetHorizontalFOV(const double value);

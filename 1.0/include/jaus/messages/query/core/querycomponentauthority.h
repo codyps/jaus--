@@ -64,7 +64,7 @@ namespace Jaus
     public:
         QueryComponentAuthority();
         QueryComponentAuthority(const QueryComponentAuthority &msg);
-        ~QueryComponentAuthority();
+        virtual ~QueryComponentAuthority();
         virtual int WriteMessageBody(Stream& msg, const UShort version) const { return 0; }
         virtual int ReadMessageBody(const Stream& msg, const UShort version) { return 0; }
         virtual Message* Clone() const { return new QueryComponentAuthority(*this); }

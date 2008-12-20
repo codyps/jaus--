@@ -6,7 +6,6 @@
 ///
 ///  <br>Author(s): Daniel Barber
 ///  <br>Created: 30 April 2008
-///  <br>Created: 18 May 2008
 ///  <br>Copyright (c) 2008
 ///  <br>Applied Cognition and Training in Immersive Virtual Environments
 ///  <br>(ACTIVE) Laboratory
@@ -79,7 +78,7 @@ namespace Jaus
     {
     public:
         GlobalVectorDriver();
-        ~GlobalVectorDriver();
+        virtual ~GlobalVectorDriver();
         // Intializes component.
         virtual int Initialize(const Byte subsystem,
                                const Byte node,

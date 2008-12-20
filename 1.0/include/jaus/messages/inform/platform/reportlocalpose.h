@@ -134,7 +134,7 @@ namespace Jaus
     public:
         ReportLocalPose();
         ReportLocalPose(const ReportLocalPose &msg);
-        ~ReportLocalPose();
+        virtual ~ReportLocalPose();
 
         virtual int SetPresenceVector(const UShort pv);
         virtual int SetX(const double val);

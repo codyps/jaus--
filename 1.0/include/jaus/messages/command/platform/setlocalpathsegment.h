@@ -121,7 +121,7 @@ namespace Jaus
 
         SetLocalPathSegment();
         SetLocalPathSegment(const SetLocalPathSegment& vector);
-        ~SetLocalPathSegment();
+        virtual ~SetLocalPathSegment();
 
         int SetPathSegmentNumber(const UShort value);
         int SetP1X(const double value);

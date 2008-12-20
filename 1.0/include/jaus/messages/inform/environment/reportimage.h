@@ -78,7 +78,7 @@ namespace Jaus
     public:
         ReportImage();
         ReportImage(const ReportImage &gp);
-        ~ReportImage();
+        virtual ~ReportImage();
         int SetImageData(const Byte* img,
                          const UInt length,
                          const bool copy = true);

@@ -130,7 +130,7 @@ namespace Jaus
         };
         ReportPlatformSpecifications();
         ReportPlatformSpecifications(const ReportPlatformSpecifications& msg);
-        ~ReportPlatformSpecifications();
+        virtual ~ReportPlatformSpecifications();
         int SetMobilityPlatformName(const std::string& name);
         int SetDistanceToFront(const double val);
         int SetDistanceToBack(const double val);

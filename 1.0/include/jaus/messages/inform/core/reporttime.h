@@ -98,7 +98,7 @@ namespace Jaus
         };
         ReportTime();
         ReportTime(const ReportTime &time);
-        ~ReportTime();
+        virtual ~ReportTime();
         int SetTimeStamp(const Time& t);
         int SetDateStamp(const Date& d);
         void ClearTime();

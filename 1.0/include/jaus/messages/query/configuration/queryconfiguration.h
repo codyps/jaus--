@@ -85,7 +85,7 @@ namespace Jaus
         };
         QueryConfiguration();
         QueryConfiguration(const QueryConfiguration &msg);
-        ~QueryConfiguration();
+        virtual ~QueryConfiguration();
         int SetQueryField(const Byte field);
         inline Byte GetQueryField() const { return mQueryField; }
         virtual int WriteMessageBody(Stream &msg, const UShort version) const;

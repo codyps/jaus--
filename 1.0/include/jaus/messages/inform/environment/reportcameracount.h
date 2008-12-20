@@ -61,7 +61,7 @@ namespace Jaus
     public:
          ReportCameraCount();
         ReportCameraCount(const ReportCameraCount &msg);
-        ~ReportCameraCount();
+        virtual ~ReportCameraCount();
 
         int SetCameraCount(const Byte value);
         Byte GetCameraCount() const { return mCameraCount; }

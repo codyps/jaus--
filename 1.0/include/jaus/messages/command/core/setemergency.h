@@ -67,7 +67,7 @@ namespace Jaus
     public:
         SetEmergency();
         SetEmergency(const SetEmergency &msg);
-        ~SetEmergency();
+        virtual ~SetEmergency();
         UShort GetEmergencyCode() const;
         int SetEmergencyCode(const UShort code);
         virtual int WriteMessageBody(Stream &msg, const UShort version) const;

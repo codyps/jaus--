@@ -59,7 +59,7 @@ namespace Jaus
     public:
         QueryLocalVector();
         QueryLocalVector(const QueryLocalVector &msg);
-        ~QueryLocalVector();
+        virtual ~QueryLocalVector();
         virtual int WriteMessageBody(Stream& msg, const UShort version) const;
         virtual int ReadMessageBody(const Stream& msg, const UShort version);
         virtual void ClearMessageBody();

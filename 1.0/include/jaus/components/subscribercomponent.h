@@ -109,6 +109,8 @@ namespace Jaus
         // Enables automatic discovery of subsystems and there configurations.
         virtual int EnableSubsystemDiscovery(const bool on = true, 
                                              const std::set<Byte>* subsystems = NULL);
+        // Sets how long to wait in ms before checking for configuration changes on network.
+        void SetDiscoveryDelayTimeMs(const unsigned int ttl) { mDiscoveryTTL = ttl; }
         // Add subsystem to discovery to discovery list.
         virtual int AddSubsystemToDiscover(const Byte subsystemID);
         virtual int QuerySubsystemServices(const Byte subsystemID);
@@ -178,6 +180,8 @@ namespace Jaus
         virtual Platform::Map GetSystemConfiguration() const;
         // Get the configuration of a platform.
         Platform GetPlatformInfo(const Byte subsystemID) const;
+        // Get the time to wait between configuration update checks.
+        unsigned int GetDiscoveryDelayTimeMs() const { return mDiscoveryTTL; }
     protected:   
         EventManager mEventManager;      ///<  Stores all events for component.
     private:
@@ -188,6 +192,7 @@ namespace Jaus
         void CheckEvents();
         void CheckDiscoveryEvents();
         void UpdateSubsystemList(const ReportSubsystemList* report);
+        volatile unsigned int mDiscoveryTTL;        ///<  Time-To-Live for Subsystem Discovery Checking.
         volatile bool mSystemDiscoveryFlag;         ///<  If true, component acquires system configuration.
         Event::List mLostEvents;                    ///<  Events that we lost and need to re-acquire.
         Platform::Map mSubsystems;                  ///<  Known subsystems.

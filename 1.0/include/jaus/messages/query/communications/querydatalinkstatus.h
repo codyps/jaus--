@@ -59,7 +59,7 @@ namespace Jaus
     public:
         QueryDataLinkStatus();
         QueryDataLinkStatus(const QueryDataLinkStatus &msg);
-        ~QueryDataLinkStatus();
+        virtual ~QueryDataLinkStatus();
         void SetDataLinkID(const Byte id);
         Byte GetDataLinkID() const { return mDataLinkID; }
         virtual int WriteMessageBody(Stream& msg, const UShort version) const;

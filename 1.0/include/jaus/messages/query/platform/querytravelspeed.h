@@ -58,7 +58,7 @@ namespace Jaus
     public:
         QueryTravelSpeed();
         QueryTravelSpeed(const QueryTravelSpeed& query);
-        ~QueryTravelSpeed() {}
+        virtual ~QueryTravelSpeed() {}
         virtual int WriteMessageBody(Stream& msg,
                                      const UShort version) const { return 0; }
         virtual int ReadMessageBody(const Stream& msg, 

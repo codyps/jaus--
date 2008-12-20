@@ -100,7 +100,7 @@ namespace Jaus
         };
         SetTime();
         SetTime(const SetTime &time);
-        ~SetTime();
+        virtual ~SetTime();
         int SetTimeStamp(const Time& t);
         int SetDateStamp(const Date& d);
         void ClearTime();

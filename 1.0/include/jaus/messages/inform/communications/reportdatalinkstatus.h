@@ -66,7 +66,7 @@ namespace Jaus
         };
         ReportDataLinkStatus();
         ReportDataLinkStatus(const ReportDataLinkStatus &msg);
-        ~ReportDataLinkStatus();
+        virtual ~ReportDataLinkStatus();
         void SetDataLinkState(const Byte state);
         void SetDataLinkID(const Byte id);        
         Byte GetDataLinkState() const { return mDataLinkState; }

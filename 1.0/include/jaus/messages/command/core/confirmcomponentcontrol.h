@@ -81,7 +81,7 @@ namespace Jaus
         };
         ConfirmComponentControl();
         ConfirmComponentControl(const ConfirmComponentControl &msg);
-        ~ConfirmComponentControl();
+        virtual ~ConfirmComponentControl();
         Byte GetResponseCode() const { return mResponseCode; }
         int SetResponseCode(const Byte code);
         virtual int WriteMessageBody(Stream& msg, const UShort version) const;

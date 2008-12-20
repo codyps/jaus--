@@ -103,7 +103,7 @@ namespace Jaus
         };
         QueryVelocityState();
         QueryVelocityState(const QueryVelocityState& query);
-        ~QueryVelocityState() {}
+        virtual ~QueryVelocityState() {}
         void SetPresenceVector(const UShort pv) { mPresenceVector = pv; }
         UShort GetPresenceVector() const { return mPresenceVector; }
         virtual int WriteMessageBody(Stream& msg,

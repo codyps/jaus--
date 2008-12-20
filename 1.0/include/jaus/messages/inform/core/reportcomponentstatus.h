@@ -107,7 +107,7 @@ namespace Jaus
         };
         ReportComponentStatus();
         ReportComponentStatus(const ReportComponentStatus &msg);
-        ~ReportComponentStatus();
+        virtual ~ReportComponentStatus();
         Byte GetPrimaryStatusCode() const { return mPrimaryStatusCode; }
         UInt GetSecondaryStatusCode() const { return mSecondaryStatusCode; }
         int SetPrimaryStatusCode(const Byte code);

@@ -118,7 +118,7 @@ namespace Jaus
         };
         QueryGlobalPathSegment();
         QueryGlobalPathSegment(const QueryGlobalPathSegment &msg);
-        ~QueryGlobalPathSegment();
+        virtual ~QueryGlobalPathSegment();
         int SetPresenceVector(const Byte pv);
         int SetPathSegmentNumber(const UInt val);
         Byte GetPresenceVector() const { return mPresenceVector; }

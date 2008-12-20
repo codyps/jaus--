@@ -64,7 +64,7 @@ namespace Jaus
     public:
         QueryComponentStatus();
         QueryComponentStatus(const QueryComponentStatus &msg);
-        ~QueryComponentStatus();
+        virtual ~QueryComponentStatus();
         virtual int WriteMessageBody(Stream& msg, const UShort version) const { return 0; }
         virtual int ReadMessageBody(const Stream& msg, const UShort version) { return 0; }
         virtual Message* Clone() const { return new QueryComponentStatus(*this); }

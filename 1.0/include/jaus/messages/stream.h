@@ -91,7 +91,7 @@ namespace Jaus
         typedef std::vector<Stream*> PointerList;
         Stream();
         Stream(const Stream& another);
-        ~Stream();
+        virtual ~Stream();
      
         virtual int Write(const Header& header, const unsigned int pos = UINT_MAX);
         virtual int Write(const Byte val, const unsigned int pos = UINT_MAX);
