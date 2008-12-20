@@ -13,6 +13,7 @@
 				<Option external_deps="../../../../lib/libjmsg_1.0_d.a;../../../../lib/libjcmp_1.0_d.a;../../../../../../../cxutils/trunk/1.0/lib/libcxutils_1.0_d.a;" />
 				<Option type="1" />
 				<Option compiler="gcc" />
+				<Option parameters="1.1.37.1" />
 				<Option projectCompilerOptionsRelation="1" />
 				<Option projectLinkerOptionsRelation="2" />
 				<Compiler>

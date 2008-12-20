@@ -281,6 +281,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\..\src\jaus\services\globalwaypointdriver.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\..\src\jaus\services\joystickdriver.cpp"
 				>
 			</File>
@@ -290,6 +294,10 @@
 			</File>
 			<File
 				RelativePath="..\..\..\..\src\jaus\services\rangesensor.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\src\jaus\services\systemcommander.cpp"
 				>
 			</File>
 			<File
@@ -311,6 +319,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\..\include\jaus\services\globalwaypointdriver.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\..\include\jaus\services\joystickdriver.h"
 				>
 			</File>
@@ -328,6 +340,10 @@
 			</File>
 			<File
 				RelativePath="..\..\..\..\include\jaus\services\srvclibdll.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\include\jaus\services\systemcommander.h"
 				>
 			</File>
 			<File

@@ -41,7 +41,7 @@
              for routing.  The value is in bytes. Default size is
              4 MB -->
         <MessageBoxSize>4194304</MessageBoxSize>
-        <SubsystemID>1</SubsystemID>
+        <SubsystemID>2</SubsystemID>
         <NodeID>1</NodeID>
         <!-- Option Subsystem Identification data if available.  Authority
              is the lowest level of authority to gain control of parts of
@@ -49,7 +49,7 @@
              type is the type of subsystem, however the values are 
              not defined as of this writing (JAUS RA 3.3)-->
         <SubsystemIdentification authority="0"
-                                 identification="Megatron"
+                                 identification="Optimus Prime"
                                  type="10001"/>
         
         <!-- SubsystemConfiguration lists what the configuration
@@ -58,16 +58,17 @@
              waiting for Dynamic Discovery finding nodes on your
              subsystem. -->
         <SubsystemConfiguration>
+            <!--
             <Node id="1">
                 <Component id="35" instance="1"></Component> 
                 <Component id="38" instance="1"></Component>
                 <Component id="33" instance="1"></Component> 
                 <Component id="42" instance="1"></Component>
-                <Component id="37" instance="1"></Component>
             </Node> 
+            -->
         </SubsystemConfiguration>
         <!-- Enable or disable logging at startup by setting the
              logdata attribute to true, use false to not have logging at startup. -->
-        <NodeLogger logdata="true" />        
+        <NodeLogger logdata="false" />        
     </NodeManagerComponent>
 </Jaus>

@@ -286,6 +286,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\..\src\jaus\video\videosubscriber.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\..\src\jaus\video\visualsensor.cpp"
 				>
 			</File>
@@ -341,6 +345,10 @@
 			</File>
 			<File
 				RelativePath="..\..\..\..\include\jaus\video\videolibdll.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\include\jaus\video\videosubscriber.h"
 				>
 			</File>
 			<File

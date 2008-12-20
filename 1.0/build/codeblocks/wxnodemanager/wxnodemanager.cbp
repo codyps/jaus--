@@ -14,7 +14,7 @@
 				<Option external_deps="../../../lib/libjmsg_1.0_d.a;../../../lib/libjcmp_1.0_d.a;../../../../../../cxutils/trunk/1.0/lib/libcxutils_1.0_d.a;" />
 				<Option type="0" />
 				<Option compiler="gcc" />
-				<Option parameters="settings/nodesettings.xml" />
+				<Option parameters="settings/nodesettings2.xml" />
 				<Option projectLinkerOptionsRelation="2" />
 				<Compiler>
 					<Add option="-g" />

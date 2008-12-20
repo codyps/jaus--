@@ -2986,3 +2986,376 @@
 	<wx/image.h>
 	<wx/aboutdlg.h>
 
+1229395584 source:/home/dbarber/Active/libraries/jaus++/trunk/1.0/src/wxnodemanager/nodemanagerapp.cpp
+	<wx/app.h>
+	<wx/cmdline.h>
+	"wxnodemanager/nodemanagerframe.h"
+	<vld.h>
+
+1229388770 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/wxnodemanager/nodemanagerframe.h
+	<wx/wx.h>
+	<wx/numdlg.h>
+	<wx/notebook.h>
+	<wx/treectrl.h>
+	<wx/cmdline.h>
+	<wx/button.h>
+	<wx/image.h>
+	<wx/timer.h>
+	<jaus/components/node/nodemanager.h>
+
+1229398410 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/components/node/nodemanager.h
+	"jaus/messages/common/configuration/service.h"
+	"jaus/messages/common/configuration/configuration.h"
+	"jaus/components/eventmanager.h"
+	"jaus/components/receipt.h"
+	"jaus/components/node/communicator.h"
+
+1229391086 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/common/configuration/service.h
+	"jaus/messages/types.h"
+	<string>
+	<set>
+	<map>
+	<vector>
+
+1229388774 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/types.h
+	<limits.h>
+	"msglibdll.h"
+	<unistd.h>
+
+1229388774 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/msglibdll.h
+
+1229388772 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/common/configuration/configuration.h
+	"jaus/messages/address.h"
+	"jaus/messages/common/configuration/service.h"
+	"jaus/messages/common/configuration/identification.h"
+	<vector>
+	<map>
+
+1229388774 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/address.h
+	"jaus/messages/types.h"
+	<string>
+	<set>
+	<vector>
+
+1229388772 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/common/configuration/identification.h
+	<string>
+	"jaus/messages/types.h"
+
+1229388771 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/components/eventmanager.h
+	<map>
+	<set>
+	<cxutils/mutex.h>
+	"jaus/components/callback.h"
+	"jaus/messages/errorhistory.h"
+	"jaus/messages/query/events/queryevents.h"
+	"jaus/messages/inform/events/reportevents.h"
+	"jaus/messages/common/events/event.h"
+	"jaus/messages/command/events/cancelevent.h"
+	"jaus/messages/command/events/createeventrequest.h"
+	"jaus/messages/command/events/updateevent.h"
+
+1229388727 /home/dbarber/Active/libraries/cxutils/trunk/1.0/include/cxutils/mutex.h
+	<sys/sem.h>
+	<sys/types.h>
+	<sys/stat.h>
+	<unistd.h>
+	<pthread.h>
+	<string>
+	"cxtypes.h"
+
+1229388727 /home/dbarber/Active/libraries/cxutils/trunk/1.0/include/cxutils/cxtypes.h
+
+1229388771 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/components/callback.h
+	"jaus/messages/types.h"
+	"jaus/components/cmplibdll.h"
+
+1229388771 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/components/cmplibdll.h
+
+1229388774 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/errorhistory.h
+	"jaus/messages/errorcodes.h"
+	<string>
+
+1229388774 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/errorcodes.h
+	"jaus/messages/types.h"
+
+1229388773 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/query/events/queryevents.h
+	"jaus/messages/message.h"
+
+1229388774 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/message.h
+	"header.h"
+	"stream.h"
+	"time.h"
+	"errorhistory.h"
+	"bitvector.h"
+
+1229388774 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/header.h
+	"jaus/messages/types.h"
+	"address.h"
+
+1229388774 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/stream.h
+	"header.h"
+	"errorhistory.h"
+	"bitvector.h"
+	"scaledinteger.h"
+	"vartype.h"
+	<cxutils/packet.h>
+	<vector>
+
+1229388774 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/bitvector.h
+	"jaus/messages/types.h"
+
+1229388774 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/scaledinteger.h
+	"jaus/messages/types.h"
+
+1229388774 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/vartype.h
+	"jaus/messages/types.h"
+	<string>
+
+1229388727 /home/dbarber/Active/libraries/cxutils/trunk/1.0/include/cxutils/packet.h
+	<limits.h>
+	<string>
+	"cxtypes.h"
+
+1229388774 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/time.h
+	"jaus/messages/types.h"
+	"bitvector.h"
+
+1229388772 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/inform/events/reportevents.h
+	"jaus/messages/message.h"
+	"jaus/messages/common/events/event.h"
+
+1229388771 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/common/events/event.h
+	<map>
+	"jaus/messages/command/events/createeventrequest.h"
+	"jaus/messages/command/events/updateevent.h"
+
+1229388774 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/command/events/createeventrequest.h
+	"jaus/messages/message.h"
+
+1229388774 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/command/events/updateevent.h
+	"jaus/messages/message.h"
+
+1229388774 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/command/events/cancelevent.h
+	"jaus/messages/message.h"
+
+1229388771 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/components/receipt.h
+	"jaus/messages/time.h"
+	"jaus/messages/message.h"
+	"jaus/components/cmplibdll.h"
+
+1229388771 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/components/node/communicator.h
+	"jaus/components/component.h"
+	"jaus/components/streamcallback.h"
+	"jaus/messages/common/configuration/configuration.h"
+	<cxutils/udpclient.h>
+	<cxutils/udpserver.h>
+	<map>
+
+1229388771 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/components/component.h
+	"connectionhandler.h"
+	"messagehandler.h"
+	"transport/jsharedmemory.h"
+	"jaus/messages/messagecreator.h"
+	"jaus/messages/inform/acknackmessage.h"
+	"jaus/messages/common/configuration/service.h"
+	<cxutils/mutex.h>
+	<string>
+
+1229388771 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/components/connectionhandler.h
+	"jaus/messages/message.h"
+	"jaus/messages/largedataset.h"
+	"jaus/components/cmplibdll.h"
+	"jaus/components/receipt.h"
+	"jaus/components/streamcallback.h"
+	<cxutils/mutex.h>
+
+1229388774 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/largedataset.h
+	"stream.h"
+	<string.h>
+	<set>
+	<map>
+
+1229388771 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/components/streamcallback.h
+	"jaus/components/callback.h"
+	"jaus/messages/stream.h"
+	<map>
+
+1229388771 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/components/messagehandler.h
+	"jaus/messages/types.h"
+	"jaus/messages/stream.h"
+	"jaus/messages/largedataset.h"
+	"jaus/components/streamcallback.h"
+	"jaus/components/messagecallback.h"
+	<cxutils/thread.h>
+	<cxutils/mutex.h>
+	<list>
+	<map>
+
+1229388771 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/components/messagecallback.h
+	"jaus/components/callback.h"
+	"jaus/messages/message.h"
+	<map>
+
+1229388727 /home/dbarber/Active/libraries/cxutils/trunk/1.0/include/cxutils/thread.h
+	<stdlib.h>
+	<unistd.h>
+	<signal.h>
+	<pthread.h>
+	"cxtypes.h"
+	"mutex.h"
+
+1229388771 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/components/transport/jsharedmemory.h
+	"jaus/components/streamcallback.h"
+	"jaus/messages/largedataset.h"
+	"jaus/messages/time.h"
+	<cxutils/thread.h>
+	<cxutils/mutex.h>
+	<cxutils/mappedmemory.h>
+
+1229388727 /home/dbarber/Active/libraries/cxutils/trunk/1.0/include/cxutils/mappedmemory.h
+	<limits.h>
+	<assert.h>
+	"cxtypes.h"
+	"packet.h"
+
+1229388774 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/messagecreator.h
+	"jaus/messages/message.h"
+	"jaus/messages/command/commandcodes.h"
+	"jaus/messages/query/querycodes.h"
+	"jaus/messages/inform/informcodes.h"
+	"jaus/messages/experimental/experimentalcodes.h"
+	<set>
+	<string>
+
+1229388774 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/command/commandcodes.h
+	<string>
+	"jaus/messages/types.h"
+
+1229388773 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/query/querycodes.h
+	"jaus/messages/types.h"
+
+1229388772 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/inform/informcodes.h
+	"jaus/messages/types.h"
+
+1229388773 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/experimental/experimentalcodes.h
+	"jaus/messages/types.h"
+
+1229388772 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/inform/acknackmessage.h
+	"informcodes.h"
+	"jaus/messages/message.h"
+
+1229388727 /home/dbarber/Active/libraries/cxutils/trunk/1.0/include/cxutils/udpclient.h
+	"cxtypes.h"
+	"socket.h"
+	<string>
+
+1229388727 /home/dbarber/Active/libraries/cxutils/trunk/1.0/include/cxutils/socket.h
+	<stdio.h>
+	<stdlib.h>
+	<string>
+	<vector>
+	<winsock.h>
+	<errno.h>
+	<sys/ioctl.h>
+	<sys/types.h>
+	<unistd.h>
+	<netinet/in.h>
+	<sys/socket.h>
+	<netdb.h>
+	<arpa/inet.h>
+	"cxtypes.h"
+	"packet.h"
+
+1229388727 /home/dbarber/Active/libraries/cxutils/trunk/1.0/include/cxutils/udpserver.h
+	"socket.h"
+	<string>
+
+1229391861 source:/home/dbarber/Active/libraries/jaus++/trunk/1.0/src/wxnodemanager/nodemanagerframe.cpp
+	"wxnodemanager/nodemanagerframe.h"
+	"jaus/components/node/nodeconnectionhandler.h"
+	<string>
+	<wx/image.h>
+	<wx/aboutdlg.h>
+
+1229388771 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/components/node/nodeconnectionhandler.h
+	"jaus/components/messagehandler.h"
+	"jaus/components/connectionhandler.h"
+	"jaus/components/node/nodeconnection.h"
+	"jaus/components/node/nodelogger.h"
+	"jaus/components/node/communicator.h"
+	<cxutils/mutex.h>
+	<map>
+
+1229388771 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/components/node/nodeconnection.h
+	<string>
+	"jaus/components/transport/transport.h"
+
+1229388771 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/components/transport/transport.h
+	"jaus/components/cmplibdll.h"
+	"jaus/components/transport/jsharedmemory.h"
+	"jaus/components/transport/judpclient.h"
+	"jaus/components/transport/judpserver.h"
+	"jaus/components/transport/jtcpclient.h"
+	"jaus/components/transport/jtcpserver.h"
+	"jaus/components/transport/jserial.h"
+
+1229388771 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/components/transport/judpclient.h
+	<cxutils/udpclient.h>
+	<cxutils/mutex.h>
+	<string>
+	"jaus/components/cmplibdll.h"
+	"jaus/messages/stream.h"
+
+1229388771 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/components/transport/judpserver.h
+	<cxutils/udpserver.h>
+	<cxutils/thread.h>
+	<cxutils/mutex.h>
+	<string>
+	<map>
+	"jaus/messages/stream.h"
+	"jaus/components/streamcallback.h"
+
+1229388771 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/components/transport/jtcpclient.h
+	<cxutils/tcpclient.h>
+	<cxutils/thread.h>
+	"jaus/components/streamcallback.h"
+	"jaus/messages/stream.h"
+
+1229388727 /home/dbarber/Active/libraries/cxutils/trunk/1.0/include/cxutils/tcpclient.h
+	"socket.h"
+	<netinet/tcp.h>
+
+1229388771 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/components/transport/jtcpserver.h
+	<cxutils/tcplistensocket.h>
+	<cxutils/tcpserver.h>
+	<cxutils/thread.h>
+	"jaus/messages/stream.h"
+	"jaus/components/streamcallback.h"
+
+1229388727 /home/dbarber/Active/libraries/cxutils/trunk/1.0/include/cxutils/tcplistensocket.h
+	"socket.h"
+
+1229388727 /home/dbarber/Active/libraries/cxutils/trunk/1.0/include/cxutils/tcpserver.h
+	"socket.h"
+	"tcplistensocket.h"
+
+1229388771 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/components/transport/jserial.h
+	<cxutils/serial.h>
+	<cxutils/thread.h>
+	"jaus/components/streamcallback.h"
+	"jaus/messages/stream.h"
+
+1229388727 /home/dbarber/Active/libraries/cxutils/trunk/1.0/include/cxutils/serial.h
+	<string>
+	"packet.h"
+	"mutex.h"
+
+1229388771 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/components/node/nodelogger.h
+	"jaus/messages/types.h"
+	"jaus/messages/stream.h"
+	"jaus/messages/largedataset.h"
+	"jaus/components/streamcallback.h"
+	<cxutils/mutex.h>
+	<string>
+	<map>
+

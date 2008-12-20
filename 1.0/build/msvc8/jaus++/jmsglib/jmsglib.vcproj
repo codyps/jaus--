@@ -724,6 +724,18 @@
 			<Filter
 				Name="experimental"
 				>
+				<Filter
+					Name="sick"
+					>
+					<File
+						RelativePath="..\..\..\..\src\jaus\messages\experimental\sick\querysicklidar.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\..\src\jaus\messages\experimental\sick\reportsicklidar.cpp"
+						>
+					</File>
+				</Filter>
 			</Filter>
 			<Filter
 				Name="inform"
@@ -1474,6 +1486,18 @@
 					RelativePath="..\..\..\..\include\jaus\messages\experimental\experimentalmessages.h"
 					>
 				</File>
+				<Filter
+					Name="sick"
+					>
+					<File
+						RelativePath="..\..\..\..\include\jaus\messages\experimental\sick\querysicklidar.h"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\..\include\jaus\messages\experimental\sick\reportsicklidar.h"
+						>
+					</File>
+				</Filter>
 			</Filter>
 			<Filter
 				Name="inform"

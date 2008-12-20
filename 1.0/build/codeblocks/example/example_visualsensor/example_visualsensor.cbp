@@ -24,9 +24,6 @@
 					<Add library="../../../../lib/libjcmp_1.0_d.a" />
 					<Add library="../../../../lib/libjmsg_1.0_d.a" />
 					<Add library="../../../../../../../cxutils/trunk/1.0/lib/libcxutils_1.0_d.a" />
-					<Add library="../../../../ext/lib/libjpeg_d.a" />
-					<Add library="../../../../ext/lib/libpng_d.a" />
-					<Add library="../../../../ext/lib/libz_d.a" />
 				</Linker>
 			</Target>
 			<Target title="Release">
@@ -47,9 +44,6 @@
 					<Add library="../../../../lib/libjcmp_1.0.a" />
 					<Add library="../../../../lib/libjmsg_1.0.a" />
 					<Add library="../../../../../../../cxutils/trunk/1.0/lib/libcxutils_1.0.a" />
-					<Add library="../../../../ext/lib/libjpeg.a" />
-					<Add library="../../../../ext/lib/libpng.a" />
-					<Add library="../../../../ext/lib/libz.a" />
 				</Linker>
 			</Target>
 		</Build>
@@ -62,6 +56,11 @@
 		</Compiler>
 		<Linker>
 			<Add library="pthread" />
+			<Add library="png" />
+			<Add library="z" />
+			<Add library="jpeg" />
+			<Add library="tinyxml" />
+			<Add directory="../../../../ext/lib" />
 		</Linker>
 		<Unit filename="../../../../src/examples/example_visualsensor.cpp" />
 		<Extensions>

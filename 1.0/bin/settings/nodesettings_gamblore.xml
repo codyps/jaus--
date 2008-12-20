@@ -5,7 +5,7 @@
          it only broadcasts to SubsystemID.255.1.1 which is used for Node
          disocvery.  See Dynamic Discovery in the JAUS RA for more info about
          discovery procedures.-->
-    <NodeManagerComponent broadcast="false">
+    <NodeManagerComponent broadcast="true">
         <NetHeader>JAUS01.0</NetHeader>
         <NetPort>3794</NetPort>
         <SubsystemID>51</SubsystemID>

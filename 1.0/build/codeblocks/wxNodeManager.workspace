@@ -3,12 +3,11 @@
 	<Workspace title="Workspace">
 		<Project filename="../../../../../cxutils/trunk/1.0/build/codeblocks/cxutils/cxutils.cbp" />
 		<Project filename="jaus++/jmsglib/libjmsg_1.0/libjmsg_1.0.cbp" />
-		<Project filename="jaus++/jcmplib/libjcmp_1.0/libjcmp_1.0.cbp">
-			<Depends filename="../../../../../cxutils/trunk/1.0/build/codeblocks/cxutils/cxutils.cbp" />
-		</Project>
 		<Project filename="wxnodemanager/wxnodemanager.cbp" active="1">
 			<Depends filename="../../../../../cxutils/trunk/1.0/build/codeblocks/cxutils/cxutils.cbp" />
+			<Depends filename="jaus++/jmsglib/libjmsg_1.0/libjmsg_1.0.cbp" />
 			<Depends filename="jaus++/jcmplib/libjcmp_1.0/libjcmp_1.0.cbp" />
 		</Project>
+		<Project filename="jaus++/jcmplib/libjcmp_1.0/libjcmp_1.0.cbp" />
 	</Workspace>
 </CodeBlocks_workspace_file>

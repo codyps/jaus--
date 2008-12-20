@@ -8,7 +8,7 @@
     <Source>Logitech QuickCam Pro 9000</Source>
     <!-- If maxWidth and maxHeight are not 0, then 
              image data will be scaled. -->
-    <Settings width="640" height="480" interlaced="false" show="true"></Settings>
+    <Settings width="320" height="240" interlaced="false" show="true"></Settings>
     <!-- If maxWidth and maxHeight are not 0, then 
                image data will be scaled. -->
     <!--<ScaledResolution maxWidth="640" maxHeight="480"></ScaledResolution>-->
