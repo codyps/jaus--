@@ -2060,14 +2060,14 @@
 	"jaus/messages/address.h"
 	"jaus/video/image.h"
 
-1229396364 source:/home/dbarber/Active/libraries/jaus++/trunk/1.0/src/examples/example_imagesubscriber.cpp
+1229824827 source:/home/dbarber/Active/libraries/jaus++/trunk/1.0/src/examples/example_imagesubscriber.cpp
 	<iostream>
 	<vector>
 	<vld.h>
-	"jaus/jaus++.h"
+	"jaus/video/videosubscriber.h"
 	<conio.h>
 
-1229388765 /home/dbarber/Active/libraries/jaus++/trunk/1.0/ext/include/vld/vld.h
+1229970186 /home/dbarber/Active/libraries/jaus++/trunk/1.0/ext/include/vld/vld.h
 
 1229388774 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/jaus++.h
 	"jaus/messages/msglib.h"
@@ -2089,33 +2089,34 @@
 	"jaus/messages/inform/informmessages.h"
 	"jaus/messages/experimental/experimentalmessages.h"
 
-1229388774 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/types.h
+1229824818 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/types.h
 	<limits.h>
+	<cxutils/math/cxmath.h>
 	"msglibdll.h"
 	<unistd.h>
 
-1229388774 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/msglibdll.h
+1229824818 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/msglibdll.h
 
-1229388774 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/time.h
+1229824818 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/time.h
 	"jaus/messages/types.h"
 	"bitvector.h"
 
-1229388774 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/bitvector.h
+1229824818 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/bitvector.h
 	"jaus/messages/types.h"
 
-1229388774 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/date.h
+1229824818 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/date.h
 	"jaus/messages/types.h"
 	"errorhistory.h"
 	"bitvector.h"
 
-1229388774 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/errorhistory.h
+1229824818 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/errorhistory.h
 	"jaus/messages/errorcodes.h"
 	<string>
 
-1229388774 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/errorcodes.h
+1229824818 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/errorcodes.h
 	"jaus/messages/types.h"
 
-1229388774 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/stream.h
+1229824818 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/stream.h
 	"header.h"
 	"errorhistory.h"
 	"bitvector.h"
@@ -2124,44 +2125,44 @@
 	<cxutils/packet.h>
 	<vector>
 
-1229388774 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/header.h
+1229824818 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/header.h
 	"jaus/messages/types.h"
 	"address.h"
 
-1229388774 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/address.h
+1229824818 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/address.h
 	"jaus/messages/types.h"
 	<string>
 	<set>
 	<vector>
 
-1229388774 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/scaledinteger.h
+1229824818 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/scaledinteger.h
 	"jaus/messages/types.h"
 
-1229388774 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/vartype.h
+1229824818 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/vartype.h
 	"jaus/messages/types.h"
 	<string>
 
-1229388727 /home/dbarber/Active/libraries/cxutils/trunk/1.0/include/cxutils/packet.h
+1229824759 /home/dbarber/Active/libraries/cxutils/trunk/1.0/include/cxutils/packet.h
 	<limits.h>
 	<string>
 	"cxtypes.h"
 
-1229388727 /home/dbarber/Active/libraries/cxutils/trunk/1.0/include/cxutils/cxtypes.h
+1229824759 /home/dbarber/Active/libraries/cxutils/trunk/1.0/include/cxutils/cxtypes.h
 
-1229388774 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/message.h
+1229824818 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/message.h
 	"header.h"
 	"stream.h"
 	"time.h"
 	"errorhistory.h"
 	"bitvector.h"
 
-1229388774 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/largedataset.h
+1229824818 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/largedataset.h
 	"stream.h"
 	<string.h>
 	<set>
 	<map>
 
-1229388774 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/messagecreator.h
+1229824818 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/messagecreator.h
 	"jaus/messages/message.h"
 	"jaus/messages/command/commandcodes.h"
 	"jaus/messages/query/querycodes.h"
@@ -2170,17 +2171,17 @@
 	<set>
 	<string>
 
-1229388774 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/command/commandcodes.h
+1229824818 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/command/commandcodes.h
 	<string>
 	"jaus/messages/types.h"
 
-1229388773 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/query/querycodes.h
+1229824817 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/query/querycodes.h
 	"jaus/messages/types.h"
 
-1229388772 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/inform/informcodes.h
+1229824816 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/inform/informcodes.h
 	"jaus/messages/types.h"
 
-1229388773 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/experimental/experimentalcodes.h
+1229824816 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/experimental/experimentalcodes.h
 	"jaus/messages/types.h"
 
 1229388774 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/command/commandmessages.h
@@ -2224,7 +2225,7 @@
 	"jaus/messages/command/platform/setlocalpathsegment.h"
 	"jaus/messages/command/world/createvectorknowledgestoreobjects.h"
 
-1229388774 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/command/core/activateserviceconnection.h
+1229824818 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/command/core/activateserviceconnection.h
 	"jaus/messages/message.h"
 
 1229388774 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/command/core/clearemergency.h
@@ -2233,10 +2234,10 @@
 1229388774 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/command/core/confirmcomponentcontrol.h
 	"jaus/messages/message.h"
 
-1229388774 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/command/core/confirmserviceconnection.h
+1229824818 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/command/core/confirmserviceconnection.h
 	"jaus/messages/message.h"
 
-1229388774 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/command/core/createserviceconnection.h
+1229824818 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/command/core/createserviceconnection.h
 	"jaus/messages/message.h"
 
 1229388774 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/command/core/rejectcomponentcontrol.h
@@ -2271,10 +2272,10 @@
 1229388774 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/command/core/standby.h
 	"jaus/messages/message.h"
 
-1229388774 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/command/core/suspendserviceconnection.h
+1229824818 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/command/core/suspendserviceconnection.h
 	"jaus/messages/message.h"
 
-1229388774 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/command/core/terminateserviceconnection.h
+1229824818 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/command/core/terminateserviceconnection.h
 	"jaus/messages/message.h"
 
 1229388774 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/command/communications/setdatalinkselect.h
@@ -2298,13 +2299,13 @@
 1229388773 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/command/environment/setcameraformatoptions.h
 	"jaus/messages/message.h"
 
-1229388774 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/command/events/createeventrequest.h
+1229824817 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/command/events/createeventrequest.h
 	"jaus/messages/message.h"
 
-1229388774 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/command/events/updateevent.h
+1229824817 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/command/events/updateevent.h
 	"jaus/messages/message.h"
 
-1229388774 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/command/events/cancelevent.h
+1229824817 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/command/events/cancelevent.h
 	"jaus/messages/message.h"
 
 1229388774 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/command/events/confirmeventrequest.h
@@ -2420,7 +2421,7 @@
 1229388773 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/query/communications/queryselecteddatalinkstatus.h
 	"jaus/messages/message.h"
 
-1229388773 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/query/events/queryevents.h
+1229824817 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/query/events/queryevents.h
 	"jaus/messages/message.h"
 
 1229388773 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/query/platform/queryglobalpose.h
@@ -2531,7 +2532,7 @@
 	"jaus/messages/inform/environment/reportrelativeobjectposition.h"
 	"jaus/messages/inform/environment/reportcameracapabilities.h"
 
-1229388772 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/inform/acknackmessage.h
+1229824816 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/inform/acknackmessage.h
 	"informcodes.h"
 	"jaus/messages/message.h"
 
@@ -2562,21 +2563,21 @@
 	"jaus/messages/message.h"
 	"jaus/messages/common/configuration/configuration.h"
 
-1229388772 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/common/configuration/configuration.h
+1229824815 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/common/configuration/configuration.h
 	"jaus/messages/address.h"
 	"jaus/messages/common/configuration/service.h"
 	"jaus/messages/common/configuration/identification.h"
 	<vector>
 	<map>
 
-1229391086 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/common/configuration/service.h
+1229824815 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/common/configuration/service.h
 	"jaus/messages/types.h"
 	<string>
 	<set>
 	<map>
 	<vector>
 
-1229388772 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/common/configuration/identification.h
+1229824815 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/common/configuration/identification.h
 	<string>
 	"jaus/messages/types.h"
 
@@ -2588,18 +2589,18 @@
 	"jaus/messages/message.h"
 	"jaus/messages/common/configuration/identification.h"
 
-1229388772 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/inform/configuration/reportsubsystemlist.h
+1229824816 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/inform/configuration/reportsubsystemlist.h
 	"jaus/messages/message.h"
 	<vector>
 
 1229388772 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/inform/events/eventmessage.h
 	"jaus/messages/message.h"
 
-1229388772 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/inform/events/reportevents.h
+1229824815 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/inform/events/reportevents.h
 	"jaus/messages/message.h"
 	"jaus/messages/common/events/event.h"
 
-1229388771 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/common/events/event.h
+1229824815 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/common/events/event.h
 	<map>
 	"jaus/messages/command/events/createeventrequest.h"
 	"jaus/messages/command/events/updateevent.h"
@@ -2608,17 +2609,17 @@
 	"jaus/messages/message.h"
 	"jaus/messages/common/platform/globalpose.h"
 
-1229388772 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/common/platform/globalpose.h
+1229824815 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/common/platform/globalpose.h
 	"jaus/messages/time.h"
 	"jaus/messages/date.h"
 	"jaus/messages/bitvector.h"
 	"jaus/messages/common/platform/globalposition.h"
 	"jaus/messages/common/platform/attitude.h"
 
-1229388772 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/common/platform/globalposition.h
+1229824815 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/common/platform/globalposition.h
 	"jaus/messages/types.h"
 
-1229388772 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/common/platform/attitude.h
+1229824815 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/common/platform/attitude.h
 	"jaus/messages/types.h"
 
 1229388772 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/inform/platform/reportlocalpose.h
@@ -2667,27 +2668,27 @@
 1229388772 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/inform/platform/reportlocalpathsegment.h
 	"jaus/messages/message.h"
 
-1229388772 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/inform/environment/reportimage.h
+1229824816 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/inform/environment/reportimage.h
 	"jaus/messages/message.h"
 	<vector>
 
-1229388772 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/inform/environment/reportcameraformatoptions.h
+1229824816 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/inform/environment/reportcameraformatoptions.h
 	"jaus/messages/message.h"
 
-1229388772 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/inform/environment/reportcamerapose.h
+1229824816 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/inform/environment/reportcamerapose.h
 	<string>
 	"jaus/messages/message.h"
 
-1229388772 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/inform/environment/reportcameracount.h
+1229824816 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/inform/environment/reportcameracount.h
 	"jaus/messages/message.h"
 
-1229388772 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/inform/environment/reportselectedcamera.h
+1229824816 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/inform/environment/reportselectedcamera.h
 	"jaus/messages/message.h"
 
 1229388772 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/inform/environment/reportrelativeobjectposition.h
 	"jaus/messages/message.h"
 
-1229388772 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/inform/environment/reportcameracapabilities.h
+1229824816 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/inform/environment/reportcameracapabilities.h
 	<string>
 	"jaus/messages/message.h"
 
@@ -2711,9 +2712,9 @@
 	"jaus/components/transport/jtcpserver.h"
 	"jaus/components/transport/jserial.h"
 
-1229388771 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/components/cmplibdll.h
+1229824814 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/components/cmplibdll.h
 
-1229388771 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/components/transport/jsharedmemory.h
+1229824814 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/components/transport/jsharedmemory.h
 	"jaus/components/streamcallback.h"
 	"jaus/messages/largedataset.h"
 	"jaus/messages/time.h"
@@ -2721,16 +2722,16 @@
 	<cxutils/mutex.h>
 	<cxutils/mappedmemory.h>
 
-1229388771 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/components/streamcallback.h
+1229824814 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/components/streamcallback.h
 	"jaus/components/callback.h"
 	"jaus/messages/stream.h"
 	<map>
 
-1229388771 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/components/callback.h
+1229824814 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/components/callback.h
 	"jaus/messages/types.h"
 	"jaus/components/cmplibdll.h"
 
-1229388727 /home/dbarber/Active/libraries/cxutils/trunk/1.0/include/cxutils/thread.h
+1229824759 /home/dbarber/Active/libraries/cxutils/trunk/1.0/include/cxutils/thread.h
 	<stdlib.h>
 	<unistd.h>
 	<signal.h>
@@ -2738,7 +2739,7 @@
 	"cxtypes.h"
 	"mutex.h"
 
-1229388727 /home/dbarber/Active/libraries/cxutils/trunk/1.0/include/cxutils/mutex.h
+1229824759 /home/dbarber/Active/libraries/cxutils/trunk/1.0/include/cxutils/mutex.h
 	<sys/sem.h>
 	<sys/types.h>
 	<sys/stat.h>
@@ -2747,7 +2748,7 @@
 	<string>
 	"cxtypes.h"
 
-1229388727 /home/dbarber/Active/libraries/cxutils/trunk/1.0/include/cxutils/mappedmemory.h
+1229824759 /home/dbarber/Active/libraries/cxutils/trunk/1.0/include/cxutils/mappedmemory.h
 	<limits.h>
 	<assert.h>
 	"cxtypes.h"
@@ -2830,7 +2831,7 @@
 	"packet.h"
 	"mutex.h"
 
-1229388771 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/components/component.h
+1229824814 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/components/component.h
 	"connectionhandler.h"
 	"messagehandler.h"
 	"transport/jsharedmemory.h"
@@ -2840,7 +2841,7 @@
 	<cxutils/mutex.h>
 	<string>
 
-1229388771 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/components/connectionhandler.h
+1229824814 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/components/connectionhandler.h
 	"jaus/messages/message.h"
 	"jaus/messages/largedataset.h"
 	"jaus/components/cmplibdll.h"
@@ -2848,12 +2849,12 @@
 	"jaus/components/streamcallback.h"
 	<cxutils/mutex.h>
 
-1229388771 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/components/receipt.h
+1229824814 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/components/receipt.h
 	"jaus/messages/time.h"
 	"jaus/messages/message.h"
 	"jaus/components/cmplibdll.h"
 
-1229388771 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/components/messagehandler.h
+1229824814 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/components/messagehandler.h
 	"jaus/messages/types.h"
 	"jaus/messages/stream.h"
 	"jaus/messages/largedataset.h"
@@ -2864,12 +2865,12 @@
 	<list>
 	<map>
 
-1229388771 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/components/messagecallback.h
+1229824814 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/components/messagecallback.h
 	"jaus/components/callback.h"
 	"jaus/messages/message.h"
 	<map>
 
-1229391086 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/components/subscribercomponent.h
+1230000361 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/components/subscribercomponent.h
 	"jaus/components/eventmanager.h"
 	"jaus/components/component.h"
 	"jaus/components/serviceconnection.h"
@@ -2882,7 +2883,7 @@
 	"jaus/messages/inform/configuration/reportsubsystemlist.h"
 	<cxutils/thread.h>
 
-1229388771 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/components/eventmanager.h
+1229824814 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/components/eventmanager.h
 	<map>
 	<set>
 	<cxutils/mutex.h>
@@ -2895,13 +2896,13 @@
 	"jaus/messages/command/events/createeventrequest.h"
 	"jaus/messages/command/events/updateevent.h"
 
-1229388771 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/components/serviceconnection.h
+1229824814 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/components/serviceconnection.h
 	"jaus/messages/address.h"
 	"jaus/messages/stream.h"
 	"jaus/components/cmplibdll.h"
 	<map>
 
-1229388772 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/common/platform/platform.h
+1229824815 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/messages/common/platform/platform.h
 	"jaus/messages/common/platform/globalpose.h"
 	"jaus/messages/common/configuration/configuration.h"
 
@@ -2995,7 +2996,7 @@
 	"timer.h"
 	"cxutils/math/cxmath.h"
 
-1229388726 /home/dbarber/Active/libraries/cxutils/trunk/1.0/include/cxutils/math/cxmath.h
+1229824758 /home/dbarber/Active/libraries/cxutils/trunk/1.0/include/cxutils/math/cxmath.h
 	<math.h>
 	"vector3d.h"
 	"point3d.h"
@@ -3004,23 +3005,23 @@
 	"quaternion.h"
 	"coordinates.h"
 
-1229388726 /home/dbarber/Active/libraries/cxutils/trunk/1.0/include/cxutils/math/vector3d.h
+1229824758 /home/dbarber/Active/libraries/cxutils/trunk/1.0/include/cxutils/math/vector3d.h
 	<vector>
 	"cxutils/cxtypes.h"
 
-1229388726 /home/dbarber/Active/libraries/cxutils/trunk/1.0/include/cxutils/math/point3d.h
+1229824758 /home/dbarber/Active/libraries/cxutils/trunk/1.0/include/cxutils/math/point3d.h
 	"cxutils/cxtypes.h"
 
-1229388726 /home/dbarber/Active/libraries/cxutils/trunk/1.0/include/cxutils/math/segment3d.h
+1229824758 /home/dbarber/Active/libraries/cxutils/trunk/1.0/include/cxutils/math/segment3d.h
 	"cxutils/math/point3d.h"
 
-1229388726 /home/dbarber/Active/libraries/cxutils/trunk/1.0/include/cxutils/math/matrix.h
+1229824758 /home/dbarber/Active/libraries/cxutils/trunk/1.0/include/cxutils/math/matrix.h
 	"cxutils/cxtypes.h"
 
-1229388726 /home/dbarber/Active/libraries/cxutils/trunk/1.0/include/cxutils/math/quaternion.h
+1229824758 /home/dbarber/Active/libraries/cxutils/trunk/1.0/include/cxutils/math/quaternion.h
 	"cxutils/cxtypes.h"
 
-1229388726 /home/dbarber/Active/libraries/cxutils/trunk/1.0/include/cxutils/math/coordinates.h
+1229824758 /home/dbarber/Active/libraries/cxutils/trunk/1.0/include/cxutils/math/coordinates.h
 	"point3d.h"
 	"quaternion.h"
 
@@ -3042,9 +3043,9 @@
 	"jaus/video/image.h"
 	"jaus/video/visualsensor.h"
 
-1229388771 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/video/videolibdll.h
+1229824814 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/video/videolibdll.h
 
-1229388771 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/video/image.h
+1229824814 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/video/image.h
 	<string>
 	<iostream>
 	"jaus/video/videolibdll.h"
@@ -3055,19 +3056,19 @@
 	"jaus/video/ppm/ppm.h"
 	<cxutils/virtualfile.h>
 
-1229388771 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/video/jpeg/jpeg.h
+1229824814 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/video/jpeg/jpeg.h
 	"jaus/video/videolibdll.h"
 
-1229388771 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/video/png/png.h
+1229824814 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/video/png/png.h
 	"jaus/video/videolibdll.h"
 
-1229388771 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/video/pgm/pgm.h
+1229824814 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/video/pgm/pgm.h
 	"jaus/video/videolibdll.h"
 
-1229388771 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/video/ppm/ppm.h
+1229824814 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/video/ppm/ppm.h
 	"jaus/video/videolibdll.h"
 
-1229388727 /home/dbarber/Active/libraries/cxutils/trunk/1.0/include/cxutils/virtualfile.h
+1229824759 /home/dbarber/Active/libraries/cxutils/trunk/1.0/include/cxutils/virtualfile.h
 	<stdio.h>
 	<string>
 	"cxtypes.h"
@@ -3082,10 +3083,22 @@
 	"jaus/messages/inform/environment/reportcameraformatoptions.h"
 	<cxutils/mutex.h>
 
-1229388771 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/video/sharedimage.h
+1229824814 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/video/sharedimage.h
 	<cxutils/mappedmemory.h>
 	<cxutils/thread.h>
 	<cxutils/mutex.h>
 	"jaus/messages/address.h"
 	"jaus/video/image.h"
+
+1229824814 /home/dbarber/Active/libraries/jaus++/trunk/1.0/include/jaus/video/videosubscriber.h
+	"jaus/video/videolibdll.h"
+	"jaus/video/image.h"
+	"jaus/video/sharedimage.h"
+	"jaus/components/subscribercomponent.h"
+	"jaus/messages/inform/environment/reportcameracapabilities.h"
+	"jaus/messages/inform/environment/reportcameracount.h"
+	"jaus/messages/inform/environment/reportcameraformatoptions.h"
+	"jaus/messages/inform/environment/reportcamerapose.h"
+	"jaus/messages/inform/environment/reportselectedcamera.h"
+	"jaus/messages/inform/environment/reportimage.h"
 

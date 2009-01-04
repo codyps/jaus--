@@ -73,6 +73,7 @@ public:
     void OnAbout(wxCommandEvent& event);
     void OnOpenXML(wxCommandEvent& event);
     void UpdateImage(const CvImageCapture::Image &image);
+    void OnTimer(wxTimerEvent& event);
 private:
     static void VideoCaptureThread(void* args);
     Jaus::UShort mMaxWidth;
@@ -96,6 +97,8 @@ private:
     Jaus::VisualSensor mSensor;         ///<  JAUS Visual Sensor component.
     CvImageCapture::Image mImage;       ///<  Main image from sensor.
     CxUtils::Thread mCaptureThread;     ///<  Thread for capturing video data.
+    std::string mSourceName;            ///<  Video source name.
+    wxImage mImageCopy;                 ///<  Copy of image data for display.
 };
 
 #endif

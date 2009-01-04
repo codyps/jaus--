@@ -86,7 +86,10 @@ bool NodeManagerApp::OnInit()
 
     if(argc == 1)
     {
-        mpNode->Initialize("settings/nodesettings.xml");
+        if(mpNode->Initialize("settings/nodesettings.xml") == Jaus::FAILURE)
+        {
+            mpNode->Initialize(1, 1);
+        }
     }
     else
     {

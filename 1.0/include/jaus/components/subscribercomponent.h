@@ -185,7 +185,7 @@ namespace Jaus
     protected:   
         EventManager mEventManager;      ///<  Stores all events for component.
     private:
-        static void StreamCallbackFunction(const Stream&, const Header*, const Byte, void*);
+        static void StreamCallbackFunction(const Stream& msg, const Header* info, const Byte transport, void* cmp);
         static void PeriodicEventThreadFunction(void *args); 
         virtual void SubscriptionsLoop();
         void CheckServiceConnections();

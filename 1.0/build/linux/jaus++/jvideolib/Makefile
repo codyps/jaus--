@@ -1,6 +1,6 @@
 # make file
  
-ARCHIVE  	:= libjvid.1.0
+ARCHIVE  	:= libjvideo.1.0
 CC 		:= gcc
 CXX      	:= g++
 CXXFLAGS 	:= -g -c -fPIC -Wall
@@ -9,6 +9,7 @@ JAUSDIR  := ../../../..
 DESTDIR  := $(JAUSDIR)/lib
 ODIR     := $(JAUSDIR)/obj
 CXUTILSDIR := $(JAUSDIR)/../../../cxutils/trunk/1.0
+INSTALLDIR   	:= /usr
 
 #--------------------------------------------
 #  project source files dirs
@@ -73,7 +74,7 @@ EXTLIBSDIR     := $(JAUSDIR)/ext/lib
 
 LIBS := $(CXUTILSLIBDIR)/cxutils.1.0
 LIBPATH := $(CXUTILSLIBDIR) \
-			/usr/lib \
+			$(INSTALLDIR)/lib \
 			$(JAUSDIR)/lib \
 			$(CXUTILSOBJ) \
 			$(EXTLIBS)
@@ -117,6 +118,21 @@ allclean:
 	@-rm -f $(foreach DIR,$(SRCDIRS), $(DIR)/$(ARCHIVE).so)
 	@-rm -f $(DESTDIR)/$(ARCHIVE).so
 
+install:
+	cp $(DESTDIR)/$(ARCHIVE).so $(INSTALLDIR)/lib
+	cp $(DESTDIR)/$(ARCHIVE).a $(INSTALLDIR)/lib
+	if test -d $(INSTALLDIR)/include/jaus/video; \
+	then echo exists;                \
+	else mkdir $(INSTALLDIR)/include/jaus/video; \
+	fi
+	cp $(JAUSDIR)/include/jaus/video/*.h $(INSTALLDIR)/include/jaus/video/
+	
+uninstall:
+	rm $(INSTALLDIR)/lib/$(ARCHIVE).so
+	rm $(INSTALLDIR)/lib/$(ARCHIVE).a
+	rm $(INSTALLDIR)/include/jaus/video/*.h
+	rmdir $(INSTALLDIR)/include/jaus/video/	
+	
 help: 
 	@echo $(OBJECTFILES)
 	@echo $@

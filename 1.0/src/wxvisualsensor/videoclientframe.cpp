@@ -47,7 +47,6 @@
 #include <wx/numdlg.h>
 
 #define TIMER_ID 1000
-
 #define DISCONNECT_ID 1001
 
 // specialized definese used in wxwidgets programming
@@ -104,30 +103,15 @@ VideoClientFrame::VideoClientFrame(wxWindow* parent,
 
     // Create the video panel.
     mpImagePanel = new wxImagePanel(mpMainPanel, 
-                                    wxID_ANY, 0, 
+                                    wxID_ANY, 
                                     wxPoint(0, 0), 
                                     wxSize(360, 240), 
-                                    wxIP_WINDOWS_OPTIMIZE);
+                                    0);
 
     
     CreateStatusBar(2);
     
     mpTimer = new wxTimer(this, TIMER_ID);
-
-    // Load the default image.
-    wxImage image;
-    wxInitAllImageHandlers();
-    image.LoadFile(wxT("images/please_stand_by.png"));
-    mpImagePanel->SetClientSize(wxSize(image.GetWidth(), image.GetHeight()));
-    mpImagePanel->SetImage(image);
-    SetClientSize(mpImagePanel->GetBestSize());
-    wxImage logo;
-    if(logo.LoadFile(wxString("icons/camera-photo.png", wxConvUTF8)))
-    {
-        wxIcon icon;
-        icon.CopyFromBitmap(logo);
-        SetIcon(icon);
-    }
 }
 
 
@@ -138,6 +122,22 @@ VideoClientFrame::VideoClientFrame(wxWindow* parent,
 ////////////////////////////////////////////////////////////////////////////////////
 bool VideoClientFrame::Initialize()
 {
+    // Load the default image.
+    wxImage image;
+    wxInitAllImageHandlers();
+    image.LoadFile(wxT("images/please_stand_by.png"));
+    mpImagePanel->SetClientSize(wxSize(image.GetWidth(), image.GetHeight()));    
+    SetClientSize(mpImagePanel->GetBestSize());
+    mpImagePanel->SetImage(image);
+    
+    wxImage logo;
+    if(logo.LoadFile(wxString("icons/camera-photo.png", wxConvUTF8)))
+    {
+        wxIcon icon;
+        icon.CopyFromBitmap(logo);
+        SetIcon(icon);
+    }
+    
     // Initialize JAUS Component.
     Jaus::Address nodeID;
     
@@ -273,8 +273,8 @@ void VideoClientFrame::OnDisconnect(wxCommandEvent& event)
     wxImage image;
     image.LoadFile(wxT("images/please_stand_by.png"));
     mpImagePanel->SetClientSize(wxSize(image.GetWidth(), image.GetHeight()));
-    mpImagePanel->SetImage(image);
     SetClientSize(mpImagePanel->GetBestSize());
+    mpImagePanel->SetImage(image);
     mFrameNumber = 0;
     mMutex.Leave();
 
@@ -405,19 +405,24 @@ void VideoClientFrame::OnTimer(wxTimerEvent& event)
         mCurrentImage.Width() > 0 &&
         mCurrentImage.Height() > 0 &&
         mCurrentImage.ImageData() != NULL &&
-        mVisualSensorID.IsValid())
+        mVisualSensorID.IsValid() &&
+        mFrameNumber > 0)
     {
-        mpImagePanel->SetImage(wxImage(mCurrentImage.Width(),
-                                               mCurrentImage.Height(),
-                                               mCurrentImage.ImageData(),
-                                               true));
-        wxSize windowSize(mCurrentImage.Width(), mCurrentImage.Height());
-        mpImagePanel->SetClientSize(windowSize);
-        SetClientSize(mpImagePanel->GetBestSize());
+        wxImage image(mCurrentImage.Width(),
+                       mCurrentImage.Height(),
+                       mCurrentImage.ImageData(),
+                       true);
+        if(image.Ok())
+        {            
+            wxSize imageSize(image.GetWidth(), image.GetHeight());
+            mpImagePanel->SetClientSize(imageSize);
+            SetClientSize(mpImagePanel->GetBestSize());    
+            mpImagePanel->SetImage(&image);
+        }               
     }
+    
     mMutex.Leave();
-    mpMainPanel->Update();
-
+    
     if(!mShutdownFlag)
     {
         char buffer[256];
@@ -434,8 +439,9 @@ void VideoClientFrame::OnTimer(wxTimerEvent& event)
     
     // If we haven't received an image in a while, and
     // have a valid visual sensor ID, try re-create subscription.
+    unsigned int currentTimeMs = Jaus::Time::GetUtcTimeMs();
     if( mVisualSensorID.IsValid() &&
-        Jaus::Time::GetUtcTimeMs() - mFrameUpdateTimeMs > 1000 )
+        currentTimeMs > mFrameUpdateTimeMs && currentTimeMs - mFrameUpdateTimeMs > 1500 )
     {
         if(mClient.HaveEventSubscription(mVisualSensorID, Jaus::JAUS_REPORT_IMAGE))
         {

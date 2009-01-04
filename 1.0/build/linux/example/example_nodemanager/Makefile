@@ -61,8 +61,6 @@ LIBPATHS := -L$(CXUTILSLIBDIR) \
 CXUTILSLIB	:= cxutils.1.0
 JMSGLIB		:= jmsg.1.0  
 JCMPLIB		:= jcmp.1.0
-JVIDLIB		:= jvid.1.0
-JSRVLIB		:= jsrv.1.0
 TINYLIB		:= tinyxml
 
 LIBS		:= -l$(CXUTILSLIB) \

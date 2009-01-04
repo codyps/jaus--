@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////
 ///
-///  \file QueryLocalPathSegment.cpp
+///  \file querylocalpathsegment.cpp
 ///  \brief This file contains the message structure for Query Local Path Segment
 ///
 ///  <br>Author(s): David Adams

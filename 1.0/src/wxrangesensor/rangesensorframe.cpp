@@ -108,10 +108,9 @@ RangeSensorFrame::RangeSensorFrame(wxWindow* parent,
 
     // Create the video panel.
     mpImagePanel = new wxImagePanel(mpMainPanel, 
-                                    wxID_ANY, 0, 
+                                    wxID_ANY, 
                                     wxPoint(0, 0), 
-                                    wxSize(360, 240), 
-                                    wxIP_WINDOWS_OPTIMIZE);
+                                    wxSize(360, 240));
 
     
     CreateStatusBar(2);
@@ -412,11 +411,12 @@ void RangeSensorFrame::OnTimer(wxTimerEvent& event)
     if(mRangeSensorID.IsValid())
     {
         // Draw data to image.        
-        wxBitmap bitmap(640, 640);
+        wxBitmap bitmap(640, 640, -1);
         wxMemoryDC memoryDC;
         memoryDC.SelectObject(bitmap);
-        memoryDC.SetPen(*wxGREEN_PEN);
-        memoryDC.SetBrush(*wxGREEN_BRUSH);
+        // Set line color to green, fill color to green
+        memoryDC.SetPen(wxPen(*wxGREEN, 2, wxSOLID));
+        memoryDC.SetBrush(wxBrush(*wxGREEN, wxSOLID));
 
         if(mLidarScan.GetScanData()->size() > 0)
         {
@@ -471,7 +471,7 @@ void RangeSensorFrame::OnTimer(wxTimerEvent& event)
                 point.x = (int)(mCurrentImage.GetWidth()/2.0 + distancePixelsX);
 
                 // Draw a circle.
-                memoryDC.DrawCircle(point, 3);
+                memoryDC.DrawCircle(point, 2);
                 bearing -= increment;
             }
         }
@@ -500,7 +500,7 @@ void RangeSensorFrame::OnTimer(wxTimerEvent& event)
                     point.x = (int)(mCurrentImage.GetWidth()/2.0 + distancePixelsX);
 
                     // Draw a circle.
-                    memoryDC.DrawCircle(point, 3);
+                    memoryDC.DrawCircle(point, 2);
                 }
             }            
 
@@ -530,6 +530,9 @@ void RangeSensorFrame::OnTimer(wxTimerEvent& event)
         }
         SetTitle(wxString(buffer, wxConvUTF8));
 
+        // Tidy up
+        memoryDC.SelectObject(wxNullBitmap);
+        memoryDC.SelectObject(wxNullBitmap);
         mCurrentImage = bitmap.ConvertToImage();
         mpImagePanel->SetClientSize(wxSize(mCurrentImage.GetWidth(), mCurrentImage.GetHeight()));
         mpImagePanel->SetImage(mCurrentImage);
@@ -561,16 +564,6 @@ void RangeSensorFrame::ProcessMessageCallback(const Jaus::Message* message, void
         frame->mFrameNumber++;
         frame->mFrameUpdateTimeMs = Jaus::Time::GetUtcTimeMs();
         frame->mMutex.Leave();
-        char buffer[256];
-        if(frame->mFrameNumber > 0)
-        {
-            sprintf(buffer, "Range Sensor Client - %d", frame->mFrameNumber);
-        }
-        else
-        {
-            sprintf(buffer, "Range Sensor Client", frame->mFrameNumber);
-        }
-        frame->SetTitle(wxString(buffer, wxConvUTF8));
 
     }
     else if(message->GetCommandCode() == Jaus::JAUS_REPORT_SICK_LIDAR)
@@ -581,16 +574,6 @@ void RangeSensorFrame::ProcessMessageCallback(const Jaus::Message* message, void
         frame->mFrameNumber++;
         frame->mFrameUpdateTimeMs = Jaus::Time::GetUtcTimeMs();
         frame->mMutex.Leave();
-        char buffer[256];
-        if(frame->mFrameNumber > 0)
-        {
-            sprintf(buffer, "Range Sensor Client - %d", frame->mFrameNumber);
-        }
-        else
-        {
-            sprintf(buffer, "Range Sensor Client", frame->mFrameNumber);
-        }
-        frame->SetTitle(wxString(buffer, wxConvUTF8));
     }
 }
 

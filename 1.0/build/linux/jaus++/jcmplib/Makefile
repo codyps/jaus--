@@ -13,7 +13,8 @@ CXUTILSLIBDIR 	:= $(CXUTILSDIR)/lib
 EXTLIBDIR     	:= $(JAUSDIR)/ext/lib
 EXTSRCDIR       := $(JAUSDIR)/ext/src
 JAUSLIBDIR	    := $(JAUSDIR)/lib
-USRLIBDIR	    := /usr/lib
+INSTALLDIR   	:= /usr
+USRLIBDIR	    := $(INSTALLDIR)/lib
 #--------------------------------------------
 #  Component source files directories
 #--------------------------------------------
@@ -125,6 +126,21 @@ allclean:
 	@-rm -f $(DESTDIR)/$(ARCHIVE).a
 	@-rm -f $(foreach DIR,$(CMPSRCS), $(DIR)/$(ARCHIVE).so)
 	@-rm -f $(DESTDIR)/$(ARCHIVE).so
+	
+install:
+	cp $(DESTDIR)/$(ARCHIVE).so $(INSTALLDIR)/lib
+	cp $(DESTDIR)/$(ARCHIVE).a $(INSTALLDIR)/lib
+	if test -d $(INSTALLDIR)/include/jaus/components; \
+	then echo exists;                \
+	else mkdir $(INSTALLDIR)/include/jaus/components; \
+	fi
+	cp $(JAUSDIR)/include/jaus/components/*.h $(INSTALLDIR)/include/jaus/components/
+	
+uninstall:
+	rm $(INSTALLDIR)/lib/$(ARCHIVE).so
+	rm $(INSTALLDIR)/lib/$(ARCHIVE).a
+	rm $(INSTALLDIR)/include/jaus/components/*.h
+	rmdir $(INSTALLDIR)/include/jaus/components/	
 
 help: 
 	@echo $(OBJECTFILES)

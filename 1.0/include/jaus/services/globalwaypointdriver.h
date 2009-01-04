@@ -107,9 +107,13 @@ namespace Jaus
         // Sets a global waypoint to reach.
         virtual int SetGlobalWaypoint(const Jaus::SetGlobalWaypoint& waypointCommand);
         // Sets the ID of the Global Vector Driver to use to get to a destination.
-        void SetGlobalVectorDriver(const Address& id);
+        void SetGlobalVectorDriverID(const Address& id);
+        // Gets the ID of the global vector driver
+        Jaus::Address GetGlobalVectorDriverID() const   { return mGlobalVectorDriverID; }
         // Sets the ID of the Global Pose Sensor to get data from (latitude, longitude, attitude data, etc.)
-        void SetGlobalPoseSensor(const Address& id);
+        void SetGlobalPoseSensorID(const Address& id);
+        // Gets the ID of the global post sensor
+        Jaus::Address GetGlobalPoseSensorID() const     {return mGlobalPoseSensorID; }
         // Gets the update rate for generating commands.
         double GetUpdateRate() const;
         // Gets the current known global pose of platform.
@@ -118,6 +122,10 @@ namespace Jaus
         WaypointList GetWaypointList() const;
         // Gets the current waypoint being driven to.
         Jaus::SetGlobalWaypoint GetCurrentDesiredGlobalWaypoint() const;
+        // Sets the desired travel speed
+        void SetTravelSpeed(const double speed);
+        // Gets the travel speed
+        double GetTravelSpeed() const;
     protected:
         static void GlobalWaypointDriverThread(void *args);
         bool IsGlobalPoseSubscriptionReady();

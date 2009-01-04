@@ -1029,6 +1029,7 @@ int InformComponent::ProcessDiscoveryEvent(const Platform& subsystem,
                         id = subscribers->erase(id);
 #else
                         subscribers->erase(id);
+                        id = subscribers->begin();
 #endif
                         continue;
                     }
@@ -1041,6 +1042,7 @@ int InformComponent::ProcessDiscoveryEvent(const Platform& subsystem,
                 ev = myEvents->erase(ev);
 #else
                 myEvents->erase(ev);
+                ev = myEvents->begin();
 #endif
             }
             else

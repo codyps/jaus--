@@ -55,6 +55,7 @@ BEGIN_EVENT_TABLE(VisualSensorFrame, wxFrame)
     EVT_MENU(wxID_EXIT, VisualSensorFrame::OnQuit)
     EVT_MENU(TOGGLE_VIDEO_ID, VisualSensorFrame::OnShowImage)
     EVT_MENU(wxID_OPEN, VisualSensorFrame::OnOpenXML)
+    EVT_TIMER(TIMER_ID, VisualSensorFrame::OnTimer)
 END_EVENT_TABLE()
 
 #define wxMENU_BAR_OFFSET 15
@@ -100,10 +101,9 @@ VisualSensorFrame::VisualSensorFrame(wxWindow* parent,
 
     // Create the video panel.
     mpImagePanel = new wxImagePanel(mpMainPanel, 
-                                    wxID_ANY, 0, 
+                                    wxID_ANY, 
                                     wxPoint(0, 0), 
-                                    size/*, 
-                                    wxIP_WINDOWS_OPTIMIZE*/);
+                                    size);
 
     
     CreateStatusBar(2);
@@ -127,6 +127,8 @@ VisualSensorFrame::VisualSensorFrame(wxWindow* parent,
         icon.CopyFromBitmap(logo);
         SetIcon(icon);
     }
+    
+    mpTimer = new wxTimer(this, TIMER_ID);
 }
 
 
@@ -161,7 +163,6 @@ bool VisualSensorFrame::Initialize(const std::string& settings)
     }
 
     Jaus::Byte instanceID = 1;
-    std::string sourceName;
     unsigned int messageBoxSize = 2097152;
     
     TiXmlHandle docHandle(&xml);
@@ -181,7 +182,7 @@ bool VisualSensorFrame::Initialize(const std::string& settings)
         wxMessageBox(wxT("Invalid XML File"), wxT("Failed to Initialize"));
         return false;
     }
-    sourceName = node->FirstChild()->Value();
+    mSourceName = node->FirstChild()->Value();
 
     node = docHandle.FirstChild("Jaus").FirstChild("VisualSensorComponent").FirstChild("MessageBoxSize").ToNode();
     if(node == NULL)
@@ -239,11 +240,12 @@ bool VisualSensorFrame::Initialize(const std::string& settings)
     }
     
     SetStatusText(wxString(mSensor.GetID().ToString().c_str(), wxConvUTF8), 1);
-    mVisualSource->Start(sourceName.c_str(), mSourceWidth, mSourceHeight, mInterlacedVideoFlag);
+    mVisualSource->Start(mSourceName.c_str(), mSourceWidth, mSourceHeight, mInterlacedVideoFlag);
     // Start thread to capture video data.
     mCaptureThread.CreateThread(&VisualSensorFrame::VideoCaptureThread, this);
+    mpTimer->Start(10);
     CxUtils::SleepMs(100);
-
+    
     return true;
 }
 
@@ -345,22 +347,6 @@ void VisualSensorFrame::OnAbout(wxCommandEvent& event)
     text.Clear();
 
     info.SetWebSite(TEXT_TYPE("http://active.ist.ucf.edu"));
-
-    //text.Append(TEXT_TYPE("GNU LESSER GENERAL PUBLIC LICENSE\n"));
-    //text.Append(TEXT_TYPE("This library is free software; you can redistribute it and/or\n"));
-    //text.Append(TEXT_TYPE("modify it under the terms of the GNU Lesser General Public\n"));
-    //text.Append(TEXT_TYPE("License as published by the Free Software Foundation; either\n"));
-    //text.Append(TEXT_TYPE("version 2.1 of the License, or (at your option) any later version.\n"));
-    //text.Append(TEXT_TYPE("\n"));
-    //text.Append(TEXT_TYPE("This library is distributed in the hope that it will be useful,\n"));
-    //text.Append(TEXT_TYPE("but WITHOUT ANY WARRANTY; without even the implied warranty of\n"));
-    //text.Append(TEXT_TYPE("MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU\n"));
-    //text.Append(TEXT_TYPE("Lesser General Public License for more details.\n"));
-    //text.Append(TEXT_TYPE("\n"));
-    //text.Append(TEXT_TYPE("You should have received a copy of the GNU Lesser General Public\n"));
-    //text.Append(TEXT_TYPE("License along with this library; if not, write to the Free Software\n"));
-    //text.Append(TEXT_TYPE("Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA\n"));
-    //info.SetLicence(text);
     
     wxImage logo;
     if(logo.LoadFile(wxString("logo/jaus++_logo_100x100.gif", wxConvUTF8)))
@@ -381,20 +367,17 @@ void VisualSensorFrame::OnAbout(wxCommandEvent& event)
 void VisualSensorFrame::UpdateImage(const CvImageCapture::Image& image)
 {
     if(true == mDisplayImageFlag)
-    {
-        mpImagePanel->SetImage(wxImage(image.mWidth, image.mHeight, image.mpData, true));
-        mpImagePanel->SetClientSize(image.mWidth, image.mHeight);
-        SetClientSize(mpImagePanel->GetBestSize());
+    {    
+        mMutex.Enter();
+        mImageCopy.Create(image.mWidth, image.mHeight, image.mpData, true);
+        mMutex.Leave();      
     }
-    
+  
     // Update JAUS stuff later.
     if(mSensor.IsInitialized())
     {
-        mSensor.SetCurrentFrame(image.mpData, image.mWidth, image.mHeight, 3, false, mMaxWidth, mMaxHeight);
-        char buffer[256];
-        sprintf(buffer, "JAUS++ Visual Sensor - %d", mSensor.GetFrameNumber());
-        SetTitle(wxString(buffer, wxConvUTF8));
-    }
+        mSensor.SetCurrentFrame(image.mpData, image.mWidth, image.mHeight, 3, false, mMaxWidth, mMaxHeight);        
+    }  
 }
 
 
@@ -407,12 +390,12 @@ void VisualSensorFrame::UpdateImage(const CvImageCapture::Image& image)
 void VisualSensorFrame::VideoCaptureThread(void* args)
 {
     VisualSensorFrame* sensor = (VisualSensorFrame*)args;
-    
+    unsigned int failCount = 0;
     while(sensor && sensor->mCaptureThread.QuitThreadFlag() == false)
     {
+        
         if(sensor->mVisualSource->GetFrame(&sensor->mImage, true))
-        {
-            
+        {            
             unsigned char* ptr = sensor->mImage.mpData;
             unsigned char temp;
             for(unsigned int i = 0; i < (unsigned int)((unsigned int)(sensor->mImage.mHeight)*(unsigned int)(sensor->mImage.mWidth)*3); i+= 3)
@@ -425,9 +408,56 @@ void VisualSensorFrame::VideoCaptureThread(void* args)
             
             sensor->UpdateImage(sensor->mImage);           
         }
+        else
+        {
+            failCount++;
+        }
+        
+        if(failCount == 10)
+        {
+            sensor->mVisualSource->Start(sensor->mSourceName.c_str(), 
+                                         sensor->mSourceWidth, 
+                                         sensor->mSourceHeight, 
+                                         sensor->mInterlacedVideoFlag);
+            failCount = 0;
+        }
+       
+        #ifdef WIN32
         CxUtils::SleepMs(1);
+        #else
+        CxUtils::SleepMs(10);
+        #endif
     }
 }
+
+////////////////////////////////////////////////////////////////////////////////////
+///
+///  \brief Function called when mpTimer activates
+///
+///  This method updates the display.
+///
+///  \param event Required wxTimerEvent parameter
+///
+////////////////////////////////////////////////////////////////////////////////////
+void VisualSensorFrame::OnTimer(wxTimerEvent& event)
+{
+    if(true == mDisplayImageFlag)
+    {    
+        mMutex.Enter();       
+        if(mImageCopy.Ok() && mImageCopy.GetWidth() > 0 && mImageCopy.GetHeight() > 0)
+        {
+            wxSize imageSize(mImageCopy.GetWidth(), mImageCopy.GetHeight());
+            mpImagePanel->SetClientSize(imageSize);
+            SetClientSize(mpImagePanel->GetBestSize());    
+            mpImagePanel->SetImage(mImageCopy);  
+            char buffer[256];
+            sprintf(buffer, "JAUS++ Visual Sensor - %d", mSensor.GetFrameNumber());
+            SetTitle(wxString(buffer, wxConvUTF8));
+        }  
+        mMutex.Leave();
+    }
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////////
 ///
@@ -444,20 +474,9 @@ void VisualSensorFrame::OnOpenXML(wxCommandEvent& event)
     wxString wildcard = wxT("XML files (*.xml)|*.xml");
     wxString defaultDir = wxT(".\\");
     wxString defaultFile = wxT("");
-#ifdef _WIN32_WCE
 
     wxFileDialog fileDialog(this, caption, defaultDir, defaultFile, wildcard, wxOPEN);
 
-    //At http://www.lpthe.jussieu.fr/~zeitlin/wxWindows/docs/wxwin_wxmswport.html,
-    //it was advised that we use wxGenericFileDialog in WINCE, however there are problems with
-    //timestamp access violations that don't seem to go away.
-    //Currently, the wxFileDialog under WINCE will only read files from
-    //"My Documents" folder and subfolders.
-
-    //wxGenericFileDialog fileDialog(this, caption, defaultDir, defaultFile, wildcard);
-#else
-    wxFileDialog fileDialog(this, caption, defaultDir, defaultFile, wildcard, wxOPEN);
-#endif
     if(fileDialog.ShowModal() == wxID_OK)
     {
         wxString path = fileDialog.GetPath();

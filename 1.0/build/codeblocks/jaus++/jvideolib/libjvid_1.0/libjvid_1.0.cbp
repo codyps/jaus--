@@ -71,6 +71,7 @@
 		<Unit filename="../../../../../include/jaus/video/sharedimage.h" />
 		<Unit filename="../../../../../include/jaus/video/videolib.h" />
 		<Unit filename="../../../../../include/jaus/video/videolibdll.h" />
+		<Unit filename="../../../../../include/jaus/video/videosubscriber.h" />
 		<Unit filename="../../../../../include/jaus/video/visualsensor.h" />
 		<Unit filename="../../../../../src/jaus/video/image.cpp" />
 		<Unit filename="../../../../../src/jaus/video/jpeg/jpeg.cpp" />
@@ -78,6 +79,7 @@
 		<Unit filename="../../../../../src/jaus/video/png/png.cpp" />
 		<Unit filename="../../../../../src/jaus/video/ppm/ppm.cpp" />
 		<Unit filename="../../../../../src/jaus/video/sharedimage.cpp" />
+		<Unit filename="../../../../../src/jaus/video/videosubscriber.cpp" />
 		<Unit filename="../../../../../src/jaus/video/visualsensor.cpp" />
 		<Extensions>
 			<code_completion />

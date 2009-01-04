@@ -1394,18 +1394,26 @@ void CvImageCapture::Image::Create(const unsigned short width,
                                    const unsigned short height,
                                    const unsigned short channels)
 {
-    if(mpData)
+    if(mWidth != width || mHeight != height || mChannels != channels)
     {
-        delete[] mpData;
-        mpData = NULL;
+        if(mpData)
+        {
+            delete[] mpData;
+            mpData = NULL;
+        }
+        mWidth = mHeight = 0;
+        mChannels = 0;
     }
     mWidth = width;
     mHeight = height;
     mChannels = channels;
     if(mWidth > 0 && mHeight > 0 && mChannels > 0)
     {
-        mpData = new unsigned char[mWidth*mHeight*mChannels];
-        memset(mpData, 0, mWidth*mHeight*mChannels);
+        if(mpData == NULL)
+        {
+            mpData = new unsigned char[mWidth*mHeight*mChannels];
+            memset(mpData, 0, mWidth*mHeight*mChannels); 
+        }        
     }
 }
 
@@ -1635,18 +1643,26 @@ void CvImageCapture::Image::Create(const unsigned short width,
                                    const unsigned short height,
                                    const unsigned short channels)
 {
-    if(mpData)
+    if(mWidth != width || mHeight != height || mChannels != channels)
     {
-        delete[] mpData;
-        mpData = NULL;
+        if(mpData)
+        {
+            delete[] mpData;
+            mpData = NULL;
+        }
+        mWidth = mHeight = 0;
+        mChannels = 0;
     }
     mWidth = width;
     mHeight = height;
     mChannels = channels;
     if(mWidth > 0 && mHeight > 0 && mChannels > 0)
     {
-        mpData = new unsigned char[mWidth*mHeight*mChannels];
-        memset(mpData, 0, mWidth*mHeight*mChannels);
+        if(mpData == NULL)
+        {
+            mpData = new unsigned char[mWidth*mHeight*mChannels];
+            memset(mpData, 0, mWidth*mHeight*mChannels); 
+        }        
     }
 }
 
@@ -1746,16 +1762,20 @@ int CvImageCapture::GetFrame(Image *dest, const bool block)
     if(!mCapture)
         return false;
 
-    if( (mImage = cvQueryFrame(mCapture)) )
+    if( dest && (mImage = cvQueryFrame(mCapture)) != NULL )
     {
         //  Make sure origin is in the top left corner
         if(mImage->origin != IPL_ORIGIN_TL)
         {
             cvFlip(mImage, mImage, 0);
         }
-
+        dest->Create(mImage->width, mImage->height, mImage->nChannels);
         memcpy(dest->mpData, mImage->imageData, mImage->imageSize);
-
+        //cvReleaseImage(&mImage);
+        //static unsigned int frameNumber = 0;
+        //char name[256];
+        //sprintf(name, "test%0.3d.jpg", frameNumber++);
+        //cvSaveImage(name, mImage);
         return 1;
     }
     return 0;

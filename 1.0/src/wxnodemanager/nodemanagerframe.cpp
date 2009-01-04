@@ -236,6 +236,11 @@ NodeManagerFrame::NodeManagerFrame(Jaus::NodeManager* node,
         icon.CopyFromBitmap(imageIcon);
         SetIcon(icon);
     }
+    
+    if(mpNode->IsLogOpen())
+    {
+        mpLogButton->SetLabel(TEXT_TYPE("End Log"));
+    }
 
     mpTimer->Start(2);
 }
@@ -276,12 +281,7 @@ void NodeManagerFrame::OnTimer(wxTimerEvent& event)
 {
 
     if(mpNode)
-    {
-        if(mpNode->IsLogOpen())
-        {
-            mpLogButton->SetLabel(TEXT_TYPE("End Log"));
-        }
-
+    {      
         unsigned int connectionUpdateTimeMs = mpNode->GetConnectionEventTimeMs();
         Jaus::Configuration system;
         Jaus::Configuration::Subsystem::Map::iterator ss;
@@ -379,22 +379,6 @@ void NodeManagerFrame::OnAbout(wxCommandEvent& event)
 
     info.SetWebSite(TEXT_TYPE("http://active.ist.ucf.edu"));
 
-    //text.Append(TEXT_TYPE("GNU LESSER GENERAL PUBLIC LICENSE\n"));
-    //text.Append(TEXT_TYPE("This library is free software; you can redistribute it and/or\n"));
-    //text.Append(TEXT_TYPE("modify it under the terms of the GNU Lesser General Public\n"));
-    //text.Append(TEXT_TYPE("License as published by the Free Software Foundation; either\n"));
-    //text.Append(TEXT_TYPE("version 2.1 of the License, or (at your option) any later version.\n"));
-    //text.Append(TEXT_TYPE("\n"));
-    //text.Append(TEXT_TYPE("This library is distributed in the hope that it will be useful,\n"));
-    //text.Append(TEXT_TYPE("but WITHOUT ANY WARRANTY; without even the implied warranty of\n"));
-    //text.Append(TEXT_TYPE("MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU\n"));
-    //text.Append(TEXT_TYPE("Lesser General Public License for more details.\n"));
-    //text.Append(TEXT_TYPE("\n"));
-    //text.Append(TEXT_TYPE("You should have received a copy of the GNU Lesser General Public\n"));
-    //text.Append(TEXT_TYPE("License along with this library; if not, write to the Free Software\n"));
-    //text.Append(TEXT_TYPE("Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA\n"));
-    //info.SetLicence(text);
-
     wxImage logo;
     if(logo.LoadFile(wxString("logo/jaus++_logo_100x100.gif", wxConvUTF8)))
     {
@@ -428,14 +412,16 @@ void NodeManagerFrame::OnQuit(wxCommandEvent& event)
             {
                 mpNode->CloseLogFile();
             }
-
+            mpNode->Shutdown();
             delete mpNode;
-            delete mpTimer;
             mpNode = NULL;
+        }
+        if(mpTimer)
+        {
+            delete mpTimer;
             mpTimer = NULL;
         }
 
-        Sleep(100);
         Close(true);
         break;
     case wxID_NO:
@@ -615,7 +601,8 @@ void NodeManagerFrame::OnLog(wxCommandEvent & event)
 #endif
         mpNode->CreateLogFile(buff);
     }
-    else {
+    else 
+    {
         mpNode->CloseLogFile();
         mpLogButton->SetLabel(TEXT_TYPE("Start Log"));
     }

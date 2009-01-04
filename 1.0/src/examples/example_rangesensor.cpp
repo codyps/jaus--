@@ -123,7 +123,7 @@ int main(int argc, char *argv[])
         for(double bearing = -90.0; bearing <= 90.0; bearing += 0.5)
         {
             // Simulate SICK data with MM accuracy 180 degree scan half degree res.
-            scan.push_back(abs((UShort)(range*1000.0))); 
+            scan.push_back(abs((UShort)(range*100.0))); 
 
             // Populate JAUS standard data (Report Relative Object Position).
             object.SetRange(range);

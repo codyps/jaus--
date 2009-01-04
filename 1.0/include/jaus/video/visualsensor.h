@@ -130,6 +130,9 @@ namespace Jaus
         // If using JPEG compression, this sets the
         // quality of it.
         void SetJPEGQuality(const int quality);
+        // Enables a shared memory image buffer for faster
+        // image transfer to VideoSubscriber on local machine.
+        void EnableSharedMemoryImage(const bool on = true);
     protected:       
         CxUtils::Mutex mImageMutex;         ///< Mutex to protect RAW image data.
         Image mRawImage;                    ///< The internal Image object to compress/decompress

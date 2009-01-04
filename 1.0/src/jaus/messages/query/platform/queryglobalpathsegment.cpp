@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////
 ///
-///  \file QueryGlobalPathSegment.cpp
+///  \file queryglobalpathsegment.cpp
 ///  \brief This file contains the message structure for Query Global Path Segment
 ///
 ///  <br>Author(s): David Adams

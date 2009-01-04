@@ -114,10 +114,13 @@ int VisualSensor::Initialize(const Byte subsystem,
                                            Address(subsystem, 
                                            node, 
                                            (Byte)(Service::VisualSensor), 
-                                           i)) &&
-               mSharedImage.CreateSharedImage( GetID(), mbsize))
+                                           i)))
             {
                 this->EnableSubsystemDiscovery(true);
+                if(mEnableSharedImageFlag)
+                {
+                    mSharedImage.CreateSharedImage( GetID(), mbsize);
+                }
                 return JAUS_OK;
             }
         }
@@ -129,10 +132,13 @@ int VisualSensor::Initialize(const Byte subsystem,
                                        Address(subsystem, 
                                        node, 
                                        (Byte)(Service::VisualSensor), 
-                                       instance)) &&
-           mSharedImage.CreateSharedImage( GetID(), mbsize))
-        {
+                                       instance)))
+        {            
             this->EnableSubsystemDiscovery(true);
+            if(mEnableSharedImageFlag)
+            {
+                mSharedImage.CreateSharedImage( GetID(), mbsize);
+            }
             return JAUS_OK;
         }
     }
@@ -982,5 +988,25 @@ void VisualSensor::SetJPEGQuality(const int quality)
         mJPEGQuality = quality;
     }
 }
+
+
+////////////////////////////////////////////////////////////////////////////////////
+///
+///   \brief Enables a shared memory buffer to store RAW uncompressed image
+///   data.
+///
+///   This shared memory image is only accessible if you use the SharedImage
+///   class or VideoSubscriber component.  It is only useful if you plan to
+///   get image data from the Visual Sensor from the same node/host machine 
+///   because you won't have to compress/decompress the image data.
+///
+///   \param[in] on If true, shared image is used, otherwise off if false.
+///
+////////////////////////////////////////////////////////////////////////////////////
+void VisualSensor::EnableSharedMemoryImage(const bool on)
+{
+    mEnableSharedImageFlag = on;
+}
+
 
 /*  End of File */

@@ -77,9 +77,9 @@ bool VideoClientApp::OnInit()
                                                     wxSize(640, 480),
                                                     wxDEFAULT_FRAME_STYLE);
     
+    client->Show();  
     if(client->Initialize())
-    {
-        client->Show();   
+    {         
         if(this->argc > 1)
         {
             wxString argString(this->argv[1]);

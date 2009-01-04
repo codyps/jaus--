@@ -10,7 +10,7 @@
 				<Option output="../../../../bin/example_imagesubscriber_d" prefix_auto="0" extension_auto="0" />
 				<Option working_dir="../../../../bin/" />
 				<Option object_output="../../../../obj/example_imagesubscriber_d" />
-				<Option external_deps="../../../../lib/libjmsg_1.0_d.a;../../../../lib/libjcmp_1.0_d.a;../../../../../../../cxutils/trunk/1.0/lib/libcxutils_1.0_d.a;" />
+				<Option external_deps="../../../../lib/libjmsg_1.0_d.a;../../../../lib/libjcmp_1.0_d.a;../../../../../../../cxutils/trunk/1.0/lib/libcxutils_1.0_d.a;../../../../lib/libjvid_1.0_d.a;" />
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Option parameters="1.1.37.1" />
@@ -20,15 +20,16 @@
 					<Add option="-g" />
 				</Compiler>
 				<Linker>
-					<Add library="../../../../lib/libjsrv_1.0_d.a" />
-					<Add library="../../../../lib/libjcmp_1.0_d.a" />
-					<Add library="../../../../lib/libjmsg_1.0_d.a" />
-					<Add library="../../../../lib/libjvid_1.0_d.a" />
-					<Add library="../../../../../../../cxutils/trunk/1.0/lib/libcxutils_1.0_d.a" />
 					<Add library="pthread" />
 					<Add library="png" />
 					<Add library="z" />
 					<Add library="jpeg" />
+					<Add library="../../../../ext/lib/libtinyxml.a" />
+					<Add library="../../../../../../../cxutils/trunk/1.0/lib/libcxutils_1.0_d.a" />
+					<Add library="../../../../lib/libjmsg_1.0_d.a" />
+					<Add library="../../../../lib/libjcmp_1.0_d.a" />
+					<Add library="../../../../lib/libjsrvc_1.0_d.a" />
+					<Add library="../../../../lib/libjvid_1.0_d.a" />
 				</Linker>
 			</Target>
 			<Target title="Release">
@@ -44,15 +45,16 @@
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
-					<Add library="../../../../lib/libjcmp_1.0.a" />
-					<Add library="../../../../lib/libjmsg_1.0.a" />
-					<Add library="../../../../lib/libjvid_1.0.a" />
-					<Add library="../../../../lib/libjsrv_1.0.a" />
-					<Add library="../../../../../../../cxutils/trunk/1.0/lib/libcxutils_1.0.a" />
 					<Add library="pthread" />
 					<Add library="png" />
 					<Add library="z" />
 					<Add library="jpeg" />
+					<Add library="../../../../ext/lib/libtinyxml.a" />
+					<Add library="../../../../../../../cxutils/trunk/1.0/lib/libcxutils_1.0.a" />
+					<Add library="../../../../lib/libjmsg_1.0.a" />
+					<Add library="../../../../lib/libjcmp_1.0.a" />
+					<Add library="../../../../lib/libjsrvc_1.0.a" />
+					<Add library="../../../../lib/libjvid_1.0.a" />
 				</Linker>
 			</Target>
 		</Build>

@@ -426,7 +426,7 @@ bool VideoSubscriber::FindVisualSensors(const Byte subsystem)
 ///  information about it.  Results are saved to internal SensorInfo data
 ///  members.
 ///
-///  \param[in] visualSensor The ID of a Visual Sensor component to query.
+///  \param[in] visualSensorID The ID of a Visual Sensor component to query.
 ///  \param[out] sensorInfoCopy A copy of the data retrieved, set to NULL if
 ///                             you don't want a copy.
 ///
@@ -470,7 +470,7 @@ bool VideoSubscriber::QueryVisualSensorInfo(const Address& visualSensorID,
 ///  information about it.  Results are saved to internal SensorInfo data
 ///  members.
 ///
-///  \param[in] visualSensor The ID of a Visual Sensor component to query.
+///  \param[in] visualSensorID The ID of a Visual Sensor component to query.
 ///  \param[out] report A copy of the data retrieved, set to NULL if
 ///                             you don't want a copy.
 ///
@@ -506,7 +506,7 @@ bool VideoSubscriber::QueryCameraCount(const Address& visualSensorID,
 ///  information about it.  Results are saved to internal SensorInfo data
 ///  members.
 ///
-///  \param[in] visualSensor The ID of a Visual Sensor component to query.
+///  \param[in] visualSensorID The ID of a Visual Sensor component to query.
 ///  \param[out] report A copy of the data retrieved, set to NULL if
 ///                             you don't want a copy.
 ///
@@ -542,7 +542,7 @@ bool VideoSubscriber::QuerySelectedCamera(const Address& visualSensorID,
 ///  information about it.  Results are saved to internal SensorInfo data
 ///  members.
 ///
-///  \param[in] visualSensor The ID of a Visual Sensor component to query.
+///  \param[in] visualSensorID The ID of a Visual Sensor component to query.
 ///  \param[in] cameraID The ID of the camera on the sensor to get the data for.
 ///  \param[out] report A copy of the data retrieved, set to NULL if
 ///                             you don't want a copy.
@@ -583,7 +583,7 @@ bool VideoSubscriber::QueryCameraFormatOptions(const Address& visualSensorID,
 ///  information about it.  Results are saved to internal SensorInfo data
 ///  members.
 ///
-///  \param[in] visualSensor The ID of a Visual Sensor component to query.
+///  \param[in] visualSensorID The ID of a Visual Sensor component to query.
 ///  \param[in] cameraID The ID of the camera on the sensor to get the data for.
 ///  \param[out] report A copy of the data retrieved, set to NULL if
 ///                             you don't want a copy.
@@ -624,7 +624,7 @@ bool VideoSubscriber::QueryCameraPose(const Address& visualSensorID,
 ///  information about it.  Results are saved to internal SensorInfo data
 ///  members.
 ///
-///  \param[in] visualSensor The ID of a Visual Sensor component to query.
+///  \param[in] visualSensorID The ID of a Visual Sensor component to query.
 ///  \param[in] cameraID The ID of the camera on the sensor to get the data for.
 ///  \param[out] report A copy of the data retrieved, set to NULL if
 ///                             you don't want a copy.
@@ -742,8 +742,7 @@ VideoSubscriber::SensorInfo VideoSubscriber::GetVisualSensorInfo(const unsigned 
 ///  \brief Gets information about a visual sensor in the list of known
 ///  sensors based on its index.
 ///
-///  \param[in] i The index of the visual sensor in the internal list to get
-///               information for.
+///  \param[in] id Gets information for a specific visual sensor based on its ID.
 ///
 ///  \return Copy of sensor information.  If none availalbe, a blank copy is
 ///          returned with invalid sensor ID.

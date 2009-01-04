@@ -175,7 +175,7 @@ int main(int argc, char *argv[])
         //  to this data.
         sensor.SetVelocityState(velocityState);
         // Set travel speed.
-        sensor.SetTravelSpeed(velocityState.GetVelocityX());
+        sensor.SetTravelSpeed(0.13/*velocityState.GetVelocityX()*/);
 
         // Display values to console.
         velocityState.PrintVelocityState();

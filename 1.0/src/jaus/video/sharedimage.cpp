@@ -377,8 +377,8 @@ bool SharedImage::IsActive(const unsigned int timeout) const
         mImageBuffer.SetReadPos(0);
         mImageBuffer.Read(imgTimeStamp);
         mImageBuffer.Unlock();
-
-        if(Jaus::Time::GetUtcTimeMs() - imgTimeStamp < timeout)
+        UInt currentTime = Jaus::Time::GetUtcTimeMs();
+        if(currentTime > imgTimeStamp && currentTime - imgTimeStamp < timeout)
         {
             return true;
         }
@@ -397,7 +397,7 @@ void SharedImage::SharedImageUpdate(void *args)
 {
     SharedImage *img = (SharedImage*)args;
     UInt imgNumber = 0, prevImgNumber = 0;
-    UInt imgTimeStamp = 0;
+    UInt imgTimeStamp = 0, currentTime = 0;
     UShort width, height;
     Byte channels;
 
@@ -448,7 +448,8 @@ void SharedImage::SharedImageUpdate(void *args)
                 img->mCallbackMutex.Leave();
             }
 
-            if(imgTimeStamp == 0 || Time::GetUtcTimeMs() - imgTimeStamp > 10000)
+            currentTime = Time::GetUtcTimeMs();
+            if(imgTimeStamp == 0 || (imgTimeStamp < currentTime && currentTime - imgTimeStamp > 10000))
             {
                 img->mImageBuffer.CloseMappedMemory();
                 // Wait a while for others to close there

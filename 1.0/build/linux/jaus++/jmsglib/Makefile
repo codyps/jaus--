@@ -8,7 +8,7 @@ CXXFLAGS 	:= -g -c -fPIC -Wall
 JAUSDIR  := ../../../..
 DESTDIR  := $(JAUSDIR)/lib
 ODIR     := $(JAUSDIR)/obj
-
+INSTALLDIR   	:= /usr
 
 #--------------------------------------------
 #  Message source files
@@ -47,6 +47,7 @@ MSGQUEEVENSRC	:= $(MSGQUESRC)/events
 MSGQUEPLATSRC	:= $(MSGQUESRC)/platform
 
 MSGEXPSRC	:= $(MSGSRC)/experimental
+MSGEXPSRC_SICK	:= $(MSGSRC)/experimental/sick
 
 MSGSRCS   	:= $(MSGSRC) \
 		$(MSGCOMSRC) \
@@ -75,7 +76,9 @@ MSGSRCS   	:= $(MSGSRC) \
 		$(MSGQUECORESRC) \
 		$(MSGQUEENVISRC) \
 		$(MSGQUEEVENSRC) \
-		$(MSGQUEPLATSRC) 
+		$(MSGQUEPLATSRC) \
+		$(MSGEXPSRC) \
+		$(MSGEXPSRC_SICK)
 	
 
 #--------------------------------------------
@@ -121,7 +124,7 @@ JAUSLIBDIR		:= $(JAUSDIR)/lib
 LIBPATHS 	:= -L$(CXUTILSLIBDIR) \
 			-L$(JAUSLIBDIR) \
 			-L$(EXTLIBDIR) \
-			-L/usr/lib
+			-L$(INSTALLDIR)/lib
 
 CXUTILSLIB	:= cxutils.1.0
 LIBS		:= -l$(CXUTILSLIB) \
@@ -159,6 +162,21 @@ allclean:
 	@-rm -f $(foreach DIR,$(MSGSRCS), $(DIR)/$(ARCHIVE).so)
 	@-rm -f $(DESTDIR)/$(ARCHIVE).so
 
+install:
+	cp $(DESTDIR)/$(ARCHIVE).so $(INSTALLDIR)/lib
+	cp $(DESTDIR)/$(ARCHIVE).a $(INSTALLDIR)/lib	
+	if test -d $(INSTALLDIR)/include/jaus/messages; \
+	then echo exists;                \
+	else mkdir $(INSTALLDIR)/include/jaus/messages; \
+	fi
+	cp $(JAUSDIR)/include/jaus/messages/*.h $(INSTALLDIR)/include/jaus/messages/
+	
+uninstall:
+	rm $(INSTALLDIR)/lib/$(ARCHIVE).so
+	rm $(INSTALLDIR)/lib/$(ARCHIVE).a
+	rm $(INSTALLDIR)/include/jaus/messages/*.h
+	rmdir $(INSTALLDIR)/include/jaus/messages/	
+	
 help: 
 	@echo $(CXUTILSOBJS)
 	@echo $@

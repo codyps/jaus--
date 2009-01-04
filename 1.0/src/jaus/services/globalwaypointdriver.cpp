@@ -264,7 +264,7 @@ int GlobalWaypointDriver::ProcessCommandMessage(const Message* msg,
                 if(command && IsInputMessageSupported(JAUS_SET_TRAVEL_SPEED, 0))
                 {
                     mGlobalWaypointDriverMutex.Enter();
-                    mDesiredTravelSpeed = command->GetSpeed();
+                    SetTravelSpeed(command->GetSpeed());
                     mGlobalWaypointDriverMutex.Leave();
                 }
             };
@@ -372,9 +372,62 @@ int GlobalWaypointDriver::ProcessQueryMessage(const Message* msg)
 ///
 ////////////////////////////////////////////////////////////////////////////////////
 // Process inform messages.
+// 
+// No idea what inform messages the driver should process
 int GlobalWaypointDriver::ProcessInformMessage(const Message* msg)
 {
-    return 0;
+    int result = JAUS_OK;
+    switch(msg->GetCommandCode())
+    {
+    case JAUS_REPORT_GLOBAL_POSE:
+        {
+            const Jaus::ReportGlobalPose* report = dynamic_cast<const Jaus::ReportGlobalPose*>(msg);
+            if(report)
+            {
+                mGlobalWaypointDriverMutex.Enter();
+
+                mCurrentGlobalPose.SetLatitude(report->GetLatitude());
+                mCurrentGlobalPose.SetLongitude(report->GetLongitude());
+                
+                if(report->HaveElevation())
+                {
+                    mCurrentGlobalPose.SetElevation(report->GetElevation());
+                }
+                if(report->HaveYaw())
+                {
+                    mCurrentGlobalPose.SetYaw(report->GetYaw());
+                }
+                if(report->HaveRoll())
+                {
+                    mCurrentGlobalPose.SetRoll(report->GetRoll());
+                }
+                if(report->HavePitch())
+                {
+                    mCurrentGlobalPose.SetPitch(report->GetPitch());
+                }
+
+                mGlobalWaypointDriverMutex.Leave();
+            }
+        }
+        break;
+    default:
+        result = JAUS_FAILURE;
+        break;
+    }
+
+    // Still let parent class process (in case dynamic discovery is
+    // enabled and parent class needs this data too.
+    if(result == JAUS_FAILURE)
+    {
+        result = CommandComponent::ProcessInformMessage(msg);
+    }
+    else
+    {
+        // Always run parent process command in case it needs the data too.
+        CommandComponent::ProcessInformMessage(msg);
+    }
+    return result;
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////////
@@ -395,7 +448,7 @@ int GlobalWaypointDriver::SetGlobalWaypoint(const Jaus::SetGlobalWaypoint& waypo
 ///          attitude and elevation data for vector control.
 ///
 ////////////////////////////////////////////////////////////////////////////////////
-void GlobalWaypointDriver::SetGlobalVectorDriver(const Address& id)
+void GlobalWaypointDriver::SetGlobalVectorDriverID(const Address& id)
 {
     mGlobalVectorDriverID = id;
 }
@@ -406,7 +459,7 @@ void GlobalWaypointDriver::SetGlobalVectorDriver(const Address& id)
 ///          attitude and elevation data for vector control.
 ///
 ////////////////////////////////////////////////////////////////////////////////////
-void GlobalWaypointDriver::SetGlobalPoseSensor(const Address& id)
+void GlobalWaypointDriver::SetGlobalPoseSensorID(const Address& id)
 {
     mGlobalPoseSensorID = id;
 }
@@ -463,6 +516,26 @@ Jaus::SetGlobalWaypoint GlobalWaypointDriver::GetCurrentDesiredGlobalWaypoint() 
 
 ////////////////////////////////////////////////////////////////////////////////////
 ///
+///    Sets the desired speed the platform should move to a waypoint
+///
+////////////////////////////////////////////////////////////////////////////////////
+void GlobalWaypointDriver::SetTravelSpeed(const double speed)
+{
+    mDesiredTravelSpeed = speed;
+}
+
+////////////////////////////////////////////////////////////////////////////////////
+///
+///    Gets the desired speed the platform should move to a waypoint
+///
+////////////////////////////////////////////////////////////////////////////////////
+double GlobalWaypointDriver::GetTravelSpeed() const
+{
+    return mDesiredTravelSpeed;
+}
+
+////////////////////////////////////////////////////////////////////////////////////
+///
 ///   \brief This thread continuously checks the status of the Global Waypoint
 ///          driver based on the Update Rate set using (SetUpdateRate).  If
 ///          in a Ready state, this thread will take control of the vector
@@ -472,9 +545,10 @@ Jaus::SetGlobalWaypoint GlobalWaypointDriver::GetCurrentDesiredGlobalWaypoint() 
 ////////////////////////////////////////////////////////////////////////////////////
 void GlobalWaypointDriver::GlobalWaypointDriverThread(void *args)
 {
-    /*
+    
     GlobalWaypointDriver* driver = (GlobalWaypointDriver*)(args);
-    SetGlobalVector globalVector;
+    Jaus::SetGlobalWaypoint globalWaypoint;
+    Jaus::SetGlobalVector globalVector;
     while(driver && !driver->mGlobalWaypointDriverThread.QuitThreadFlag())
     {
         // If we are in a ready state, and we have the necessary
@@ -482,15 +556,32 @@ void GlobalWaypointDriver::GlobalWaypointDriverThread(void *args)
         // then generate wrench efforts!
         if(driver->GetPrimaryStatus() == Component::Status::Ready &&
             driver->IsGlobalPoseSubscriptionReady() &&
-            driver->HaveControlOfGlobalVectorDriver())
+            driver->HaveControlOfGlobalVectorDriver() &&
+            !driver->mWaypointList.empty())
         {
-            // Generate the wrench effort to send to the
-            // primitive driver component.
-            driver->GenerateWrench(driver->GetDesiredGlobalVector(), wrenchEffort);
-            wrenchEffort.SetDestinationID(driver->GetPrimitiveDriverID());
-            wrenchEffort.SetSourceID(driver->GetID());
+            // Generate the global vector to send to the
+            // global vector driver component.
+            if(driver->IsWaypointAcheived(driver->GetCurrentDesiredGlobalWaypoint()))
+            {
+                // Remove current waypoint
+                WaypointList::iterator wpl_itr = driver->mWaypointList.begin();
+                driver->mWaypointList.erase(wpl_itr);
+            }
+            
+            //if this is true, it means that we just removed the last waypoint from the list.
+            if(driver->mWaypointList.empty())
+            {
+                globalVector.SetSpeed(0.0);
+            }
+            else
+            {
+                driver->GenerateGlobalVector(driver->GetCurrentDesiredGlobalWaypoint(), globalVector);
+            }
+            
+            globalVector.SetDestinationID(driver->GetGlobalVectorDriverID());
+            globalVector.SetSourceID(driver->GetID());
             // Send the command.
-            driver->Send(&wrenchEffort);
+            driver->Send(&globalVector);
         }
         else if(driver->GetPrimaryStatus() != Component::Status::Ready)
         {
@@ -505,13 +596,8 @@ void GlobalWaypointDriver::GlobalWaypointDriverThread(void *args)
             {
                 driver->CancelEvents(driver->mGlobalVectorDriverID);
             }
-            driver->ClearCurrentVector();
             driver->mGlobalWaypointDriverMutex.Enter();
-            if(driver->mpDesiredVector)
-            {
-                delete driver->mpDesiredVector;
-                driver->mpDesiredVector = NULL;
-            }
+            driver->mWaypointList.clear();
             driver->mGlobalWaypointDriverMutex.Leave();
         }
         // Delay refresh based on update rate set.
@@ -524,19 +610,15 @@ void GlobalWaypointDriver::GlobalWaypointDriverThread(void *args)
     {
         driver->CancelEvents(driver->mGlobalPoseSensorID);
     }
-    if(driver->mVelocityStateSensorID.IsValid())
+    if(driver->mGlobalVectorDriverID.IsValid())
     {
         driver->CancelEvents(driver->mGlobalVectorDriverID);
     }
-    driver->ClearCurrentVector();
+
     driver->mGlobalWaypointDriverMutex.Enter();
-    if(driver->mpDesiredVector)
-    {
-        delete driver->mpDesiredVector;
-        driver->mpDesiredVector = NULL;
-    }
+    driver->mWaypointList.clear();
     driver->mGlobalWaypointDriverMutex.Leave();
-    */
+    
 }
 
 ////////////////////////////////////////////////////////////////////////////////////
@@ -562,8 +644,7 @@ bool GlobalWaypointDriver::IsGlobalPoseSubscriptionReady()
     if(mGlobalPoseSensorID.IsValid())
     {
         if(mGlobalWaypointDriverThread.QuitThreadFlag() == false &&
-            HaveEventSubscription(mGlobalPoseSensorID,
-                                 JAUS_REPORT_GLOBAL_POSE) == false)
+           HaveEventSubscription(mGlobalPoseSensorID, JAUS_REPORT_GLOBAL_POSE) == false)
         {
             ready = false;
             Jaus::CreateEventRequest createEvent;
@@ -578,6 +659,8 @@ bool GlobalWaypointDriver::IsGlobalPoseSubscriptionReady()
             // Find out the vector values this driver supports
             // and then request the needed sensor information for generation of
             // those vectors.
+            presenceVector |= QueryGlobalPose::VectorMask::Latitude;
+            presenceVector |= QueryGlobalPose::VectorMask::Longitude;
             
             if(IsInputMessageSupported(JAUS_SET_GLOBAL_WAYPOINT, Jaus::SetGlobalWaypoint::VectorMask::Altitude))
             {

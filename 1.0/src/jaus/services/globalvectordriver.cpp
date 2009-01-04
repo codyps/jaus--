@@ -469,6 +469,24 @@ int GlobalVectorDriver::ProcessInformMessage(const Message* msg)
             }
         }
         break;
+    case JAUS_REPORT_VELOCITY_STATE:
+        {
+            const Jaus::ReportVelocityState* report = 
+                dynamic_cast<const Jaus::ReportVelocityState*>(msg);
+            if(report)
+            {
+                mGlobalVectorDriverMutex.Enter();
+
+                if(mpSpeed == NULL)
+                {
+                    mpSpeed = new double;
+                }
+                *mpSpeed = report->GetTravelSpeed();
+
+                mGlobalVectorDriverMutex.Leave();
+            }
+        }
+        break;
     case JAUS_REPORT_TRAVEL_SPEED:
         {
             const Jaus::ReportTravelSpeed* report =
@@ -941,16 +959,50 @@ bool GlobalVectorDriver::IsTravelSpeedSubscriptionReady()
         // Only get travel speed/velocity state information if needed.
         if(mGlobalVectorDriverThread.QuitThreadFlag() == false &&
             IsInputMessageSupported(JAUS_SET_GLOBAL_VECTOR, Jaus::SetGlobalVector::VectorMask::Speed) &&
-            HaveEventSubscription(mVelocityStateSensorID,
-                                  JAUS_REPORT_TRAVEL_SPEED) == false)
+            (HaveEventSubscription(mVelocityStateSensorID,
+                                  JAUS_REPORT_TRAVEL_SPEED) == false &&
+             HaveEventSubscription(mVelocityStateSensorID, 
+                                   JAUS_REPORT_VELOCITY_STATE) == false))
         {
             ready = false;
+            // Try to get velocity state information, and only if that isn't supported
+            // request travel speed.  Travel speed is less precise than velocity state
+            // data.
+            Jaus::QueryVelocityState queryVelocityState;
+            Jaus::Receipt receipt;
+            UShort velocityStatePresenceVector = 0;
+            queryVelocityState.SetSourceID(GetID());
+            queryVelocityState.SetDestinationID(mVelocityStateSensorID);
+            queryVelocityState.SetPresenceVector((UShort)queryVelocityState.GetPresenceVectorMask());
+            
+            
+            if(Send(&queryVelocityState, receipt, 0, 250, 1))
+            {
+                // See what fields are available.
+                const Jaus::ReportVelocityState* report = 
+                    dynamic_cast<const Jaus::ReportVelocityState*>(receipt.GetResponseMessage());
+                velocityStatePresenceVector = Jaus::ReportVelocityState::VectorMask::VelocityX |
+                                              Jaus::ReportVelocityState::VectorMask::VelocityY |
+                                              Jaus::ReportVelocityState::VectorMask::VelocityZ;
+                if( (velocityStatePresenceVector & report->GetPresenceVector()) == 0 )
+                {
+                    velocityStatePresenceVector = 0;
+                }
+            }
             Jaus::CreateEventRequest createEvent;
             // Try create event subscription.
             createEvent.SetSourceID(GetID());
             createEvent.SetDestinationID(mVelocityStateSensorID);
             createEvent.SetRequestID(EventManager::GenerateRequestID());
-            createEvent.SetMessageCode(JAUS_REPORT_TRAVEL_SPEED);
+            if(velocityStatePresenceVector > 0)
+            {
+                createEvent.SetMessageCode(JAUS_REPORT_VELOCITY_STATE);
+                queryVelocityState.SetPresenceVector(velocityStatePresenceVector);
+            }
+            else
+            {
+                createEvent.SetMessageCode(JAUS_REPORT_TRAVEL_SPEED);
+            }
             createEvent.SetEventType(CreateEventRequest::EveryChange);
 
             if(mGlobalVectorDriverThread.QuitThreadFlag() == false &&
@@ -965,7 +1017,8 @@ bool GlobalVectorDriver::IsTravelSpeedSubscriptionReady()
         ready = false;
         // Check and see if someone manually created event subscriptions
         // to this data (didn't use automatic creation).
-        if(HaveEventSubscriptionsOfType(JAUS_REPORT_TRAVEL_SPEED) && mpSpeed)
+        if( (HaveEventSubscriptionsOfType(JAUS_REPORT_TRAVEL_SPEED) || 
+             HaveEventSubscriptionsOfType(JAUS_REPORT_VELOCITY_STATE) ) && mpSpeed)
         {
             ready = true;
         }
@@ -1109,6 +1162,7 @@ void GlobalVectorDriver::GlobalVectorDriverThread(void *args)
                 driver->HaveComponentControl(driver->mPrimitiveDriverID))
             {
                 driver->ReleaseComponentControl(driver->mPrimitiveDriverID);
+                driver->SendStandbyCommand(driver->mPrimitiveDriverID);
             }
             driver->ClearCurrentVector();
             driver->mGlobalVectorDriverMutex.Enter();
@@ -1137,6 +1191,7 @@ void GlobalVectorDriver::GlobalVectorDriverThread(void *args)
         driver->HaveComponentControl(driver->mPrimitiveDriverID))
     {
         driver->ReleaseComponentControl(driver->mPrimitiveDriverID);
+        driver->SendStandbyCommand(driver->mPrimitiveDriverID);
     }
     driver->ClearCurrentVector();
     driver->mGlobalVectorDriverMutex.Enter();

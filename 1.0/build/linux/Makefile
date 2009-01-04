@@ -12,6 +12,7 @@ all:
 	cd $(CXUTILSLINUXDIR); make
 	cd $(JAUSBUILDDIR); make
 	cd $(EXAMPLEBUILDDIR); make
+	
 clean:
 	cd $(EXTBUILDDIR); make clean
 	cd $(CXUTILSLINUXDIR); make clean
@@ -30,3 +31,11 @@ external:
 
 help:
 	echo $(JAUSBUILDDIR)
+	
+install:
+	cd $(CXUTILSLINUXDIR); make install
+	cd $(JAUSBUILDDIR); make install
+
+uninstall:
+	cd $(CXUTILSLINUXDIR); make uninstall
+	cd $(JAUSBUILDDIR); make uninstall

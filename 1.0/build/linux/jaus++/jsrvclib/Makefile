@@ -1,6 +1,6 @@
 # make file
  
-ARCHIVE  	:= libjsrv.1.0
+ARCHIVE  	:= libjsrvc.1.0
 CC 		:= gcc
 CXX      	:= g++
 CXXFLAGS 	:= -g -c -fPIC -Wall
@@ -9,6 +9,7 @@ JAUSDIR  := ../../../..
 DESTDIR  := $(JAUSDIR)/lib
 ODIR     := $(JAUSDIR)/obj
 CXUTILSDIR := $(JAUSDIR)/../../../cxutils/trunk/1.0
+INSTALLDIR   	:= /usr
 
 #--------------------------------------------
 #  Service source files directories
@@ -67,7 +68,7 @@ EXTLIBSDIR     := $(JAUSDIR)/ext/lib
 
 LIBS := $(CXUTILSLIBDIR)/cxutils.1.0
 LIBPATH := $(CXUTILSLIBDIR) \
-			/usr/lib \
+			$(INSTALLDIR)/lib \
 			$(JAUSDIR)/lib \
 			$(CXUTILSOBJ) \
 			$(EXTLIBS)
@@ -110,7 +111,22 @@ allclean:
 	@-rm -f $(DESTDIR)/$(ARCHIVE).a
 	@-rm -f $(foreach DIR,$(SRVSRCS), $(DIR)/$(ARCHIVE).so)
 	@-rm -f $(DESTDIR)/$(ARCHIVE).so
-
+	
+install:
+	cp $(DESTDIR)/$(ARCHIVE).so $(INSTALLDIR)/lib
+	cp $(DESTDIR)/$(ARCHIVE).a $(INSTALLDIR)/lib
+	if test -d $(INSTALLDIR)/include/jaus/services; \
+	then echo exists;                \
+	else mkdir $(INSTALLDIR)/include/jaus/services; \
+	fi
+	cp $(JAUSDIR)/include/jaus/services/*.h $(INSTALLDIR)/include/jaus/services/
+	
+uninstall:
+	rm $(INSTALLDIR)/lib/$(ARCHIVE).so
+	rm $(INSTALLDIR)/lib/$(ARCHIVE).a
+	rm $(INSTALLDIR)/include/jaus/services/*.h
+	rmdir $(INSTALLDIR)/include/jaus/services/	
+	
 help: 
 	@echo $(SRVSRCS)
 	@echo $@

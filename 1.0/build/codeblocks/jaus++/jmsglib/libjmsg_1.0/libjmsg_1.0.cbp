@@ -110,6 +110,8 @@
 		<Unit filename="../../../../../include/jaus/messages/errorhistory.h" />
 		<Unit filename="../../../../../include/jaus/messages/experimental/experimentalcodes.h" />
 		<Unit filename="../../../../../include/jaus/messages/experimental/experimentalmessages.h" />
+		<Unit filename="../../../../../include/jaus/messages/experimental/sick/querysicklidar.h" />
+		<Unit filename="../../../../../include/jaus/messages/experimental/sick/reportsicklidar.h" />
 		<Unit filename="../../../../../include/jaus/messages/header.h" />
 		<Unit filename="../../../../../include/jaus/messages/inform/acknackmessage.h" />
 		<Unit filename="../../../../../include/jaus/messages/inform/communications/reportdatalinkstatus.h" />
@@ -249,6 +251,8 @@
 		<Unit filename="../../../../../src/jaus/messages/common/world/object.cpp" />
 		<Unit filename="../../../../../src/jaus/messages/date.cpp" />
 		<Unit filename="../../../../../src/jaus/messages/errorhistory.cpp" />
+		<Unit filename="../../../../../src/jaus/messages/experimental/sick/querysicklidar.cpp" />
+		<Unit filename="../../../../../src/jaus/messages/experimental/sick/reportsicklidar.cpp" />
 		<Unit filename="../../../../../src/jaus/messages/header.cpp" />
 		<Unit filename="../../../../../src/jaus/messages/inform/communications/reportdatalinkstatus.cpp" />
 		<Unit filename="../../../../../src/jaus/messages/inform/communications/reportheartbeatpulse.cpp" />

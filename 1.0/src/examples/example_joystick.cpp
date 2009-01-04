@@ -123,6 +123,7 @@ int main(int argc, char *argv[])
     }
     else if(joystick.InitializeJoystick())
 	{
+        joystick.SetComponentAuthority(128);                    // added to test with USSIM
 		joystick.SetSubsystemToControl(nodeID.mSubsystem);
 	}
 	else

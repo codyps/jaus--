@@ -419,7 +419,7 @@ int SubscriberComponent::ProcessInformMessage(const Message* msg)
         {
             const ReportIdentification* report = dynamic_cast<const ReportIdentification*>(msg);
             if(report && report->GetQueryType() == ReportIdentification::Subsystem)
-            {                
+            {              
                 // Add the subsystem identification info.
                 mSubsystemsMutex.Enter();
                 mSubsystems[report->GetSourceID().mSubsystem].GetConfiguration()->AddComponent(report->GetSourceID());
@@ -902,6 +902,7 @@ int SubscriberComponent::CancelEvents(const Address& id)
                     sevent = subscriptions->erase(sevent);
 #else 
                     subscriptions->erase(sevent);
+                    sevent = subscriptions->begin();
 #endif
                 }
                 else
@@ -1589,6 +1590,7 @@ void SubscriberComponent::CheckEvents()
                 eventItr = mEventManager.GetEventSubscriptions()->erase(eventItr);
 #else
                 mEventManager.GetEventSubscriptions()->erase(eventItr);
+                eventItr = mEventManager.GetEventSubscriptions()->begin();
 #endif
                 continue;
             }                
@@ -1629,6 +1631,7 @@ void SubscriberComponent::CheckEvents()
                     eventItr = mEventManager.GetEventSubscriptions()->erase(eventItr);
 #else
                     mEventManager.GetEventSubscriptions()->erase(eventItr);
+                    eventItr = mEventManager.GetEventSubscriptions()->begin();
 #endif
                     continue;
                 }
@@ -1740,8 +1743,7 @@ void SubscriberComponent::CheckDiscoveryEvents()
                 if(platform != mSubsystems.end() &&
                     platform->second.HaveIdentification() == false ||
                     (platform->second.HaveIdentification() &&
-                        platform->second.GetIdentification()->GetIdentification().empty() ||
-                        platform->second.GetIdentification()->GetType() != ReportIdentification::Subsystem))
+                        platform->second.GetIdentification()->GetIdentification().empty()))
                 {
                     for(id = mSubsystemList.begin();
                         id != mSubsystemList.end();
@@ -1771,166 +1773,6 @@ void SubscriberComponent::CheckDiscoveryEvents()
             }
             mSubsystemsMutex.Leave();
         }
-#if 0
-        Event* eventInfo = NULL;
-        QueryEvents query;
-        Receipt receipt;            
-        bool haveSubsystemListEvent = false;
-        bool haveConfigurationEvent = false;
-
-        query.SetSourceID(GetID());
-        query.SetDestinationID(Address(GetID().mSubsystem, GetID().mNode, 1, 1));
-        query.SetEventType(QueryEvents::EveryChange);
-
-        // Only request subsystem list if performing discovery.
-        if(mSystemDiscoveryFlag)
-        {
-            query.SetMessageCode(JAUS_REPORT_SUBSYSTEM_LIST);
-
-            
-            mEventManager.Lock();
-            // Check and see if we have an event with
-            // the node manager for the subsystem list.
-            if((eventInfo = mEventManager.GetEvent(Address(GetID().mSubsystem, 
-                                                   GetID().mNode, 
-                                                   1,
-                                                   1),
-                                                   JAUS_REPORT_SUBSYSTEM_LIST)) != NULL)
-            {         
-                query.SetEventID(eventInfo->GetEventID());
-                haveSubsystemListEvent = true;
-            }
-            mEventManager.Unlock();
-
-            // Double check that we have the event by sending a query.
-            if(Send(&query, receipt, JAUS_REPORT_EVENTS, 100, 1) == JAUS_OK)
-            {
-                const ReportEvents* report = dynamic_cast<const ReportEvents*>(receipt.GetResponseMessage());
-                if(report && report->GetEvents()->size() == 0)
-                {
-                    haveSubsystemListEvent = false;
-                }
-            }
-
-            if(!haveSubsystemListEvent)
-            {
-                // Create an event for the subsystem list.
-                CreateEventRequest command;
-                command.SetDestinationID(Address(GetID().mSubsystem,
-                    GetID().mNode, 1, 1));
-                command.SetSourceID(GetID());
-                command.SetMessageCode(JAUS_REPORT_SUBSYSTEM_LIST);
-                command.SetEventType(CreateEventRequest::EveryChange);
-                command.SetRequestID(EventManager::GenerateRequestID());
-                RequestEvent(command, NULL, 50, 1);
-            }
-        }
-
-        // Now check for report configuration event for this subsystem.
-        query.SetMessageCode(JAUS_REPORT_CONFIGURATION);
-
-        // See if we have event, and get the event ID
-        mEventManager.Lock();
-        // Check and see if we have an event with
-        // the node manager for the subsystem configuration.
-        if((eventInfo = mEventManager.GetEvent(Address(GetID().mSubsystem, 
-                                               GetID().mNode, 
-                                               1,
-                                               1),
-                                               JAUS_REPORT_CONFIGURATION)) != NULL)
-        {         
-            query.SetEventID(eventInfo->GetEventID());
-            haveConfigurationEvent = true;
-        }
-        mEventManager.Unlock();
-
-        // Double check that we have the event by sending a query.
-        if(Send(&query, receipt, JAUS_REPORT_EVENTS, 100, 1) == JAUS_OK)
-        {
-            const ReportEvents* report = dynamic_cast<const ReportEvents*>(receipt.GetResponseMessage());
-            if(report && report->GetEvents()->size() == 0)
-            {
-                haveConfigurationEvent = false;
-            }
-            else
-            {
-                bool match = false;
-                Event::List::const_iterator elist;
-                for(elist = report->GetEvents()->begin();
-                    elist != report->GetEvents()->end();
-                    elist++)
-                {
-                    if(elist->GetMessageCode() == JAUS_REPORT_CONFIGURATION &&
-                        elist->GetQueryMessage())
-                    {
-                        const QueryConfiguration* query = dynamic_cast<const QueryConfiguration*>(elist->GetQueryMessage());
-                        if(query && query->GetQueryField() == QueryConfiguration::Subsystem)
-                        {
-                            match = true;
-                            break;
-                        }
-                    }
-                }
-                if(match == false)
-                {
-                    haveConfigurationEvent = false;
-                }
-            }
-        }            
-
-        // Check and see if we have an event with
-        // the node manager for the subsystem configuration.
-        if(!haveConfigurationEvent)
-        {                    
-            // Create an event for the subsystem list.
-            CreateEventRequest command;
-            QueryConfiguration query;
-            command.SetDestinationID(Address(GetID().mSubsystem,
-                GetID().mNode, 1, 1));
-            command.SetSourceID(GetID());
-            command.SetMessageCode(JAUS_REPORT_CONFIGURATION);
-            command.SetEventType(CreateEventRequest::EveryChange);
-            command.SetRequestID(EventManager::GenerateRequestID());
-            query.SetQueryField(QueryConfiguration::Subsystem);
-            command.SetQueryMessage(&query);
-            RequestEvent(command, NULL, 50, 1);
-        }
-
-        // Go through the subsystem list and verify we have
-        // all the data we need.
-        Platform::Map::iterator platform;
-        
-        mSubsystemsMutex.Enter();
-        for(platform = mSubsystems.begin();
-            platform != mSubsystems.end();
-            platform++)
-        {
-            // If we don't have identification data yet, or we don't
-            // have complete subsystem identification send a query.
-            if(platform != mSubsystems.end() &&
-                platform->second.HaveIdentification() == false ||
-                (platform->second.HaveIdentification() &&
-                    platform->second.GetIdentification()->GetIdentification().empty() ||
-                    platform->second.GetIdentification()->GetType() != ReportIdentification::Subsystem))
-            {
-                Address::Set::iterator id;
-                for(id = mSubsystemList.begin();
-                    id != mSubsystemList.end();
-                    id++)
-                {
-                    if(id->mSubsystem == platform->second.GetSubsystemID())
-                    {
-                        QueryIdentification queryIdent;
-                        queryIdent.SetSourceID(GetID());
-                        queryIdent.SetDestinationID(*id);
-                        queryIdent.SetQueryType(QueryIdentification::Subsystem);                    
-                        Send(&queryIdent);
-                    }
-                }
-            }
-        }
-        mSubsystemsMutex.Leave();
-#endif
     }
 }
 
