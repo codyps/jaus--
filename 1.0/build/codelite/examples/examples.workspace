@@ -9,7 +9,7 @@
   <Project Name="example_component" Path="example_component/example_component.project" Active="No"/>
   <Project Name="example_control_transfer" Path="example_control_transfer/example_control_transfer.project" Active="No"/>
   <Project Name="example_discovery" Path="example_discovery/example_discovery.project"/>
-  <Project Name="example_eventsubscriber" Path="example_eventsubscriber/example_eventsubscriber.project" Active="No"/>
+  <Project Name="example_eventsubscriber" Path="example_eventsubscriber/example_eventsubscriber.project" Active="Yes"/>
   <Project Name="example_images" Path="example_images/example_images.project"/>
   <Project Name="example_joystick" Path="example_joystick/example_joystick.project"/>
   <Project Name="example_messages" Path="example_messages/example_messages.project"/>
@@ -17,7 +17,7 @@
   <Project Name="example_pdcontroller" Path="example_pdcontroller/example_pdcontroller.project"/>
   <Project Name="example_posesensor" Path="example_posesensor/example_posesensor.project"/>
   <Project Name="example_primitivedriver" Path="example_primitivedriver/example_primitivedriver.project"/>
-  <Project Name="example_rangesensor" Path="example_rangesensor/example_rangesensor.project" Active="Yes"/>
+  <Project Name="example_rangesensor" Path="example_rangesensor/example_rangesensor.project" Active="No"/>
   <Project Name="example_scsubscriber" Path="example_scsubscriber/example_scsubscriber.project"/>
   <Project Name="example_subsystem" Path="example_subsystem/example_subsystem.project"/>
   <Project Name="example_systemcommander" Path="example_systemcommander/example_systemcommander.project"/>

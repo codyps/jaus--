@@ -736,6 +736,18 @@
 						>
 					</File>
 				</Filter>
+				<Filter
+					Name="video"
+					>
+					<File
+						RelativePath="..\..\..\..\src\jaus\messages\experimental\video\querypixelonscreen.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\..\src\jaus\messages\experimental\video\reportpixelonscreen.cpp"
+						>
+					</File>
+				</Filter>
 			</Filter>
 			<Filter
 				Name="inform"
@@ -1495,6 +1507,18 @@
 					</File>
 					<File
 						RelativePath="..\..\..\..\include\jaus\messages\experimental\sick\reportsicklidar.h"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="video"
+					>
+					<File
+						RelativePath="..\..\..\..\include\jaus\messages\experimental\video\querypixelonscreen.h"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\..\include\jaus\messages\experimental\video\reportpixelonscreen.h"
 						>
 					</File>
 				</Filter>

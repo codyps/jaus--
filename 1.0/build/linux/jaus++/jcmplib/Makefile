@@ -8,8 +8,6 @@ CXXFLAGS 	:= -g -c -fPIC -Wall
 JAUSDIR         := ../../../..
 DESTDIR         := $(JAUSDIR)/lib
 ODIR            := $(JAUSDIR)/obj
-CXUTILSDIR      := $(JAUSDIR)/../../../cxutils/trunk/1.0
-CXUTILSLIBDIR 	:= $(CXUTILSDIR)/lib
 EXTLIBDIR     	:= $(JAUSDIR)/ext/lib
 EXTSRCDIR       := $(JAUSDIR)/ext/src
 JAUSLIBDIR	    := $(JAUSDIR)/lib
@@ -29,7 +27,6 @@ CMPSRCS		:=  $(CMPSRC) $(CMPNODESRC) $(CMPTRANSRC)
 #---------------------------------------
 #  Source and Object files for compiling
 #---------------------------------------
-TINYSRCFILES        := $(foreach DIR, $(EXTSRCDIR)/tinyxml, $(addprefix $(DIR)/, $(notdir $(wildcard $(DIR)/*.cpp))))
 SOURCEFILES	        := 	$(foreach DIR,$(CMPSRCS), $(addprefix $(DIR)/, $(notdir $(wildcard $(DIR)/*.cpp)))) $(TINYSRCFILES)
 SOURCEFILENAMES     := $(foreach DIR, $(CMPSRCS),$(notdir $(wildcard $(DIR)/*.cpp)))
 OBJECTFILENAMES	    :=	$(foreach DIR, $(SOURCEFILENAMES),$(addprefix $(ODIR)/,$(DIR)))
@@ -39,8 +36,6 @@ OBJECTFILES         :=	$(SOURCEFILES:.cpp=.o)
 #   includes dirs
 #---------------------------------------
 CMPINC 		:= $(JAUSDIR)/include
-CXUTILSINC := $(CXUTILSDIR)/include
-	
 EXTINC		:= $(JAUSDIR)/ext/include
 VLDINC		:= $(EXTINC)/vld
 CVINC		:= $(EXTINC)/cv
@@ -54,13 +49,6 @@ EXTINCS		:= $(VLDINC) \
 			$(TINYXMLINC) \
 			$(LIBJPEGINC) \
 			$(ZLIBINC) \
-			$(CXUTILSINC)
-
-#---------------------------------------
-#   objects
-#---------------------------------------
-CXUTILSOBJDIR := $(CXUTILSDIR)/build/linux
-CXUTILSOBJS := $(foreach DIR,$(CXUTILSOBJ),  $(addprefix $(CXUTILSOBJ)/, $(notdir $(wildcard $(DIR)/*.o))))
 
 #---------------------------------------
 #  all Includes
@@ -72,12 +60,11 @@ INCLUDES := $(CMPINC) $(EXTINCS)
 #  Libraries
 #---------------------------------------
 
-LIBPATHS 	:= -L$(CXUTILSLIBDIR) \
-			-L$(JAUSLIBDIR) \
+LIBPATHS 	:= 	-L$(JAUSLIBDIR) \
 			-L$(EXTLIBDIR) \
 			-L$(USRLIBDIR)
 
-CXUTILSLIB	:= -lcxutils.1.0
+CXUTILSLIB	:= -lcxutils
 JMSGLIB		:= -ljmsg.1.0
 JVIDLIB		:= -ljvid.1.0
 JSRVLIB		:= -ljsrv.1.0
@@ -86,8 +73,8 @@ PTHREADLIB	:= -lpthread
 
 DYNAMICLIBS		:= $(CXUTILSLIB) \
 			$(JMSGLIB) \
-			$(PTHREADLIB)
-STATICLIBS  	:= $(TINYLIB) 
+			$(PTHREADLIB) \
+			$(TINYLIB) 
 #---------------------------------------
 #  dependencies
 #---------------------------------------
@@ -128,19 +115,19 @@ allclean:
 	@-rm -f $(DESTDIR)/$(ARCHIVE).so
 	
 install:
-	cp $(DESTDIR)/$(ARCHIVE).so $(INSTALLDIR)/lib
-	cp $(DESTDIR)/$(ARCHIVE).a $(INSTALLDIR)/lib
+	cp -f $(DESTDIR)/$(ARCHIVE).so $(INSTALLDIR)/lib
+	cp -f $(DESTDIR)/$(ARCHIVE).a $(INSTALLDIR)/lib
 	if test -d $(INSTALLDIR)/include/jaus/components; \
 	then echo exists;                \
 	else mkdir $(INSTALLDIR)/include/jaus/components; \
 	fi
-	cp $(JAUSDIR)/include/jaus/components/*.h $(INSTALLDIR)/include/jaus/components/
+	cp -rf $(JAUSDIR)/include/jaus/components/* $(INSTALLDIR)/include/jaus/components/
 	
 uninstall:
 	rm $(INSTALLDIR)/lib/$(ARCHIVE).so
 	rm $(INSTALLDIR)/lib/$(ARCHIVE).a
 	rm $(INSTALLDIR)/include/jaus/components/*.h
-	rmdir $(INSTALLDIR)/include/jaus/components/	
+	rm -rf $(INSTALLDIR)/include/jaus/components/	
 
 help: 
 	@echo $(OBJECTFILES)

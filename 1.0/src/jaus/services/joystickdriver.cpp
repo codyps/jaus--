@@ -39,6 +39,9 @@
 ///
 ////////////////////////////////////////////////////////////////////////////////////
 #include "jaus/services/joystickdriver.h"
+#include "jaus/messages/query/platform/queryglobalpose.h"
+#include "jaus/messages/query/platform/queryplatformspecifications.h"
+#include "jaus/messages/inform/platform/reportplatformspecifications.h"
 #include <iostream>
 #include <tinyxml.h>
 
@@ -64,6 +67,8 @@ JoystickDriver::JoystickDriver()
     MapAxisToWrench(Joystick::X, PropulsiveRotationalEffortZ, false, 2);
     MapAxisToCameraWrench(Joystick::PovY, XAngleOrAngularRotationRate, true, false);
     MapAxisToCameraWrench(Joystick::PovX, YAngleOrAngularRotationRate, true, false);
+    MapAxisToVectorCommand(Joystick::Y, Speed, true, 2);
+    MapAxisToVectorCommand(Joystick::X, Heading, false, 2);
     MapButtonToFunction(7, RequestDriveControl);
     MapButtonToFunction(8, ReleaseDriveControl);
     MapButtonToFunction(9, RequestCameraControl);
@@ -71,6 +76,8 @@ JoystickDriver::JoystickDriver()
     MapButtonToFunction(1, ResetCameraPose);
     mControlCheckTimeMs = 0;
     mCameraID = 1;    
+    mVectorJoystickFlag = false;
+    mControlledVehicleMaxSpeed = 0.0;
 }
 
 
@@ -230,6 +237,64 @@ int JoystickDriver::InitializeJoystick(const std::string& settingsXML)
         element = element->NextSiblingElement();
     }
 
+    element = docHandle.FirstChild("Jaus").FirstChild("JoystickDriverComponent").FirstChild("Axes").FirstChild("VectorCommand").ToElement();
+    while(element)
+    {
+        if(strcmp(element->Value(), "VectorCommand") == 0 &&
+            element->Attribute("vector") &&
+            element->Attribute("axis") &&
+            element->Attribute("invert") &&
+            element->Attribute("deadzone"))
+        {
+            VectorCommand vector = (VectorCommand)(atoi(element->Attribute("vector")));
+            CxUtils::Joystick::Axes axis = CxUtils::Joystick::X;
+            if(strcmp(element->Attribute("axis"), "X") == 0)
+            {
+                axis = CxUtils::Joystick::X;
+            }
+            if(strcmp(element->Attribute("axis"), "Y") == 0)
+            {
+                axis = CxUtils::Joystick::Y;
+            }
+            if(strcmp(element->Attribute("axis"), "Z") == 0)
+            {
+                axis = CxUtils::Joystick::Z;
+            }
+            if(strcmp(element->Attribute("axis"), "R") == 0)
+            {
+                axis = CxUtils::Joystick::R;
+            }
+            if(strcmp(element->Attribute("axis"), "U") == 0)
+            {
+                axis = CxUtils::Joystick::U;
+            }
+            if(strcmp(element->Attribute("axis"), "V") == 0)
+            {
+                axis = CxUtils::Joystick::V;
+            }
+            if(strcmp(element->Attribute("axis"), "PovX") == 0)
+            {
+                axis = CxUtils::Joystick::PovX;
+            }
+            if(strcmp(element->Attribute("axis"), "PovY") == 0)
+            {
+                axis = CxUtils::Joystick::PovY;
+            }
+            short int deadzone = 0;
+            bool invert = false;
+            deadzone = (short int)atoi(element->Attribute("deadzone"));
+            if(strcmp(element->Attribute("invert"), "true") == 0)
+            {
+                invert = true;
+            }
+            MapAxisToVectorCommand(axis, vector, invert, deadzone);
+            // Since we have Vector Command data, this joystick will
+            // operate as a Joystick Vector Driver (controls Global Vector Driver component).
+            SetPrimitiveDriverJoystick(false);
+        }
+        element = element->NextSiblingElement();
+    }
+
     element = docHandle.FirstChild("Jaus").FirstChild("JoystickDriverComponent").FirstChild("Axes").FirstChild("CameraWrench").ToElement();
     while(element)
     {
@@ -373,6 +438,40 @@ int JoystickDriver::Shutdown()
 
 ////////////////////////////////////////////////////////////////////////////////////
 ///
+///   \brief This method is called whenever an Inform message is received
+///   by the component.  This specific implementation adds support for
+///   Report Platform Specifications message.
+///
+///   \param[in] message Message to process.
+///
+///   \return JAUS_OK on success, otherwise JAUS_FAILURE.
+///
+////////////////////////////////////////////////////////////////////////////////////
+int JoystickDriver::ProcessInformMessage(const Message* message)
+{
+    int result = FAILURE;
+    if(message->GetCommandCode() == JAUS_REPORT_PLATFORM_SPECIFICATIONS)
+    {
+        result = OK;
+        const ReportPlatformSpecifications* specs = dynamic_cast<const ReportPlatformSpecifications*>(message);
+        if(specs)
+        {
+            mControlledVehicleMaxSpeed = specs->GetMaximumVelocityX();
+        }
+    }
+    if(result == FAILURE)
+    {
+        result = CommandComponent::ProcessInformMessage(message);
+    }
+    else
+    {
+        CommandComponent::ProcessInformMessage(message);
+    }
+    return result;
+}
+
+////////////////////////////////////////////////////////////////////////////////////
+///
 ///   \brief Map a joystick axis to a wrench effort axis.
 ///
 ///   \param axis Joystick axis.
@@ -390,6 +489,33 @@ int JoystickDriver::MapAxisToWrench(const CxUtils::Joystick::Axes axis,
 {
     mJoystickMutex.Enter();
     mAxesMapping[axis] = wrench;
+    mDeadZones[axis] = deadzone;
+    mInvertFlags[axis] = invertFlag;
+    mJoystickMutex.Leave();
+
+    return JAUS_OK;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////
+///
+///   \brief Map a joystick axis to a wrench effort axis.
+///
+///   \param axis Joystick axis.
+///   \param vector Vector command to map joystick data to.
+///   \param invertFlag Invert joystick true/false.
+///   \param deadzone Joystick axis deadzone.
+///
+///   \return JAUS_OK on success, otherwise JAUS_FAILURE.
+///
+////////////////////////////////////////////////////////////////////////////////////
+int JoystickDriver::MapAxisToVectorCommand(const CxUtils::Joystick::Axes axis,
+                                           const VectorCommand vector,
+                                           const bool invertFlag,
+                                           const short int deadzone)
+{
+    mJoystickMutex.Enter();
+    mAxesMappingVectors[axis] = vector;
     mDeadZones[axis] = deadzone;
     mInvertFlags[axis] = invertFlag;
     mJoystickMutex.Leave();
@@ -418,6 +544,41 @@ int JoystickDriver::ClearAxisToWrenchMap(const CxUtils::Joystick::Axes axis)
     a = mAxesMapping.find(axis);
     if(a != mAxesMapping.end())
         mAxesMapping.erase(a);
+
+    i = mInvertFlags.find(axis);
+    if(i != mInvertFlags.end())
+        mInvertFlags.erase(i);
+
+    d = mDeadZones.find(axis);
+    if(d != mDeadZones.end())
+        mDeadZones.erase(d);
+
+    mJoystickMutex.Leave();
+
+    return JAUS_OK;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////
+///
+///   \brief Clear joystick axis mapping to a global vector command.
+///
+///   \param axis Joystick axis.
+///
+///   \return JAUS_OK on success, otherwise JAUS_FAILURE.
+///
+////////////////////////////////////////////////////////////////////////////////////
+int JoystickDriver::ClearAxisToVectorCommand(const CxUtils::Joystick::Axes axis)
+{
+    std::map<CxUtils::Joystick::Axes, JoystickDriver::VectorCommand>::iterator a;
+    std::map<CxUtils::Joystick::Axes, Short>::iterator d;
+    std::map<CxUtils::Joystick::Axes,bool>::iterator i;
+
+    mJoystickMutex.Enter();
+
+    a = mAxesMappingVectors.find(axis);
+    if(a != mAxesMappingVectors.end())
+        mAxesMappingVectors.erase(a);
 
     i = mInvertFlags.find(axis);
     if(i != mInvertFlags.end())
@@ -601,11 +762,11 @@ int JoystickDriver::TakeDriveControl(const bool enable)
     
     mJoystickMutex.Enter();
     mTakeDriveControlFlag = enable;
-	if(mTakeDriveControlFlag == false && mDriverID.IsValid())
-	{
-		SendStandbyCommand(mDriverID);
+    if(mTakeDriveControlFlag == false && mDriverID.IsValid())
+    {
+        SendStandbyCommand(mDriverID);
         ReleaseComponentControl(mDriverID, 50);
-	}
+    }
     mJoystickMutex.Leave();
 
     return result;
@@ -631,6 +792,21 @@ int JoystickDriver::TakeCameraControl(const bool enable)
     mJoystickMutex.Leave();
 
     return result;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////
+///
+///   \brief Use this method to seet the joytick operating mode to controlling
+///   a Primitive Driver or a Global Vector Driver component.
+///
+///   \param primitiveController If true, joystick controls a Primitive Driver
+///                              (this is default).
+///
+////////////////////////////////////////////////////////////////////////////////////
+void JoystickDriver::SetPrimitiveDriverJoystick(const bool primitiveController)
+{
+    mVectorJoystickFlag = !primitiveController;
 }
 
 
@@ -761,13 +937,13 @@ int JoystickDriver::SetSubsystemToControl(const Byte sid)
     {
         std::set<Byte> subsystems;
         subsystems.insert(sid);
-		AddSubsystemToDiscover(sid);
+        AddSubsystemToDiscover(sid);
 
         mJoystickMutex.Enter();
         mJoystickSubsystemID = sid;
         mJoystickMutex.Leave();
         
-		return JAUS_OK;
+        return JAUS_OK;
     }
     return JAUS_FAILURE;
 }
@@ -812,6 +988,22 @@ void JoystickDriver::PrintWrenchEffort() const
     mJoystickMutex.Leave();
 }
 
+////////////////////////////////////////////////////////////////////////////////////
+///
+///   \brief Prints wrench effort being generated by joystick.
+///
+////////////////////////////////////////////////////////////////////////////////////
+void JoystickDriver::PrintGlobalVector() const
+{
+    mJoystickMutex.Enter();
+    if(mDriverID.IsValid() && HaveComponentControl(mDriverID))
+    {
+        cout << "Have Control of Component: " << mDriverID.ToString() << endl;
+    }
+    mGlobalVector.PrintGlobalVector();
+    mJoystickMutex.Leave();
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////////
 ///
@@ -842,8 +1034,9 @@ void JoystickDriver::PrintCameraWrench() const
 void JoystickDriver::JoystickCallback(const CxUtils::Joystick& joystick, void *args)
 {
     JoystickDriver* driver = (JoystickDriver*)(args);
-    std::map<CxUtils::Joystick::Axes, JoystickDriver::WrenchEffort>::iterator axis;
-    std::map<CxUtils::Joystick::Axes, JoystickDriver::CameraWrench>::iterator caxis;
+    std::map<CxUtils::Joystick::Axes, JoystickDriver::WrenchEffort>::iterator axis;   // Wrench Command Axis
+    std::map<CxUtils::Joystick::Axes, JoystickDriver::VectorCommand>::iterator vaxis; // Vector Command Axis
+    std::map<CxUtils::Joystick::Axes, JoystickDriver::CameraWrench>::iterator caxis;  // Camera Command Axis
     std::map<CxUtils::Joystick::Axes, Short>::iterator deadzone;
     std::map<CxUtils::Joystick::Axes,bool>::iterator invertFlag;
     std::map<int, ButtonActions>::iterator button;
@@ -856,73 +1049,199 @@ void JoystickDriver::JoystickCallback(const CxUtils::Joystick& joystick, void *a
 
     driver->mWrenchEffort.ClearMessageBody();
 
-    for(axis = driver->mAxesMapping.begin();
-        axis != driver->mAxesMapping.end();
-        axis++)
+    if(!driver->mVectorJoystickFlag)
     {
-        double percent = 0.0;
-        Short axisDeadzone = 0;
+        for(axis = driver->mAxesMapping.begin();
+            axis != driver->mAxesMapping.end();
+            axis++)
+        {
+            double percent = 0.0;
+            Short axisDeadzone = 0;
 
-        // See if there is a deadzone for the axis.
-        deadzone = driver->mDeadZones.find(axis->first);
-        if(deadzone != driver->mDeadZones.end())
-        {
-            axisDeadzone = deadzone->second;
-        }
-        // Get axis percentage.
-        percent = joystick.GetAxisPercentage((short)(axis->first), axisDeadzone);
-        // Invert if needed.
-        invertFlag = driver->mInvertFlags.find(axis->first);
-        if(invertFlag != driver->mInvertFlags.end())
-        {
-            if(invertFlag->second)
+            // See if there is a deadzone for the axis.
+            deadzone = driver->mDeadZones.find(axis->first);
+            if(deadzone != driver->mDeadZones.end())
             {
-                percent *= -1.0;
+                axisDeadzone = deadzone->second;
+            }
+            // Get axis percentage.
+            percent = joystick.GetAxisPercentage((short)(axis->first), axisDeadzone);
+            // Invert if needed.
+            invertFlag = driver->mInvertFlags.find(axis->first);
+            if(invertFlag != driver->mInvertFlags.end())
+            {
+                if(invertFlag->second)
+                {
+                    percent *= -1.0;
+                }
+            }
+
+            // Set the wrench effort.
+            switch(axis->second)
+            {
+            case JoystickDriver::PropulsiveLinearEffortX:
+                driver->mWrenchEffort.SetPropulsiveLinearEffortX(percent);
+                break;
+            case JoystickDriver::PropulsiveLinearEffortY:
+                driver->mWrenchEffort.SetPropulsiveLinearEffortY(percent);
+                break;
+            case JoystickDriver::PropulsiveLinearEffortZ:
+                driver->mWrenchEffort.SetPropulsiveLinearEffortZ(percent);
+                break;
+            case JoystickDriver::PropulsiveRotationalEffortX:
+                driver->mWrenchEffort.SetPropulsiveRotationalEffortX(percent);
+                break;
+            case JoystickDriver::PropulsiveRotationalEffortY:
+                driver->mWrenchEffort.SetPropulsiveRotationalEffortY(percent);
+                break;
+            case JoystickDriver::PropulsiveRotationalEffortZ:
+                driver->mWrenchEffort.SetPropulsiveRotationalEffortZ(percent);
+                break;
+            case JoystickDriver::ResistiveLinearEffortX:
+                driver->mWrenchEffort.SetResistiveLinearEffortX(percent);
+                break;
+            case JoystickDriver::ResistiveLinearEffortY:
+                driver->mWrenchEffort.SetResistiveLinearEffortY(percent);
+                break;
+            case JoystickDriver::ResistiveLinearEffortZ:
+                driver->mWrenchEffort.SetResistiveLinearEffortZ(percent);
+                break;
+            case JoystickDriver::ResistiveRotationalEffortX:
+                driver->mWrenchEffort.SetResistiveRotationalEffortX(percent);
+                break;
+            case JoystickDriver::ResistiveRotationalEffortY:
+                driver->mWrenchEffort.SetResistiveRotationalEffortY(percent);
+                break;
+            case JoystickDriver::ResistiveRotationalEffortZ:
+                driver->mWrenchEffort.SetResistiveRotationalEffortZ(percent);
+                break;
+            default:
+                percent = 0.0;
+                break;
             }
         }
+    }
+    // Generate Global Vector
+    else
+    {
+        driver->mGlobalVector.ClearMessageBody();
 
-        // Set the wrench effort.
-        switch(axis->second)
+        for(vaxis = driver->mAxesMappingVectors.begin();
+            vaxis != driver->mAxesMappingVectors.end();
+            vaxis++)
         {
-        case JoystickDriver::PropulsiveLinearEffortX:
-            driver->mWrenchEffort.SetPropulsiveLinearEffortX(percent);
-            break;
-        case JoystickDriver::PropulsiveLinearEffortY:
-            driver->mWrenchEffort.SetPropulsiveLinearEffortY(percent);
-            break;
-        case JoystickDriver::PropulsiveLinearEffortZ:
-            driver->mWrenchEffort.SetPropulsiveLinearEffortZ(percent);
-            break;
-        case JoystickDriver::PropulsiveRotationalEffortX:
-            driver->mWrenchEffort.SetPropulsiveRotationalEffortX(percent);
-            break;
-        case JoystickDriver::PropulsiveRotationalEffortY:
-            driver->mWrenchEffort.SetPropulsiveRotationalEffortY(percent);
-            break;
-        case JoystickDriver::PropulsiveRotationalEffortZ:
-            driver->mWrenchEffort.SetPropulsiveRotationalEffortZ(percent);
-            break;
-        case JoystickDriver::ResistiveLinearEffortX:
-            driver->mWrenchEffort.SetResistiveLinearEffortX(percent);
-            break;
-        case JoystickDriver::ResistiveLinearEffortY:
-            driver->mWrenchEffort.SetResistiveLinearEffortY(percent);
-            break;
-        case JoystickDriver::ResistiveLinearEffortZ:
-            driver->mWrenchEffort.SetResistiveLinearEffortZ(percent);
-            break;
-        case JoystickDriver::ResistiveRotationalEffortX:
-            driver->mWrenchEffort.SetResistiveRotationalEffortX(percent);
-            break;
-        case JoystickDriver::ResistiveRotationalEffortY:
-            driver->mWrenchEffort.SetResistiveRotationalEffortY(percent);
-            break;
-        case JoystickDriver::ResistiveRotationalEffortZ:
-            driver->mWrenchEffort.SetResistiveRotationalEffortZ(percent);
-            break;
-        default:
-            percent = 0.0;
-            break;
+            double percent = 0.0;
+            Short axisDeadzone = 0;
+
+            // See if there is a deadzone for the axis.
+            deadzone = driver->mDeadZones.find(vaxis->first);
+            if(deadzone != driver->mDeadZones.end())
+            {
+                axisDeadzone = deadzone->second;
+            }
+            // Get axis percentage.
+            percent = joystick.GetAxisPercentage((short)(vaxis->first), axisDeadzone);
+            // Invert if needed.
+            invertFlag = driver->mInvertFlags.find(vaxis->first);
+            if(invertFlag != driver->mInvertFlags.end())
+            {
+                if(invertFlag->second)
+                {
+                    percent *= -1.0;
+                }
+            }
+
+            // Set the wrench effort.
+            switch(vaxis->second)
+            {
+            case JoystickDriver::Speed:
+                if(fabs(driver->mControlledVehicleMaxSpeed) < .0001)
+                {
+                    Jaus::QueryPlatformSpecifications querySpecs;
+                    querySpecs.SetPresenceVector(Jaus::QueryPlatformSpecifications::VectorMask::MaximumVelocityX);
+                    querySpecs.SetSourceID(driver->GetID());
+                    querySpecs.SetDestinationID(Address(driver->mJoystickSubsystemID, 255, 255, 1));
+                    driver->Send(&querySpecs);
+                }
+                else
+                {
+                    double desiredSpeed = fabs(percent/100.0)*driver->mControlledVehicleMaxSpeed;
+                    if(desiredSpeed > SetGlobalVector::Limits::MaxSpeed)
+                    {
+                        desiredSpeed = SetGlobalVector::Limits::MaxSpeed;
+                    }
+                    driver->mGlobalVector.SetSpeed(desiredSpeed);
+                }
+                break;
+            case JoystickDriver::Elevation:
+                {
+                    double elev = 0;
+                    elev = ((percent + 100)/200.0)*(SetGlobalVector::Limits::MaxElevation - SetGlobalVector::Limits::MinElevation) + SetGlobalVector::Limits::MinElevation;
+                    driver->mGlobalVector.SetElevation(elev);
+                }
+                break;
+            case JoystickDriver::Heading:
+                {
+                    // Do we have global pose data
+                    Platform platform;
+                    platform = driver->GetPlatformInfo(driver->mJoystickSubsystemID);
+                    if(platform.HaveGlobalPose())
+                    {
+                        // Generate a desired heading
+                        // First calculate a heading delta, then add
+                        // that delta to the current vehicle heading, check
+                        // for wrap around, then set value.
+                        double desiredHeading = (percent/100.0)*JAUS_PI/2.0;
+                        desiredHeading += platform.GetGlobalPose()->GetYaw();
+                        if(desiredHeading > JAUS_PI)
+                        {
+                            desiredHeading -= JAUS_TWO_PI;
+                        }
+                        else if(desiredHeading < -JAUS_PI)
+                        {
+                            desiredHeading += JAUS_TWO_PI;
+                        }
+                        driver->mGlobalVector.SetHeading(desiredHeading);
+                    }
+                    else
+                    {
+                        Address::List sensors = platform.GetConfiguration()->GetComponentsOfType((Byte)Service::GlobalPoseSensor);
+                        if(sensors.size() > 0)
+                        {
+                            Address::List::iterator id;
+                            for(id = sensors.begin(); id != sensors.end(); id++)
+                            {
+                                CreateEventRequest createEvent;
+                                QueryGlobalPose queryGlobalPose;
+                                queryGlobalPose.SetPresenceVector(QueryGlobalPose::VectorMask::Yaw);
+
+                                createEvent.SetEventType(CreateEventRequest::EveryChange);
+                                createEvent.SetMessageCode(JAUS_REPORT_GLOBAL_POSE);
+                                createEvent.SetQueryMessage(&queryGlobalPose);
+                                createEvent.SetSourceID(driver->GetID());
+                                createEvent.SetDestinationID(*id);
+
+                                if(driver->RequestEvent(createEvent) == OK)
+                                {
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+                break;
+            case JoystickDriver::Roll:
+                driver->mGlobalVector.SetRoll( (percent/100.0)*SetGlobalVector::Limits::MaxAngle );
+                break;
+            case JoystickDriver::Pitch:
+                driver->mGlobalVector.SetPitch( (percent/100.0)*SetGlobalVector::Limits::MaxAngle );
+                break;
+            case JoystickDriver::Depth:                
+                break;
+            default:
+                percent = 0.0;
+                break;
+            }
         }
     }
 
@@ -1067,6 +1386,17 @@ void JoystickDriver::JoystickCallback(const CxUtils::Joystick& joystick, void *a
         driver->mButtonValues[b] = joystick.IsButtonPressed(b);
     }
 
+    if(driver->mDriverID.IsValid() && 
+        ((driver->mDriverID.mComponent == Service::PrimitiveDriver && driver->mVectorJoystickFlag) || (driver->mDriverID.mComponent == Service::GlobalVectorDriver && !driver->mVectorJoystickFlag)) )
+    {
+        if(driver->HaveComponentControl(driver->mDriverID))
+        {
+            driver->SendStandbyCommand(driver->mDriverID);
+            driver->ReleaseComponentControl(driver->mDriverID);
+        }
+        driver->mDriverID(0, 0, 0, 0);
+    }
+
     if(driver->mTakeDriveControlFlag && driver->mDriverID.IsValid() == false)
     {
         // Get the driver ID.
@@ -1074,34 +1404,43 @@ void JoystickDriver::JoystickCallback(const CxUtils::Joystick& joystick, void *a
         if(driver->GetPlatformInfo(info, driver->mJoystickSubsystemID))
         {
             Address::List drivers;
-            drivers = info.GetConfiguration()->GetComponentsOfType(Service::PrimitiveDriver);
+            // Depending on whether or not we are controlling a Primitive Driver or
+            // Global Vector Driver, search for the right type
+            if( driver->mVectorJoystickFlag == true)
+            {
+                drivers = info.GetConfiguration()->GetComponentsOfType((Byte)Service::GlobalVectorDriver);
+            }
+            else
+            {
+                drivers = info.GetConfiguration()->GetComponentsOfType((Byte)Service::PrimitiveDriver);
+            }
             if(drivers.size() > 0)
             {
                 driver->mDriverID = *drivers.begin();
-            }			
+            }            
         }
-		if(driver->mDriverID.IsValid() == false && driver->mJoystickSubsystemID != 0)
-		{
-			static unsigned int queryTimeMs = 0;
+        if(driver->mDriverID.IsValid() == false && driver->mJoystickSubsystemID != 0)
+        {
+            static unsigned int queryTimeMs = 0;
 
-			if(Time::GetUtcTimeMs() - queryTimeMs > 1000)
-			{
-				QueryConfiguration queryConfiguration;
-				queryConfiguration.SetSourceID(driver->GetID());
-				queryConfiguration.SetDestinationID(Address(driver->mJoystickSubsystemID,
-															255, 1, 1));
-				queryConfiguration.SetQueryField((Byte)QueryConfiguration::Node);
-				driver->Send(&queryConfiguration);
+            if(Time::GetUtcTimeMs() - queryTimeMs > 1000)
+            {
+                QueryConfiguration queryConfiguration;
+                queryConfiguration.SetSourceID(driver->GetID());
+                queryConfiguration.SetDestinationID(Address(driver->mJoystickSubsystemID,
+                                                            255, 1, 1));
+                queryConfiguration.SetQueryField((Byte)QueryConfiguration::Node);
+                driver->Send(&queryConfiguration);
 
-				QueryIdentification queryIdentification;
-				queryIdentification.SetSourceID(driver->GetID());
-				queryIdentification.SetDestinationID(Address(driver->mJoystickSubsystemID,
-															 255, 1, 1));
-				queryIdentification.SetQueryType((Byte)(QueryIdentification::Subsystem));
-				driver->Send(&queryIdentification);
-				queryTimeMs = Time::GetUtcTimeMs();
-			}
-		}
+                QueryIdentification queryIdentification;
+                queryIdentification.SetSourceID(driver->GetID());
+                queryIdentification.SetDestinationID(Address(driver->mJoystickSubsystemID,
+                                                             255, 1, 1));
+                queryIdentification.SetQueryType((Byte)(QueryIdentification::Subsystem));
+                driver->Send(&queryIdentification);
+                queryTimeMs = Time::GetUtcTimeMs();
+            }
+        }
     }
 
     if(driver->mTakeCameraControlFlag && driver->mVisualSensorID.IsValid() == false)
@@ -1146,12 +1485,20 @@ void JoystickDriver::JoystickCallback(const CxUtils::Joystick& joystick, void *a
     }
 
     
-
     if(driver->mDriverID.IsValid() && driver->HaveComponentControl(driver->mDriverID))
     {
-        driver->mWrenchEffort.SetSourceID(driver->GetID());
-        driver->mWrenchEffort.SetDestinationID(driver->mDriverID);
-        driver->Send(&driver->mWrenchEffort);
+        if(driver->mVectorJoystickFlag == true)
+        {
+            driver->mGlobalVector.SetSourceID(driver->GetID());
+            driver->mGlobalVector.SetDestinationID(driver->mDriverID);
+            driver->Send(&driver->mGlobalVector);
+        }
+        else
+        {
+            driver->mWrenchEffort.SetSourceID(driver->GetID());
+            driver->mWrenchEffort.SetDestinationID(driver->mDriverID);
+            driver->Send(&driver->mWrenchEffort);
+        }
     }
 
     if(driver->mVisualSensorID.IsValid() && driver->HaveComponentControl(driver->mVisualSensorID))

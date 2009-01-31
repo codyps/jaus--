@@ -211,10 +211,10 @@ int SystemCommander::ProcessDiscoveryEvent(const Platform& subsystem,
                     currentPresenceVector = subsystem.GetGlobalPose()->GetPresenceVector();
                 }
 
-				Jaus::Address::List globalPoseSensors = subsystem.GetConfiguration()->GetComponentsOfType(Jaus::Service::GlobalPoseSensor);
+                Jaus::Address::List globalPoseSensors = subsystem.GetConfiguration()->GetComponentsOfType(Jaus::Service::GlobalPoseSensor);
 
-				if(globalPoseSensors.size() > 0)
-				{
+                if(globalPoseSensors.size() > 0)
+                {
                     // See what they support.
                     Jaus::QueryGlobalPose queryGlobalPose;
                     Jaus::Receipt receipt;                    
@@ -260,7 +260,7 @@ int SystemCommander::ProcessDiscoveryEvent(const Platform& subsystem,
                             } // If the sensor responded
                         } // If we don't already have a subscription.
                     }// For each global pose sensor on system
-				} // If the platform has Global Pose Sensors
+                } // If the platform has Global Pose Sensors
             } // If we don't have any global pose data for the platform.
         } // If we have identification information for the vehicle.
     } // If this is not a disconnect event.

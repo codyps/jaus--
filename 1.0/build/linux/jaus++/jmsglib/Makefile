@@ -48,6 +48,7 @@ MSGQUEPLATSRC	:= $(MSGQUESRC)/platform
 
 MSGEXPSRC	:= $(MSGSRC)/experimental
 MSGEXPSRC_SICK	:= $(MSGSRC)/experimental/sick
+MSGEXPSRC_VIDEO := $(MSGSRC)/experimental/video
 
 MSGSRCS   	:= $(MSGSRC) \
 		$(MSGCOMSRC) \
@@ -78,7 +79,8 @@ MSGSRCS   	:= $(MSGSRC) \
 		$(MSGQUEEVENSRC) \
 		$(MSGQUEPLATSRC) \
 		$(MSGEXPSRC) \
-		$(MSGEXPSRC_SICK)
+		$(MSGEXPSRC_SICK) \
+		$(MSGEXPSRC_VIDEO)
 	
 
 #--------------------------------------------
@@ -100,34 +102,24 @@ OBJECTFILES :=	$(SOURCEFILES:.cpp=.o)
 #  Externals
 #---------------------------------------
 
-CXUTILSDIR := $(JAUSDIR)/../../../cxutils/trunk/1.0
-CXUTILSINC := $(CXUTILSDIR)/include
-CXUTILSLIB := $(CXUTILSDIR)/lib
-CXUTILSOBJ := $(CXUTILSDIR)/build/linux
-CXUTILSOBJS := $(foreach DIR,$(CXUTILSOBJ),  $(addprefix $(CXUTILSOBJ)/, $(notdir $(wildcard $(DIR)/*.o))))
-
-
 #---------------------------------------
 #  Includes
 #---------------------------------------
 
-INCLUDES := $(CXUTILSINC) \
-	    $(MSGINCS)
+INCLUDES :=    $(MSGINCS)
 
 #---------------------------------------
 #  Libraries
 #---------------------------------------
-CXUTILSLIBDIR := $(CXUTILSDIR)/lib
 EXTLIBDIR     := $(JAUSDIR)/ext/lib
 JAUSLIBDIR		:= $(JAUSDIR)/lib
 
-LIBPATHS 	:= -L$(CXUTILSLIBDIR) \
-			-L$(JAUSLIBDIR) \
+LIBPATHS 	:= 	-L$(JAUSLIBDIR) \
 			-L$(EXTLIBDIR) \
 			-L$(INSTALLDIR)/lib
 
-CXUTILSLIB	:= cxutils.1.0
-LIBS		:= -l$(CXUTILSLIB) \
+CXUTILSLIB	:= cxutils
+LIBS		:= 
 
 #---------------------------------------
 #  rules
@@ -163,19 +155,20 @@ allclean:
 	@-rm -f $(DESTDIR)/$(ARCHIVE).so
 
 install:
-	cp $(DESTDIR)/$(ARCHIVE).so $(INSTALLDIR)/lib
-	cp $(DESTDIR)/$(ARCHIVE).a $(INSTALLDIR)/lib	
+	cp -f $(DESTDIR)/$(ARCHIVE).so $(INSTALLDIR)/lib
+	cp -f $(DESTDIR)/$(ARCHIVE).a $(INSTALLDIR)/lib	
+	
 	if test -d $(INSTALLDIR)/include/jaus/messages; \
-	then echo exists;                \
-	else mkdir $(INSTALLDIR)/include/jaus/messages; \
+	then echo Directory exists...; \
+	else mkdir -p $(INSTALLDIR)/include/jaus/messages; \
 	fi
-	cp $(JAUSDIR)/include/jaus/messages/*.h $(INSTALLDIR)/include/jaus/messages/
+	cp -rf $(JAUSDIR)/include/jaus/messages/* $(INSTALLDIR)/include/jaus/messages/
 	
 uninstall:
 	rm $(INSTALLDIR)/lib/$(ARCHIVE).so
 	rm $(INSTALLDIR)/lib/$(ARCHIVE).a
 	rm $(INSTALLDIR)/include/jaus/messages/*.h
-	rmdir $(INSTALLDIR)/include/jaus/messages/	
+	rm -rf $(INSTALLDIR)/include/jaus/messages/	
 	
 help: 
 	@echo $(CXUTILSOBJS)

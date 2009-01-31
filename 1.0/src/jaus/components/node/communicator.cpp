@@ -123,7 +123,7 @@ void Communicator::DataLink::SetID(const Byte id)
 ///
 ////////////////////////////////////////////////////////////////////////////////////
 bool Communicator::DataLink::ProcessReceivedMessage(const Stream &data,
-													void* additionalData)
+                                                    void* additionalData)
 {
     bool result = false;
 

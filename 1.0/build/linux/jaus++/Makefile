@@ -1,6 +1,8 @@
 
 JAUSDIR  := ../../..
+EXTBUILDDIR := $(JAUSDIR)/ext/build/linux
 LINUXBUILDDIR := $(JAUSDIR)/build/linux
+
 MSGMFDIR    := $(LINUXBUILDDIR)/jaus++/jmsglib
 CMPMFDIR    := $(LINUXBUILDDIR)/jaus++/jcmplib
 SRVMFDIR    := $(LINUXBUILDDIR)/jaus++/jsrvclib
@@ -8,6 +10,7 @@ VIDMFDIR    := $(LINUXBUILDDIR)/jaus++/jvideolib
 INSTALLDIR  := /usr
 
 all:
+#	cd $(EXTBUILDDIR)/tinyxml; make
 	cd $(MSGMFDIR); make
 	cd $(CMPMFDIR); make
 	cd $(SRVMFDIR); make
@@ -15,12 +18,14 @@ all:
 
 
 clean:
+#	cd $(EXTBUILDDIR)/tinyxml; make clean
 	cd $(MSGMFDIR); make clean
 	cd $(CMPMFDIR); make clean
 	cd $(SRVMFDIR); make clean
 	cd $(VIDMFDIR); make clean
 
 allclean:
+#	cd $(EXTBUILDDIR)/tinyxml; make allclean
 	cd $(MSGMFDIR); make allclean
 	cd $(CMPMFDIR); make allclean
 	cd $(SRVMFDIR); make allclean

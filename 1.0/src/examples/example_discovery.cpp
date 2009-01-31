@@ -110,8 +110,8 @@ class MyComponent : public SubscriberComponent
         else if(eventType == SubscriberComponent::SubsystemUpdate)
         {
             // Print the configuration to the screen.
-            std::cout << "Subsystem Update!\n";
-            subsystem.Print();
+            //std::cout << "Subsystem Update!\n";
+            //subsystem.Print();
 
             // See if there is a global pose sensor on the subsystem, and if so
             // try get a subscription.
@@ -216,6 +216,7 @@ int main(int argc, char *argv[])
     subscriber.EnableSubsystemDiscovery(true, NULL);
 
 	Platform::Map platforms;
+    Platform::Map::iterator p;
     while(!gExitFlag)
     {
         // While the program is running, any time a 
@@ -229,6 +230,10 @@ int main(int argc, char *argv[])
 
 		// Get a copy of system configuration discovered.
 		platforms = subscriber.GetSystemConfiguration();
+        for(p = platforms.begin(); p != platforms.end(); p++)
+        {
+            p->second.Print();
+        }
 
         if(CxUtils::GetChar() == 27)
         {

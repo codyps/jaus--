@@ -44,5 +44,8 @@
 #include "jaus/messages/experimental/sick/querysicklidar.h"
 #include "jaus/messages/experimental/sick/reportsicklidar.h"
 
+#include "jaus/messages/experimental/video/querypixelonscreen.h"
+#include "jaus/messages/experimental/video/reportpixelonscreen.h"
+
 #endif
 /*  End of File */

@@ -999,7 +999,10 @@ int EventManager::GenerateEvent(const Event* eventData,
 ///   use the Lock and Unlock methods to avoid read/write errors.
 ///
 ////////////////////////////////////////////////////////////////////////////////////
-void EventManager::Lock() const { return mEventsMutex.Enter(); }
+void EventManager::Lock() const 
+{ 
+    mEventsMutex.Enter(); 
+}
 
 
 ////////////////////////////////////////////////////////////////////////////////////
@@ -1010,7 +1013,10 @@ void EventManager::Lock() const { return mEventsMutex.Enter(); }
 ///   use the Lock and Unlock methods to avoid read/write errors.
 ///
 ////////////////////////////////////////////////////////////////////////////////////
-void EventManager::Unlock() const { return mEventsMutex.Unlock(); }
+void EventManager::Unlock() const 
+{ 
+    mEventsMutex.Unlock(); 
+}
 
 
 ////////////////////////////////////////////////////////////////////////////////////

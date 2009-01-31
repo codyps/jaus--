@@ -87,16 +87,17 @@ CXXFLAGS := ${CXXFLAGS} ${DEFS}
 # Targets of the build
 #****************************************************************************
 
-OUTPUT := xmltest
+#OUTPUT := xmltest
 
-all: ${OUTPUT}
+#all: ${OUTPUT}
 
 
 #****************************************************************************
 # Source files
 #****************************************************************************
 
-SRCS := $(SRCDIR)/tinyxml.cpp $(SRCDIR)/tinyxmlparser.cpp $(SRCDIR)/xmltest.cpp $(SRCDIR)/tinyxmlerror.cpp $(SRCDIR)/tinystr.cpp
+SRCS := $(SRCDIR)/tinyxml.cpp $(SRCDIR)/tinyxmlparser.cpp $(SRCDIR)/tinyxmlerror.cpp $(SRCDIR)/tinystr.cpp
+#SRCS := $(SRCDIR)/tinyxml.cpp $(SRCDIR)/tinyxmlparser.cpp $(SRCDIR)/xmltest.cpp $(SRCDIR)/tinyxmlerror.cpp $(SRCDIR)/tinystr.cpp
 
 # Add on the sources for libraries
 SRCS := ${SRCS}
@@ -107,15 +108,17 @@ OBJS := $(addsuffix .o,$(basename ${SRCS}))
 # Output
 #****************************************************************************
 
-${OUTPUT}: ${OBJS} $(ARCHIVE).a $(ARCHIVE).so
+${OUTPUT}: ${OBJS} $(ARCHIVE).a
 	${LD} -o $@ ${LDFLAGS} ${OBJS} ${LIBS} ${EXTRA_LIBS}
+#${OUTPUT}: ${OBJS} $(ARCHIVE).a $(ARCHIVE).so
+#	${LD} -o $@ ${LDFLAGS} ${OBJS} ${LIBS} ${EXTRA_LIBS}
 	
 
 #****************************************************************************
 # common rules
 #****************************************************************************
-$(ARCHIVE).so:
-	$(CXX) -shared -o  $(DESTDIR)/$@ $(OBJS) 
+#$(ARCHIVE).so:
+#	$(CXX) -shared -o  $(DESTDIR)/$@ $(OBJS) 
 
 $(ARCHIVE).a: $(OBJS)
 	ar -ruc $(DESTDIR)/$@ $?
@@ -141,5 +144,5 @@ depend:
 
 tinyxml.o: tinyxml.h tinystr.h
 tinyxmlparser.o: tinyxml.h tinystr.h
-xmltest.o: tinyxml.h tinystr.h
+#xmltest.o: tinyxml.h tinystr.h
 tinyxmlerror.o: tinyxml.h tinystr.h

@@ -91,7 +91,7 @@ RangeSensorFrame::RangeSensorFrame(wxWindow* parent,
     mpImagePanel = NULL;
     mFrameNumber = 0;
     mFrameUpdateTimeMs = 0;
-    mPixelsPerMeter = 32;  // At 640x480 we'll display 8 meters out.
+    mPixelsPerMeter = 8;  // At 640x480 we'll display 8 meters out.
     mRefreshRate = 10;    // Update at rate in Hz.
     mpFileMenu = new wxMenu;
     mpFileMenu->Append(wxID_NEW, wxT("Select &Sensor\tAlt-S"), wxT("Select Range Sensor"));
@@ -411,7 +411,7 @@ void RangeSensorFrame::OnTimer(wxTimerEvent& event)
     if(mRangeSensorID.IsValid())
     {
         // Draw data to image.        
-        wxBitmap bitmap(640, 640, -1);
+        wxBitmap bitmap(1024, 1024, -1);
         wxMemoryDC memoryDC;
         memoryDC.SelectObject(bitmap);
         // Set line color to green, fill color to green

@@ -38,7 +38,6 @@
 ///  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ///
 ////////////////////////////////////////////////////////////////////////////////////
-
 #include "jaus/services/srvclibdll.h"
 #include "jaus/components/commandcomponent.h"
 #include "jaus/messages/command/platform/setglobalwaypoint.h"
@@ -51,6 +50,8 @@
 
 #include "jaus/services/globalwaypointdriver.h"
 
+#include <iostream>
+
 using namespace Jaus;
 
 ////////////////////////////////////////////////////////////////////////////////////
@@ -62,6 +63,7 @@ using namespace Jaus;
 ////////////////////////////////////////////////////////////////////////////////////
 GlobalWaypointDriver::GlobalWaypointDriver() : mGlobalWaypointDriverUpdateRateHz(0)
 {
+    mDesiredTravelSpeed = 2.1;
     SetControllable(true);
 }
 
@@ -147,6 +149,7 @@ int GlobalWaypointDriver::Shutdown()
     if(!mWaypointList.empty())
     {
         mWaypointList.clear();
+        WaypointCountUpdated();
     }
     if(mGlobalVectorDriverID.IsValid())
     {
@@ -236,8 +239,18 @@ int GlobalWaypointDriver::SetUpdateRate(const double rate)
 
 ////////////////////////////////////////////////////////////////////////////////////
 ///
+///   \brief Overloaded method to process command messages.
+///
+///   This method will process Set Global Vector, Set Travel Speed,
+///   commands, or pass the message to the parent class for processing.
+///
+///   \param msg The command message to process.
+///   \param commandAuthority The authority level of the component sending
+///          the command.
+///
+///   \return JAUS_OK on success, otherwise JAUS_FAILURE.
+///
 ////////////////////////////////////////////////////////////////////////////////////
-// Processes command messages.
 int GlobalWaypointDriver::ProcessCommandMessage(const Message* msg,
                                   const Byte commandAuthority)
 {
@@ -252,9 +265,9 @@ int GlobalWaypointDriver::ProcessCommandMessage(const Message* msg,
                 const Jaus::SetGlobalWaypoint* command = dynamic_cast<const Jaus::SetGlobalWaypoint*>(msg);
                 if(command && IsInputMessageSupported(JAUS_SET_GLOBAL_WAYPOINT, command->GetPresenceVector()))
                 {
-                    mGlobalWaypointDriverMutex.Enter();
+                    //mGlobalWaypointDriverMutex.Enter();
                     SetGlobalWaypoint(*command);
-                    mGlobalWaypointDriverMutex.Leave();
+                    //mGlobalWaypointDriverMutex.Leave();
                 }
             };
             break;
@@ -263,9 +276,9 @@ int GlobalWaypointDriver::ProcessCommandMessage(const Message* msg,
                 const Jaus::SetTravelSpeed* command = dynamic_cast<const Jaus::SetTravelSpeed*>(msg);
                 if(command && IsInputMessageSupported(JAUS_SET_TRAVEL_SPEED, 0))
                 {
-                    mGlobalWaypointDriverMutex.Enter();
+                    //mGlobalWaypointDriverMutex.Enter();
                     SetTravelSpeed(command->GetSpeed());
-                    mGlobalWaypointDriverMutex.Leave();
+                    //mGlobalWaypointDriverMutex.Leave();
                 }
             };
             break;
@@ -288,6 +301,15 @@ int GlobalWaypointDriver::ProcessCommandMessage(const Message* msg,
 }
 
 ////////////////////////////////////////////////////////////////////////////////////
+///
+///   \brief Overloaded method to process query messages.
+///
+///   This method will process Query Global Vector commands, or pass the message
+///   to the parent class for processing.
+///
+///   \param msg The message to process.
+///
+///   \return JAUS_OK on success, otherwise JAUS_FAILURE.
 ///
 ////////////////////////////////////////////////////////////////////////////////////
 // Processes query messages.
@@ -370,10 +392,17 @@ int GlobalWaypointDriver::ProcessQueryMessage(const Message* msg)
 
 ////////////////////////////////////////////////////////////////////////////////////
 ///
+///   \brief Overloaded method to process inform messages.
+///
+///   This method will process Report Global Pose,
+///   Report Travel Speed, or pass the message
+///   to the parent class for processing.
+///
+///   \param msg The message to process.
+///
+///   \return JAUS_OK on success, otherwise JAUS_FAILURE.
+///
 ////////////////////////////////////////////////////////////////////////////////////
-// Process inform messages.
-// 
-// No idea what inform messages the driver should process
 int GlobalWaypointDriver::ProcessInformMessage(const Message* msg)
 {
     int result = JAUS_OK;
@@ -432,13 +461,145 @@ int GlobalWaypointDriver::ProcessInformMessage(const Message* msg)
 
 ////////////////////////////////////////////////////////////////////////////////////
 ///
-///   Adds a new global waypoint to the desintation list. The waypoint will be
-///   processed in the order that it is received. 
+///   \brief This command is called whenever the size of the waypoint list changes.
+///          It is responsible for generating events related to the waypoint count.
+///
+////////////////////////////////////////////////////////////////////////////////////
+void GlobalWaypointDriver::WaypointCountUpdated()
+{
+    // Now that we've set the pose, lets see if we need
+    // to generate any events.
+    Event::Set myEvents;
+    Event::Set::iterator e;
+
+    mEventManager.Lock();
+    myEvents = mEventManager.GetProducedEventsOfType(JAUS_REPORT_WAYPOINT_COUNT);
+    for(e = myEvents.begin();
+        e != myEvents.end();
+        e++)
+    {
+        // Our waypoint driver only supports EveryChange events
+        if((*e)->GetEventType() == Event::EveryChange)
+        {
+            GenerateEvent(*e);
+            // Update sequence number and timestamp.
+            (*e)->SetSequenceNumber((*e)->GetSequenceNumber() + 1);
+            (*e)->SetTimeStampMs(Time::GetUtcTimeMs());
+        }
+    }
+
+    mEventManager.Unlock();
+}
+
+////////////////////////////////////////////////////////////////////////////////////
+///
+///   \brief Anytime a periodic or one time event needs to be generated, the
+///   parent class (InformComponent) calls this function.  It then attempts
+///   to generate event messages for the event specified.
+///
+///   This method should not modify any internal values of your class.
+///
+///   \param eventInfo The event that needs to be generated.
+///
+///   \return JAUS_OK on success, otherwise JAUS_FAILURE.
+///
+////////////////////////////////////////////////////////////////////////////////////
+int GlobalWaypointDriver::GenerateEvent(const Event* eventInfo)
+{
+    int result = JAUS_FAILURE;
+    if(eventInfo->GetMessageCode() == JAUS_REPORT_WAYPOINT_COUNT)
+    {
+        ReportWaypointCount report;
+        mGlobalWaypointDriverMutex.Enter();
+        report.SetWaypointCount(mWaypointList.size());
+        mGlobalWaypointDriverMutex.Leave();
+
+        // Send event message to everyone.
+        EventManager::GenerateEvent(eventInfo, &report, GetConnectionHandler());
+    }
+    else
+    {
+        // See if the parent class supports the event.
+        result = InformComponent::GenerateEvent(eventInfo);
+    }
+
+    return result;
+}
+
+////////////////////////////////////////////////////////////////////////////////////
+///
+///   \brief Anytime a request is received to Create an Event, this function is
+///          called.  This function then determines if an event will be created for
+///          the requesting component.
+///
+///   If this function return JAUS_OK, then an event is created and added to
+///   the EventManager.  If the event is periodic, then the InformComponent
+///   class will generate the events by called the UpdatePeriodicEvent function.
+///   In all other cases, it is up to this child class of InformComponent
+///   to generate the events.
+///
+///   THIS MESSAGE ONLY SUPPORTS EVERY_CHANGE EVENTS. Overload if support for
+///   other event types is desired. 
+///
+///   \param command The Create Event request message.
+///   \param responseValue The response to the request. See 
+///          ConfirmEventRequest::ResponseValues for values. This value must
+///          be set no matter what.
+///   \param confirmedRate The periodic rate that can be supported (if the
+///                        event is periodic).
+///   \param errorMessage If event not supported, the error message is copied
+///                       to this variable.
+///
+///   \return JAUS_OK if the class supports the event (responeValue should be
+///   set to ConfirmEventRequest::ResponseCode::Successful in this case).  
+///   otherwise return JAUS_FAILURE if the event is not supported/refused.
+///
+////////////////////////////////////////////////////////////////////////////////////
+int GlobalWaypointDriver::ProcessEventRequest(const Jaus::CreateEventRequest& command,
+                                Byte& responseValue,
+                                double& confirmedRate,
+                                std::string& errorMessage) const
+{
+    int result = JAUS_FAILURE;
+   
+    // Currently only supports events for global pose.
+    if(command.GetMessageCode() == JAUS_REPORT_WAYPOINT_COUNT)
+    {
+        // Initialize the response value to something.
+        responseValue = RejectEventRequest::MessageNotSupported;
+        // This implementation of a Waypoint Driver only supports EveryChange, so check for unsupported types.
+        if(command.GetEventType() == CreateEventRequest::EveryChange)
+        {
+            result = JAUS_OK;
+        }
+        else
+        {
+            errorMessage = "Only Every Change Events Supported";
+        }
+    }
+    else
+    {
+        result = CommandComponent::ProcessEventRequest(command, responseValue, confirmedRate, errorMessage);
+    }
+
+    return result;
+}
+
+////////////////////////////////////////////////////////////////////////////////////
+///
+///   \brief Adds a new global waypoint to the desintation list. The waypoint will
+///   be processed in the order that it is received. 
+///
+///   \param waypointCommand The new waypoint to add to the waypoint list
 ///
 ////////////////////////////////////////////////////////////////////////////////////
 int GlobalWaypointDriver::SetGlobalWaypoint(const Jaus::SetGlobalWaypoint& waypointCommand)
 {
-    mWaypointList.insert( std::pair<UInt, Jaus::SetGlobalWaypoint>(waypointCommand.GetWaypointNumber(), waypointCommand) );
+    mGlobalWaypointDriverMutex.Enter();
+    //mWaypointList.insert( std::pair<UInt, Jaus::SetGlobalWaypoint>(waypointCommand.GetWaypointNumber(), waypointCommand) );
+    mWaypointList[waypointCommand.GetWaypointNumber()] = waypointCommand;
+    WaypointCountUpdated();
+    mGlobalWaypointDriverMutex.Leave();
     return JAUS_OK;
 }
 
@@ -446,6 +607,8 @@ int GlobalWaypointDriver::SetGlobalWaypoint(const Jaus::SetGlobalWaypoint& waypo
 ///
 ///   \brief Sets the ID of the Global Vector Driver to use to acquire
 ///          attitude and elevation data for vector control.
+///
+///   \param id The address of the global vector driver
 ///
 ////////////////////////////////////////////////////////////////////////////////////
 void GlobalWaypointDriver::SetGlobalVectorDriverID(const Address& id)
@@ -457,6 +620,8 @@ void GlobalWaypointDriver::SetGlobalVectorDriverID(const Address& id)
 ///
 ///   \brief Sets the ID of the Global Pose Sensor to use to acquire
 ///          attitude and elevation data for vector control.
+///
+///   \param id The address of the pose sensor
 ///
 ////////////////////////////////////////////////////////////////////////////////////
 void GlobalWaypointDriver::SetGlobalPoseSensorID(const Address& id)
@@ -486,7 +651,7 @@ GlobalPose GlobalWaypointDriver::GetGlobalPose() const
 
 ////////////////////////////////////////////////////////////////////////////////////
 ///
-///    Gets the list of waypoints the driver must get to.
+///  \return The list of waypoints the driver must get to.
 ///
 ////////////////////////////////////////////////////////////////////////////////////
 GlobalWaypointDriver::WaypointList GlobalWaypointDriver::GetWaypointList() const
@@ -496,7 +661,7 @@ GlobalWaypointDriver::WaypointList GlobalWaypointDriver::GetWaypointList() const
 
 ////////////////////////////////////////////////////////////////////////////////////
 ///
-///    Gets the current waypoint being driven to. (The first one on the list)
+///  \return The current waypoint being driven to. (The first one on the list)
 ///
 ////////////////////////////////////////////////////////////////////////////////////
 Jaus::SetGlobalWaypoint GlobalWaypointDriver::GetCurrentDesiredGlobalWaypoint() const
@@ -516,17 +681,21 @@ Jaus::SetGlobalWaypoint GlobalWaypointDriver::GetCurrentDesiredGlobalWaypoint() 
 
 ////////////////////////////////////////////////////////////////////////////////////
 ///
-///    Sets the desired speed the platform should move to a waypoint
+///  \brief Sets the desired speed the platform should move to a waypoint
+///
+///  \param speed The speed to set as the travel speed
 ///
 ////////////////////////////////////////////////////////////////////////////////////
 void GlobalWaypointDriver::SetTravelSpeed(const double speed)
 {
+    mGlobalWaypointDriverMutex.Enter();
     mDesiredTravelSpeed = speed;
+    mGlobalWaypointDriverMutex.Leave();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////
 ///
-///    Gets the desired speed the platform should move to a waypoint
+///  \brief Gets the desired speed the platform should move to a waypoint
 ///
 ////////////////////////////////////////////////////////////////////////////////////
 double GlobalWaypointDriver::GetTravelSpeed() const
@@ -544,28 +713,34 @@ double GlobalWaypointDriver::GetTravelSpeed() const
 ///
 ////////////////////////////////////////////////////////////////////////////////////
 void GlobalWaypointDriver::GlobalWaypointDriverThread(void *args)
-{
-    
+{   
     GlobalWaypointDriver* driver = (GlobalWaypointDriver*)(args);
     Jaus::SetGlobalWaypoint globalWaypoint;
     Jaus::SetGlobalVector globalVector;
     while(driver && !driver->mGlobalWaypointDriverThread.QuitThreadFlag())
     {
+		//std::cout << driver->GetTravelSpeed() << "   ";
+		//std::cout << driver->mWaypointList.size() << "   ";
+		//std::cout << driver->IsGlobalPoseSubscriptionReady() << "   ";
+		//std::cout << driver->HaveControlOfGlobalVectorDriver() << "     ";
         // If we are in a ready state, and we have the necessary
         // sensor data required, and control of a primitive driver
         // then generate wrench efforts!
         if(driver->GetPrimaryStatus() == Component::Status::Ready &&
             driver->IsGlobalPoseSubscriptionReady() &&
-            driver->HaveControlOfGlobalVectorDriver() &&
-            !driver->mWaypointList.empty())
+            !driver->mWaypointList.empty() &&
+            driver->HaveControlOfGlobalVectorDriver()
+            )
         {
+			
             // Generate the global vector to send to the
             // global vector driver component.
-            if(driver->IsWaypointAcheived(driver->GetCurrentDesiredGlobalWaypoint()))
+            if(driver->IsWaypointAchieved(driver->GetCurrentDesiredGlobalWaypoint()))
             {
                 // Remove current waypoint
                 WaypointList::iterator wpl_itr = driver->mWaypointList.begin();
                 driver->mWaypointList.erase(wpl_itr);
+                driver->WaypointCountUpdated();
             }
             
             //if this is true, it means that we just removed the last waypoint from the list.
@@ -582,6 +757,12 @@ void GlobalWaypointDriver::GlobalWaypointDriverThread(void *args)
             globalVector.SetSourceID(driver->GetID());
             // Send the command.
             driver->Send(&globalVector);
+
+            if(driver->mWaypointList.empty())
+            {
+				driver->SendStandbyCommand(driver->mGlobalVectorDriverID);
+                driver->ReleaseComponentControl(driver->mGlobalVectorDriverID);
+            }
         }
         else if(driver->GetPrimaryStatus() != Component::Status::Ready)
         {
@@ -596,12 +777,20 @@ void GlobalWaypointDriver::GlobalWaypointDriverThread(void *args)
             {
                 driver->CancelEvents(driver->mGlobalVectorDriverID);
             }
-            driver->mGlobalWaypointDriverMutex.Enter();
-            driver->mWaypointList.clear();
-            driver->mGlobalWaypointDriverMutex.Leave();
+			if(driver->GetPrimaryStatus() != Component::Status::Standby)
+			{
+				driver->mGlobalWaypointDriverMutex.Enter();
+				driver->mWaypointList.clear();
+				driver->mGlobalWaypointDriverMutex.Leave();
+			}
+            if(driver->HaveComponentControl(driver->mGlobalVectorDriverID))
+            {
+                driver->SendStandbyCommand(driver->mGlobalVectorDriverID);
+                driver->ReleaseComponentControl(driver->mGlobalVectorDriverID);
+            }            
         }
         // Delay refresh based on update rate set.
-        Sleep( (unsigned int)(1000.0/driver->mGlobalWaypointDriverUpdateRateHz) );
+        CxUtils::SleepMs( (unsigned int)(1000.0/driver->mGlobalWaypointDriverUpdateRateHz) );
     }
     // If not in a ready state, then we must release control
     // of all components being commanded and stop
@@ -617,8 +806,12 @@ void GlobalWaypointDriver::GlobalWaypointDriverThread(void *args)
 
     driver->mGlobalWaypointDriverMutex.Enter();
     driver->mWaypointList.clear();
+    driver->WaypointCountUpdated();
     driver->mGlobalWaypointDriverMutex.Leave();
     
+    driver->SendStandbyCommand(driver->mGlobalVectorDriverID);
+    driver->ReleaseComponentControl(driver->mGlobalVectorDriverID);
+    driver->Standby();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////

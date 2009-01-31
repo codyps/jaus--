@@ -8,7 +8,6 @@ CXXFLAGS 	:= -Wall
 JAUSDIR  := ../../../..
 DESTDIR  := $(JAUSDIR)/lib
 ODIR     := $(JAUSDIR)/bin
-CXUTILSDIR := $(JAUSDIR)/../../../cxutils/trunk/1.0
 
 #--------------------------------------------
 #  Example source files
@@ -36,21 +35,11 @@ EXTINCS		:= $(VLDINC) \
 #   includes
 #---------------------------------------
 JAUSINC		:= $(JAUSDIR)/include
-CXUTILSINC := $(CXUTILSDIR)/include
-INCLUDES := $(CXUTILSINC) \
-			$(JAUSINC) \
+INCLUDES := 		$(JAUSINC) \
 			$(EXTINCS)
 
-#---------------------------------------
-#  Objects
-#---------------------------------------
-CXUTILSOBJ := $(CXUTILSDIR)/build/linux
-CXUTILSOBJS := $(foreach DIR,$(CXUTILSOBJ),  $(addprefix $(CXUTILSOBJ)/, $(notdir $(wildcard $(DIR)/*.o))))
-
-#---------------------------------------
 #  Libraries
 #---------------------------------------
-CXUTILSLIBDIR := $(CXUTILSDIR)/lib
 EXTLIBDIR     := $(JAUSDIR)/ext/lib
 JAUSLIBDIR		:= $(JAUSDIR)/lib
 LIBPATHS := -L$(CXUTILSLIBDIR) \
@@ -58,11 +47,11 @@ LIBPATHS := -L$(CXUTILSLIBDIR) \
 			-L$(EXTLIBDIR) \
 			-L/usr/lib
 
-CXUTILSLIB	:= cxutils.1.0
+CXUTILSLIB	:= cxutils
 JMSGLIB		:= jmsg.1.0
 PTHREADLIB	:= pthread
 LIBS		:= -l$(CXUTILSLIB) \
-				-l$(JMSGLIB) \
+			-l$(JMSGLIB) \
 			-l$(PTHREADLIB) 
 
 #---------------------------------------

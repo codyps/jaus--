@@ -431,8 +431,8 @@ int VisualSensor::ProcessCommandMessage(const Message* message, const Byte comma
             break;
         case JAUS_SELECT_CAMERA:
             {
-                const SelectCamera* command = 
-                    dynamic_cast<const SelectCamera*>(message);
+                //const SelectCamera* command = 
+                //    dynamic_cast<const SelectCamera*>(message);
                 processed = JAUS_OK;
             }
             break;

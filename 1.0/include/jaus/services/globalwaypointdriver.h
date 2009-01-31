@@ -76,7 +76,7 @@ namespace Jaus
     class JAUS_SRVC_DLL GlobalWaypointDriver : public CommandComponent
     {
     public:
-        typedef std::map<UShort, Jaus::SetGlobalWaypoint> WaypointList;
+        typedef std::map<UInt, Jaus::SetGlobalWaypoint> WaypointList;
         GlobalWaypointDriver();
         virtual ~GlobalWaypointDriver();
         // Returns a presence vector indicating what fields of the Set Global Waypoint Command are supported.
@@ -86,7 +86,7 @@ namespace Jaus
         // Method takes the desired destination and generates a command for the Global Vector Driver.
         virtual int GenerateGlobalVector(const Jaus::SetGlobalWaypoint& desiredDestination, Jaus::SetGlobalVector& desiredVector) = 0;
         // Method checks to see if the waypoint destination has been acheived.
-        virtual bool IsWaypointAcheived(const Jaus::SetGlobalWaypoint& desiredDestination) = 0;
+        virtual bool IsWaypointAchieved(const Jaus::SetGlobalWaypoint& desiredDestination) = 0;
         // Initialize the waypoint driver
         virtual int Initialize(const Byte subsystem,
                                const Byte node,
@@ -104,6 +104,17 @@ namespace Jaus
         virtual int ProcessQueryMessage(const Message* msg);
         // Process inform messages.
         virtual int ProcessInformMessage(const Message* msg);
+
+        // Generates the waypoint count change events
+        void WaypointCountUpdated();
+        // Called when an event needs to be generated
+        virtual int GenerateEvent(const Event* eventInfo);
+        // Process event requests
+        virtual int ProcessEventRequest(const Jaus::CreateEventRequest& command,
+                                        Byte& responseValue,
+                                        double& confirmedRate,
+                                        std::string& errorMessage) const;
+
         // Sets a global waypoint to reach.
         virtual int SetGlobalWaypoint(const Jaus::SetGlobalWaypoint& waypointCommand);
         // Sets the ID of the Global Vector Driver to use to get to a destination.

@@ -177,6 +177,10 @@
         <File Name="../../../../src/jaus/messages/experimental/sick/querysicklidar.cpp"/>
         <File Name="../../../../src/jaus/messages/experimental/sick/reportsicklidar.cpp"/>
       </VirtualDirectory>
+      <VirtualDirectory Name="video">
+        <File Name="../../../../src/jaus/messages/experimental/video/querypixelonscreen.cpp"/>
+        <File Name="../../../../src/jaus/messages/experimental/video/reportpixelonscreen.cpp"/>
+      </VirtualDirectory>
     </VirtualDirectory>
     <File Name="../../../../src/jaus/messages/address.cpp"/>
     <File Name="../../../../src/jaus/messages/date.cpp"/>
@@ -376,6 +380,10 @@
       <VirtualDirectory Name="sick">
         <File Name="../../../../include/jaus/messages/experimental/sick/querysicklidar.h"/>
         <File Name="../../../../include/jaus/messages/experimental/sick/reportsicklidar.h"/>
+      </VirtualDirectory>
+      <VirtualDirectory Name="video">
+        <File Name="../../../../include/jaus/messages/experimental/video/querypixelonscreen.h"/>
+        <File Name="../../../../include/jaus/messages/experimental/video/reportpixelonscreen.h"/>
       </VirtualDirectory>
     </VirtualDirectory>
     <File Name="../../../../include/jaus/messages/address.h"/>

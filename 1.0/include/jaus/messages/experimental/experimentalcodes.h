@@ -64,8 +64,14 @@ namespace Jaus
         return false;
     }
 
+    // Query Messages
     const UShort JAUS_QUERY_SICK_LIDAR                                  =   0xD300;
-    const UShort JAUS_REPORT_SICK_LIDAR                                 =   0xD900;
+    const UShort JAUS_QUERY_PIXEL_ON_SCREEN                             =   0xD301;
+
+
+    // Report Messages
+    const UShort JAUS_REPORT_SICK_LIDAR                                 =   0xD900;    
+    const UShort JAUS_REPORT_PIXEL_ON_SCREEN                            =   0xD901;
 }
 
 #endif

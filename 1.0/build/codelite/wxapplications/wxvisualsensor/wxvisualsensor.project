@@ -13,6 +13,7 @@
     <File Name="../../../../include/wxvisualsensor/visualsensorframe.h"/>
     <File Name="../../../../ext/include/cv/cvimagecapture.h"/>
   </VirtualDirectory>
+  <Dependencies Name="Debug"/>
   <Settings Type="Executable">
     <Configuration Name="Debug" CompilerType="gnu g++" DebuggerType="GNU gdb debugger" Type="Executable">
       <General OutputFile="../../../../bin/wxvisualsensor_d" IntermediateDirectory="../../../../tmp/wxvisualsensor_d" Command="./wxvisualsensor_d" CommandArguments="settings/cameras/video_file_example.xml" WorkingDirectory="../../../../bin" PauseExecWhenProcTerminates="yes"/>
@@ -39,27 +40,28 @@
         <Library Value="pthread"/>
       </Linker>
       <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="">
-        <PostConnectCommands/>
-        <StartupCommands/>
+        <PostConnectCommands></PostConnectCommands>
+        <StartupCommands></StartupCommands>
       </Debugger>
       <ResourceCompiler Required="yes" Options="$(shell wx-config --rcflags)"/>
       <PreBuild/>
       <PostBuild/>
       <CustomBuild Enabled="no">
-        <CleanCommand/>
-        <BuildCommand/>
-        <SingleFileCommand/>
-        <MakefileGenerationCommand/>
+        <CleanCommand></CleanCommand>
+        <BuildCommand></BuildCommand>
+        <PreprocessFileCommand></PreprocessFileCommand>
+        <SingleFileCommand></SingleFileCommand>
+        <MakefileGenerationCommand></MakefileGenerationCommand>
         <ThirdPartyToolName>None</ThirdPartyToolName>
-        <WorkingDirectory/>
+        <WorkingDirectory></WorkingDirectory>
       </CustomBuild>
       <AdditionalRules>
-        <CustomPostBuild/>
-        <CustomPreBuild/>
+        <CustomPostBuild></CustomPostBuild>
+        <CustomPreBuild></CustomPreBuild>
       </AdditionalRules>
     </Configuration>
     <Configuration Name="Release" CompilerType="gnu g++" DebuggerType="GNU gdb debugger" Type="Executable">
-      <General OutputFile="../../../../bin/wxvisualsensor" IntermediateDirectory="../../../../tmp/wxvisualsensor" Command="./wxvisualsensor" CommandArguments="settings/cameras/video_file_example.xml" WorkingDirectory="../../../../bin/" PauseExecWhenProcTerminates="yes"/>
+      <General OutputFile="../../../../bin/wxvisualsensor" IntermediateDirectory="../../../../tmp/wxvisualsensor" Command="./wxvisualsensor" CommandArguments="settings/cameras/test.xml" WorkingDirectory="../../../../bin/" PauseExecWhenProcTerminates="yes"/>
       <Compiler Required="yes" Options=";$(shell wx-config --cxxflags --unicode=yes --debug=no)">
         <IncludePath Value="../../../../../../../cxutils/trunk/1.0/include"/>
         <IncludePath Value="../../../../include"/>
@@ -83,26 +85,28 @@
         <Library Value="pthread"/>
       </Linker>
       <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="">
-        <PostConnectCommands/>
-        <StartupCommands/>
+        <PostConnectCommands></PostConnectCommands>
+        <StartupCommands></StartupCommands>
       </Debugger>
       <ResourceCompiler Required="yes" Options="$(shell wx-config --rcflags)"/>
       <PreBuild/>
       <PostBuild/>
       <CustomBuild Enabled="no">
-        <CleanCommand/>
-        <BuildCommand/>
-        <SingleFileCommand/>
-        <MakefileGenerationCommand/>
+        <CleanCommand></CleanCommand>
+        <BuildCommand></BuildCommand>
+        <PreprocessFileCommand></PreprocessFileCommand>
+        <SingleFileCommand></SingleFileCommand>
+        <MakefileGenerationCommand></MakefileGenerationCommand>
         <ThirdPartyToolName>None</ThirdPartyToolName>
-        <WorkingDirectory/>
+        <WorkingDirectory></WorkingDirectory>
       </CustomBuild>
       <AdditionalRules>
-        <CustomPostBuild/>
-        <CustomPreBuild/>
+        <CustomPostBuild></CustomPostBuild>
+        <CustomPreBuild>
+
+</CustomPreBuild>
       </AdditionalRules>
     </Configuration>
   </Settings>
-  <Dependencies Name="Debug"/>
   <Dependencies Name="Release"/>
 </CodeLite_Project>

@@ -8,7 +8,6 @@ CXXFLAGS 	:= -Wall
 JAUSDIR  := ../../../..
 DESTDIR  := $(JAUSDIR)/lib
 ODIR     := $(JAUSDIR)/bin
-CXUTILSDIR := $(JAUSDIR)/../../../cxutils/trunk/1.0
 
 #--------------------------------------------
 #  Example source files
@@ -32,26 +31,22 @@ EXTINCS		:= -I$(VLDINC) \
 #   includes
 #---------------------------------------
 JAUSINC		:= $(JAUSDIR)/include
-CXUTILSINC := $(CXUTILSDIR)/include
-INCLUDES := -I$(CXUTILSINC) \
-			-I$(JAUSINC) \
+INCLUDES := 		-I$(JAUSINC) \
 			  $(EXTINCS)
 
 
 #---------------------------------------
 #  Libraries
 #---------------------------------------
-CXUTILSLIBDIR := $(CXUTILSDIR)/lib
 EXTLIBDIR     := $(JAUSDIR)/ext/lib
 JAUSLIBDIR		:= $(JAUSDIR)/lib
 
-LIBPATHS := -L$(CXUTILSLIBDIR) \
-			-L$(JAUSLIBDIR) \
+LIBPATHS := 		-L$(JAUSLIBDIR) \
 			-L$(EXTLIBDIR) \
 			-L$(LIBJPGDIR) \
 			-L/usr/lib
 
-CXUTILSLIB	:= cxutils.1.0
+CXUTILSLIB	:= cxutils
 JMSGLIB		:= jmsg.1.0  
 JCMPLIB		:= jcmp.1.0
 JVIDLIB		:= jvideo.1.0
@@ -62,6 +57,7 @@ LIBPNG		:= png
 LIBZ		:= z
 
 LIBS		:= -l$(CXUTILSLIB) \
+		        -l$(TINYLIB) \
 		        -l$(JMSGLIB) \
 		        -l$(JCMPLIB) \
                 -l$(JVIDLIB) \

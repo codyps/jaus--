@@ -1190,8 +1190,8 @@ void GlobalVectorDriver::GlobalVectorDriverThread(void *args)
     if(driver->mPrimitiveDriverID.IsValid() &&
         driver->HaveComponentControl(driver->mPrimitiveDriverID))
     {
-        driver->ReleaseComponentControl(driver->mPrimitiveDriverID);
         driver->SendStandbyCommand(driver->mPrimitiveDriverID);
+        driver->ReleaseComponentControl(driver->mPrimitiveDriverID);
     }
     driver->ClearCurrentVector();
     driver->mGlobalVectorDriverMutex.Enter();

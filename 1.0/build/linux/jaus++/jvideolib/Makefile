@@ -8,7 +8,6 @@ CXXFLAGS 	:= -g -c -fPIC -Wall
 JAUSDIR  := ../../../..
 DESTDIR  := $(JAUSDIR)/lib
 ODIR     := $(JAUSDIR)/obj
-CXUTILSDIR := $(JAUSDIR)/../../../cxutils/trunk/1.0
 INSTALLDIR   	:= /usr
 
 #--------------------------------------------
@@ -44,7 +43,6 @@ OBJECTFILES :=	$(SOURCEFILES:.cpp=.o)
 #   includes dirs
 #---------------------------------------
 
-CXUTILSINC := $(CXUTILSDIR)/include
 	
 EXTINC		:= $(JAUSDIR)/ext/include
 VLDINC		:= $(EXTINC)/vld
@@ -53,7 +51,6 @@ TINYXMLINC	:= $(EXTINC)/tinyxml
 EXTINCS		:= $(VLDINC) \
 				$(CVINC) \
 				$(TINYXMLINC) \
-				$(CXUTILSINC)
 
 #---------------------------------------
 #   objects
@@ -69,21 +66,13 @@ INCLUDES := $(INCDIR) $(EXTINCS)
 #---------------------------------------
 #  Libraries
 #---------------------------------------
-CXUTILSLIBDIR := $(CXUTILSDIR)/lib
 EXTLIBSDIR     := $(JAUSDIR)/ext/lib
 
-LIBS := $(CXUTILSLIBDIR)/cxutils.1.0
-LIBPATH := $(CXUTILSLIBDIR) \
-			$(INSTALLDIR)/lib \
+LIBS := cxutils
+LIBPATH := 		$(INSTALLDIR)/lib \
 			$(JAUSDIR)/lib \
-			$(CXUTILSOBJ) \
 			$(EXTLIBS)
 			
-#---------------------------------------
-#  dependencies
-#---------------------------------------
-
-
 #---------------------------------------
 #  rules
 #---------------------------------------
@@ -119,19 +108,19 @@ allclean:
 	@-rm -f $(DESTDIR)/$(ARCHIVE).so
 
 install:
-	cp $(DESTDIR)/$(ARCHIVE).so $(INSTALLDIR)/lib
-	cp $(DESTDIR)/$(ARCHIVE).a $(INSTALLDIR)/lib
+	cp -f $(DESTDIR)/$(ARCHIVE).so $(INSTALLDIR)/lib
+	cp -f $(DESTDIR)/$(ARCHIVE).a $(INSTALLDIR)/lib
 	if test -d $(INSTALLDIR)/include/jaus/video; \
 	then echo exists;                \
 	else mkdir $(INSTALLDIR)/include/jaus/video; \
 	fi
-	cp $(JAUSDIR)/include/jaus/video/*.h $(INSTALLDIR)/include/jaus/video/
+	cp -rf $(JAUSDIR)/include/jaus/video/* $(INSTALLDIR)/include/jaus/video/
 	
 uninstall:
 	rm $(INSTALLDIR)/lib/$(ARCHIVE).so
 	rm $(INSTALLDIR)/lib/$(ARCHIVE).a
 	rm $(INSTALLDIR)/include/jaus/video/*.h
-	rmdir $(INSTALLDIR)/include/jaus/video/	
+	rm -rf $(INSTALLDIR)/include/jaus/video/	
 	
 help: 
 	@echo $(OBJECTFILES)

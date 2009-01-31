@@ -181,6 +181,11 @@ UShort MessageCreator::GetResponseCodes(const UShort mcode, std::set<UShort>* re
             case JAUS_QUERY_SICK_LIDAR:
                 rcode = JAUS_REPORT_SICK_LIDAR;
                 break;
+
+            case JAUS_QUERY_PIXEL_ON_SCREEN:
+                rcode = JAUS_QUERY_PIXEL_ON_SCREEN;
+                break;
+
             default:
                 rcode = 0;
                 break;
@@ -389,6 +394,9 @@ UShort MessageCreator::GetInformQueryType(const UShort informCode)
         // Experimental
         case JAUS_REPORT_SICK_LIDAR:
             code = JAUS_QUERY_SICK_LIDAR;
+            break;
+        case JAUS_REPORT_PIXEL_ON_SCREEN:
+            code = JAUS_REPORT_PIXEL_ON_SCREEN;
             break;
         // Default Output
         default:
@@ -1409,6 +1417,12 @@ std::string MessageCreator::GetExperimentalMessageString(const UShort code)
     case JAUS_REPORT_SICK_LIDAR:
         str = "Report SICK_LIDAR";
         break;
+    case JAUS_QUERY_PIXEL_ON_SCREEN:
+        str = "Query Pixl On Screen";
+        break;
+    case JAUS_REPORT_PIXEL_ON_SCREEN:
+        str = "Report Pixel On Screen";
+        break;
     //  COULD NOT FIND MESSAGE!
     default:
         {
@@ -2064,6 +2078,12 @@ Message* MessageCreator::CreateExperimentalMessage(const UShort code)
          break;
     case JAUS_REPORT_SICK_LIDAR:
         msg = new ReportSickLidar();
+        break;
+    case JAUS_QUERY_PIXEL_ON_SCREEN:
+        msg = new QueryPixelOnScreen();
+        break;
+    case JAUS_REPORT_PIXEL_ON_SCREEN:
+        msg = new ReportPixelOnScreen();
         break;
     //  COULD NOT FIND MESSAGE!
     default:

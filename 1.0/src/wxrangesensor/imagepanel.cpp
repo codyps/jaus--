@@ -199,8 +199,34 @@ void wxImagePanel::SetImage(const wxImage *img)
 {
     if (img && img->Ok())
     {
+        wxSize clientSize = GetSize();
+        int width = img->GetWidth();
+        int height = img->GetHeight();
+        double scale = 1.0;
+        bool resize = false;
+        if(width > clientSize.GetWidth())
+        {
+            resize = true;
+            scale = clientSize.GetWidth()/(double)width;
+            width = clientSize.GetWidth();
+            height = (int)(height*scale);
+        }
+        if(height > clientSize.GetHeight())
+        {
+            resize = true;
+            scale = clientSize.GetHeight()/(double)height;
+            height = clientSize.GetHeight();
+            width = (int)(width*scale);
+        }
         mMutex.Lock();
-        mBitmap = wxBitmap(*img);
+        if(resize)
+        {
+            mBitmap = wxBitmap(img->Scale(width, height, wxIMAGE_QUALITY_HIGH));
+        }
+        else
+        {
+            mBitmap = wxBitmap(*img);
+        }
         this->mUpdated = true;
         wxClientDC realDC(this);
         wxBufferedDC dc(&realDC, mBitmap);

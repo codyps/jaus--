@@ -9,19 +9,19 @@ EXAMPLEBUILDDIR := $(LINUXBUILDDIR)/example
 EXTBUILDDIR := $(JAUSDIR)/ext/build/linux
 
 all:
-	cd $(CXUTILSLINUXDIR); make
+#	cd $(CXUTILSLINUXDIR); make
 	cd $(JAUSBUILDDIR); make
 	cd $(EXAMPLEBUILDDIR); make
 	
 clean:
-	cd $(EXTBUILDDIR); make clean
-	cd $(CXUTILSLINUXDIR); make clean
+#	cd $(EXTBUILDDIR); make clean
+#	cd $(CXUTILSLINUXDIR); make clean
 	cd $(JAUSBUILDDIR); make clean
 	cd $(EXAMPLEBUILDDIR); make clean
 
 allclean:
-	cd $(EXTBUILDDIR); make clean
-	cd $(CXUTILSLINUXDIR); make clean
+#	cd $(EXTBUILDDIR); make clean
+#	cd $(CXUTILSLINUXDIR); make clean
 	cd $(JAUSBUILDDIR); make allclean
 	cd $(EXAMPLEBUILDDIR); make allclean
 
@@ -33,9 +33,9 @@ help:
 	echo $(JAUSBUILDDIR)
 	
 install:
-	cd $(CXUTILSLINUXDIR); make install
+#	cd $(CXUTILSLINUXDIR); make install
 	cd $(JAUSBUILDDIR); make install
 
 uninstall:
-	cd $(CXUTILSLINUXDIR); make uninstall
+#	cd $(CXUTILSLINUXDIR); make uninstall
 	cd $(JAUSBUILDDIR); make uninstall
