@@ -52,6 +52,8 @@
 using namespace Jaus;
 using namespace std;
 
+std::map<UShort, Message*> sCustomMessages;
+CxUtils::Mutex sCustomMessagesMutex;
 
 ////////////////////////////////////////////////////////////////////////////////////
 ///
@@ -74,11 +76,58 @@ MessageCreator::~MessageCreator()
 
 ////////////////////////////////////////////////////////////////////////////////////
 ///
+///   \brief This method is used to add a custom message, one not defined by
+///   the JAUS standard, to the MessageCreator so that components can
+///   de-serialize received data automatically.
+///
+///   This functionality is used to add new messages you have created to the
+///   JAUS interfaces used within this library.  It allows you to add new
+///   messages without the need to modify any of the JAUS++ files.
+///
+///   \param[in] customMessage Pointer to a custom message which will be used
+///              to create more messages of the type defined for reading
+///              received message data by components.
+///
+///   \return OK if added, FAILURE if another message with the same command
+///           code has been used.
+///
+////////////////////////////////////////////////////////////////////////////////////
+int MessageCreator::AddCustomMessage(Message* customMessage)
+{
+    int result = FAILURE;
+    sCustomMessagesMutex.Enter();
+    std::map<UShort, Message*>::iterator msg;
+    msg = sCustomMessages.find(customMessage->GetCommandCode());
+    if(msg == sCustomMessages.end())
+    {
+        sCustomMessages[customMessage->GetCommandCode()] = customMessage;
+        customMessage->ClearMessage();
+        result = OK;
+    }
+    sCustomMessagesMutex.Leave();
+    return result;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////
+///
 ///   \brief Deletes any memory allocated by message creator statically.
+///   Examples are custom messages.
 ///
 ////////////////////////////////////////////////////////////////////////////////////
 void MessageCreator::CleanupMessageCreator()
 {
+    sCustomMessagesMutex.Enter();
+    std::map<UShort, Message*>::iterator msg;
+    for(msg = sCustomMessages.begin(); msg != sCustomMessages.end(); msg++)
+    {
+        if(msg->second)
+        {
+            delete msg->second;
+        }
+    }
+    sCustomMessages.clear();
+    sCustomMessagesMutex.Leave();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////
@@ -1467,6 +1516,19 @@ Message *MessageCreator::CreateMessage(const UShort code)
     else
     {
         msg = CreateExperimentalMessage(code);
+    }
+    
+    if(msg == NULL)
+    {
+        // See if it is a custom message added to Creator.
+        std::map<UShort, Message*>::iterator mitr;
+        sCustomMessagesMutex.Enter();
+        mitr = sCustomMessages.find(code);
+        if(mitr != sCustomMessages.end())
+        {
+            msg = mitr->second->Clone();
+        }
+        sCustomMessagesMutex.Leave();
     }
 
     return msg;

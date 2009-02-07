@@ -1294,7 +1294,15 @@ int JSharedMemory::ProcessMultiPacketStream(const Stream& msg, const Header& hea
         // Check for existing data set.
         if(mpstream != mMultiPacketStreams.end())
         {
-            // See if we can add to the existing stream.
+            // Delete and create a stream.  This was recently
+            // added because out of order data would sometimes
+            // get corrupted, therefore this software will only
+            // handle large data sets that arrive in order.
+            mMultiPacketStreams.erase(mpstream);
+            // Now that there is nothing there, the code
+            // later on in this function will create a new
+            // Large Data Set to add to.
+            #if 0
             if(mpstream->second->AddToDataSet(msg))
             {
                 addedFlag = true;
@@ -1304,6 +1312,7 @@ int JSharedMemory::ProcessMultiPacketStream(const Stream& msg, const Header& hea
                    mMultiPacketStreams.erase(mpstream);
                 }
             }
+            #endif
         }
     }
     else

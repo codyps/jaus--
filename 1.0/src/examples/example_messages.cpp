@@ -89,8 +89,8 @@ int main(int argc, char *argv[])
     else
     {
         //MessageExample();
-        LargeDataSetExample();
-        //MessageCreatorExample();
+        //LargeDataSetExample();
+        MessageCreatorExample();
     }
     return 0;
 }
@@ -180,6 +180,61 @@ int MessageCreatorExample()
             cout << "Created correct message using MessageCreator, and was able to read it!\n";
             heartbeat.Print();
         }
+    }
+    
+    delete msg;
+    
+    // Lets add a custom message to the Message Creator.  You should
+    // do this when you have defined a new message type that is
+    // not part of the JAUS++ library.  Failure to do so may make it
+    // difficult for you to send and receive your new message.  The
+    // alternative to this method is to modify the library to include your
+    // custom message.
+    
+    // Create a custom JAUS Message
+    class MyCustomMessage : public Message
+    {
+    public:
+        MyCustomMessage() : Message(0xD800)
+        {
+            mSomeValue = 0;
+        }
+        ~MyCustomMessage()
+        {
+            
+        }
+        virtual int ReadMessageBody(const Stream& message, const UShort version)
+        {
+            return message.Read(mSomeValue);
+        }
+        virtual int WriteMessageBody(Stream& message, const UShort version) const
+        {
+            return message.Write(mSomeValue);
+        }
+        virtual void ClearMessageBody() 
+        {
+            mSomeValue = 0;
+        }
+        virtual Message* Clone() const 
+        {
+             MyCustomMessage* newMsg = new MyCustomMessage();
+             newMsg->mSomeValue = mSomeValue;
+             return newMsg;
+        }
+        virtual UInt GetPresenceVectorMask(const UShort version) const { return 0; }
+        virtual UShort GetPresenceVectorSize(const UShort version) const { return 0; }
+        Int mSomeValue;
+    };
+    
+    // Add the custom message to Creator
+    MessageCreator::AddCustomMessage(new MyCustomMessage());
+    // Now it can be created on the fly dynamically
+    msg = MessageCreator::CreateMessage(0xD800);
+    if(msg)
+    {
+        // Success!  Now cleanup memory.
+        delete msg;
+        msg = NULL;
     }
 
     return 1;

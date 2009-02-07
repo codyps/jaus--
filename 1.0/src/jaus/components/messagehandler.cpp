@@ -121,6 +121,38 @@ MessageHandler::~MessageHandler()
 
 ////////////////////////////////////////////////////////////////////////////////////
 ///
+///   \brief This method is used to ensure certain types of data are not
+///   buffered internally.  You can add a message type, and even tie the data
+///   to a specific source of the information.
+///
+///   This method is extremely useful if you only want to the most recent of
+///   a specific message received.  For example, if you are getting GPS data
+///   and only care about the latest reading, you can make sure that only the
+///   last Global Pose message received is in the message queue when you are
+///   ready to process it.  Another example would be if you are getting the
+///   video feed from a sensor and it takes a while to process the image.  This
+///   method will make sure that you are not creating a bottleneck where you are
+///   still processing a frame 30 seconds in the past!
+///
+///   \param[in] messageCode The type of message to not buffer.
+///   \param[in] source The source of the message to not buffer.  Set to 
+///                     [0, 0, 0, 0] if you don't care who the source of the
+///                     message is.
+///
+///   \return OK on success, FAILURE otherwise.
+///
+////////////////////////////////////////////////////////////////////////////////////
+int MessageHandler::AddToDoNotBufferList(const UShort messageCode, const Address& source)
+{
+    mMessageHandlerMutex.Enter();
+    mDoNotBuffer[source].insert(messageCode);
+    mMessageHandlerMutex.Leave();
+    return OK;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////
+///
 ///   \brief Register a callback to receive stream data when it is ready
 ///   for processing.
 ///

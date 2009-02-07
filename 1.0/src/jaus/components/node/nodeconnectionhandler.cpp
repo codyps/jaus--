@@ -1250,7 +1250,7 @@ int NodeConnectionHandler::SendToNodes(const Stream& msg, const Header& header)
         {
             // Only send a broadcast message to other nodes if the message
             // originated from this node or another subsystem.
-            if((header.mSourceID.mSubsystem == mComponentID.mSubsystem && header.mDestinationID.mNode == mComponentID.mNode) ||
+            if((header.mSourceID.mSubsystem == mComponentID.mSubsystem && header.mSourceID.mNode == mComponentID.mNode) ||
                 header.mSourceID.mSubsystem != mComponentID.mSubsystem)
             {
                 result = OK;
