@@ -64,6 +64,7 @@ namespace Jaus
     class JAUS_CMP_DLL Receipt
     {
         friend class ConnectionHandler;
+        friend class Component;
     public:
         ////////////////////////////////////////////////////////////////////////////////////
         ///

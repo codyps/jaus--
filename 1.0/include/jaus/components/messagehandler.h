@@ -50,6 +50,7 @@
 #include <cxutils/mutex.h>
 #include <list>
 #include <map>
+#include <set>
 
 namespace Jaus
 {
@@ -82,6 +83,8 @@ namespace Jaus
     public:
         MessageHandler();
         virtual ~MessageHandler();
+        // Use this method to make sure some messages are not buffered within internal queue.
+        int AddToDoNotBufferList(const UShort messageCode, const Address& source = Address());
         // Add message to internal queue for processing outside of current thread.
         int AddToMessageQueue(const Stream& msg, const Header* info = NULL);
         // Add a callback for serialized messages.
@@ -147,6 +150,7 @@ namespace Jaus
         Stream *mpCurrentMessage;                           ///<  Pointer to the current message being processed.
         Header *mpCurrentMessageHeader;                     ///<  Pointer to the header of the message being processed.
         volatile unsigned int mLastProcessedMessageTimeMs;  ///<  Time of last processed message in ms.
+        std::map<Address, std::set<UShort> > mDoNotBuffer;  ///<  Messages and sources of messages to not buffer within queue.
     };
 }
 

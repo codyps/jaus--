@@ -196,6 +196,8 @@ namespace Jaus
                                          Byte& auth,
                                          const UShort tms = JAUS_RESPONSE_TIMEOUT_TIME,
                                          const UShort tries = JAUS_MAX_SEND_COUNT);
+        // Use this method to make sure some messages are not buffered within internal queue.
+        int AddToDoNotBufferList(const UShort messageCode, const Address& source = Address());
         // Checks to see if connected to node manager.
         bool IsConnected() const; 
         // Check to see if component is initialized.

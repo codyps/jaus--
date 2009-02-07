@@ -6,7 +6,7 @@
 ///
 ///  <br>Author(s): Daniel Barber
 ///  <br>Created: 26 February 2007
-///  <br>Last Modified: 8 March 2008
+///  <br>Last Modified: 5 February 2009
 ///  <br>Copyright (c) 2007
 ///  <br>Applied Cognition and Training in Immersive Virtual Environments
 ///  <br>(ACTIVE) Laboratory
@@ -42,8 +42,6 @@
 #ifndef __JAUS_MESSAGE_CREATOR_H
 #define __JAUS_MESSAGE_CREATOR_H
 
-#ifdef __cplusplus
-
 #include "jaus/messages/message.h"
 #include "jaus/messages/command/commandcodes.h"
 #include "jaus/messages/query/querycodes.h"
@@ -51,8 +49,6 @@
 #include "jaus/messages/experimental/experimentalcodes.h"
 #include <set>
 #include <string>
-
-#endif //  __cplusplus
 
 namespace Jaus
 {
@@ -72,6 +68,7 @@ namespace Jaus
     public:
         MessageCreator();
         ~MessageCreator();
+        static int AddCustomMessage(Message* customMessage);
         static UShort GetPresenceVectorSize(const UShort code, 
                                             const UShort version = JAUS_DEFAULT_VERSION,
                                             bool* successFlag = NULL);
@@ -97,6 +94,7 @@ namespace Jaus
         static Message* CreateInformMessage(const UShort code);
         static Message* CreateExperimentalMessage(const UShort code);                
     };
+    typedef MessageCreator MessageFactory;  ///<  Message Creator is basically a factory for creating messages.
 }
 
 #endif //  __JAUS_MESSAGE_CREATOR_H
