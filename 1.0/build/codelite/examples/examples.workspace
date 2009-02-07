@@ -12,8 +12,8 @@
   <Project Name="example_eventsubscriber" Path="example_eventsubscriber/example_eventsubscriber.project" Active="No"/>
   <Project Name="example_images" Path="example_images/example_images.project"/>
   <Project Name="example_joystick" Path="example_joystick/example_joystick.project"/>
-  <Project Name="example_messages" Path="example_messages/example_messages.project"/>
-  <Project Name="example_nodemanager" Path="example_nodemanager/example_nodemanager.project" Active="Yes"/>
+  <Project Name="example_messages" Path="example_messages/example_messages.project" Active="Yes"/>
+  <Project Name="example_nodemanager" Path="example_nodemanager/example_nodemanager.project"/>
   <Project Name="example_pdcontroller" Path="example_pdcontroller/example_pdcontroller.project"/>
   <Project Name="example_posesensor" Path="example_posesensor/example_posesensor.project"/>
   <Project Name="example_primitivedriver" Path="example_primitivedriver/example_primitivedriver.project"/>

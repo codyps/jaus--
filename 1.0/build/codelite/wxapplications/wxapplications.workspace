@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <CodeLite_Workspace Name="wxapplications" Database="./wxapplications.tags">
-  <Project Name="wxnodemanager" Path="wxnodemanager/wxnodemanager.project" Active="Yes"/>
+  <Project Name="wxnodemanager" Path="wxnodemanager/wxnodemanager.project" Active="No"/>
   <Project Name="libjmsg" Path="../jaus++/libjmsg/libjmsg.project" Active="No"/>
   <Project Name="libjcmp" Path="../jaus++/libjcmp/libjcmp.project" Active="No"/>
   <Project Name="libjsrvc" Path="../jaus++/libjsrvc/libjsrvc.project" Active="No"/>
   <Project Name="libjvideo" Path="../jaus++/libjvideo/libjvideo.project" Active="No"/>
   <Project Name="cxutils" Path="../../../../../../cxutils/trunk/1.0/build/codelite/cxutils/cxutils.project" Active="No"/>
   <Project Name="wxvideoclient" Path="wxvideoclient/wxvideoclient.project" Active="No"/>
-  <Project Name="wxvisualsensor" Path="wxvisualsensor/wxvisualsensor.project" Active="No"/>
+  <Project Name="wxvisualsensor" Path="wxvisualsensor/wxvisualsensor.project" Active="Yes"/>
   <Project Name="wxrangesensorclient" Path="wxrangesensorclient/wxrangesensorclient.project" Active="No"/>
   <BuildMatrix>
-    <WorkspaceConfiguration Name="Debug" Selected="yes">
+    <WorkspaceConfiguration Name="Debug" Selected="no">
       <Project Name="wxnodemanager" ConfigName="Debug"/>
       <Project Name="libjmsg" ConfigName="Debug"/>
       <Project Name="libjcmp" ConfigName="Debug"/>
@@ -21,7 +21,7 @@
       <Project Name="wxvisualsensor" ConfigName="Debug"/>
       <Project Name="wxrangesensorclient" ConfigName="Debug"/>
     </WorkspaceConfiguration>
-    <WorkspaceConfiguration Name="Release" Selected="no">
+    <WorkspaceConfiguration Name="Release" Selected="yes">
       <Project Name="wxnodemanager" ConfigName="Release"/>
       <Project Name="libjmsg" ConfigName="Release"/>
       <Project Name="libjcmp" ConfigName="Release"/>

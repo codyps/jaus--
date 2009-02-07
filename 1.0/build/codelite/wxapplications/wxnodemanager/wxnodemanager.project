@@ -8,6 +8,11 @@
     <File Name="../../../../include/wxnodemanager/nodemanagerframe.h"/>
   </VirtualDirectory>
   <Dependencies/>
+  <Dependencies Name="Debug">
+    <Project Name="cxutils"/>
+    <Project Name="libjmsg"/>
+    <Project Name="libjcmp"/>
+  </Dependencies>
   <Settings Type="Executable">
     <Configuration Name="Debug" CompilerType="gnu g++" DebuggerType="GNU gdb debugger" Type="Executable">
       <General OutputFile="../../../../bin/wxnodemanager_d" IntermediateDirectory="../../../../tmp/wxnodemanager_d" Command="./wxnodemanager_d" CommandArguments="" WorkingDirectory="../../../../bin" PauseExecWhenProcTerminates="yes"/>
@@ -91,11 +96,6 @@
     </Configuration>
   </Settings>
   <Dependencies Name="Release">
-    <Project Name="cxutils"/>
-    <Project Name="libjmsg"/>
-    <Project Name="libjcmp"/>
-  </Dependencies>
-  <Dependencies Name="Debug">
     <Project Name="cxutils"/>
     <Project Name="libjmsg"/>
     <Project Name="libjcmp"/>
