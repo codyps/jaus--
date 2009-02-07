@@ -1677,6 +1677,7 @@ CvImageCapture::CvImageCapture()
     mImage = NULL;
     mCapture = NULL;
     mSources = 0;
+    mInterlacedFlag = false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////
@@ -1717,13 +1718,19 @@ int CvImageCapture::Start(const char *videoSource,
                           const bool interlace)
 {
     Stop();
-
+    mInterlacedFlag = interlace;
     if( videoSource && (mCapture = cvCaptureFromFile(videoSource)) > 0) {
         mSourceName = videoSource;
         return 1;
     }
-    else if(videoSource && (mCapture = cvCreateCameraCapture(atoi(videoSource))) > 0) {
+    else if(videoSource && (mCapture = cvCreateCameraCapture(atoi(videoSource))) > 0) 
+    {
         mSourceName = videoSource;
+        if(width > 0 && height > 0)
+        {
+            cvSetCaptureProperty(mCapture, CV_CAP_PROP_FRAME_WIDTH, width);
+            cvSetCaptureProperty(mCapture, CV_CAP_PROP_FRAME_HEIGHT, height);
+        }
         return 1;
     }
     return 0;
@@ -1761,7 +1768,16 @@ int CvImageCapture::GetFrame(Image *dest, const bool block)
 {
     if(!mCapture)
         return false;
-
+    
+    IplImage* tmp = NULL;
+    if(dest && GetFrame(tmp, block))
+    {
+        dest->Create(mImage->width, mImage->height, mImage->nChannels);
+        memcpy(dest->mpData, mImage->imageData, mImage->imageSize);
+        cvReleaseImage(&tmp);
+        return 1;
+    }
+    /*
     if( dest && (mImage = cvQueryFrame(mCapture)) != NULL )
     {
         //  Make sure origin is in the top left corner
@@ -1771,13 +1787,9 @@ int CvImageCapture::GetFrame(Image *dest, const bool block)
         }
         dest->Create(mImage->width, mImage->height, mImage->nChannels);
         memcpy(dest->mpData, mImage->imageData, mImage->imageSize);
-        //cvReleaseImage(&mImage);
-        //static unsigned int frameNumber = 0;
-        //char name[256];
-        //sprintf(name, "test%0.3d.jpg", frameNumber++);
-        //cvSaveImage(name, mImage);
         return 1;
     }
+    */
     return 0;
 }
 
@@ -1815,15 +1827,60 @@ int CvImageCapture::GetFrame(IplImage *&image, const bool block)
                 return 0;
             }
         }
-        //  Make sure origin is in the top left corner
-        if(mImage->origin != IPL_ORIGIN_TL)
+        
+        if( !mInterlacedFlag ) 
         {
-            cvFlip(mImage, image, 0);
+            //  Make sure origin is in the top left corner
+            if(mImage->origin != IPL_ORIGIN_TL)
+            {
+                cvFlip(mImage, image, 0);
+            }
+            else
+            {
+                cvCopyImage(mImage, image);
+            }
         }
-        else
+        else 
         {
-            cvCopyImage(mImage, image);
+            for (int i = mImage->height - 1; i > 0; i--)
+            {
+                unsigned char* ptr = (unsigned char *)(mImage->imageData + (mImage->height - i)*mImage->widthStep);
+                unsigned char* iplPtr = (unsigned char *)(image->imageData + i*image->widthStep);
+
+                /*  Perform interlacing so that the video appears clear.  This is
+                    only needed if the video is DV in most cases, which arrives
+                    interlaced. */
+                //For lines that are very top or very bottom we just copy or it is a scanline to use
+                if ((i - 1 < 0) || (i + 1 >= mImage->height) || ((unsigned int)i % 2 == 0) || i == 1) 
+                {
+                    //Just copy
+                    for (int j = 0; j < mImage->width; j++) {
+                        *iplPtr++ = *ptr++; // B
+                        *iplPtr++ = *ptr++; // G
+                        *iplPtr++ = *ptr++; // R
+                    }
+                }
+                else
+                {
+                    unsigned char* dRowUp = ptr - image->widthStep;
+                    unsigned char* dRowDown = ptr + image->widthStep;
+
+                    //Interpolate!!
+                    for (int j = 0; j < mImage->width; j++) {
+                        *iplPtr++ = (*dRowUp++ + *dRowDown++) / 2;  //  B
+                        *iplPtr++ = (*dRowUp++ + *dRowDown++) / 2;  //  G
+                        *iplPtr++ = (*dRowUp++ + *dRowDown++) / 2;  //  R
+                    }
+                }
+            }
+            
+            //  Make sure origin is in the top left corner
+            if(mImage->origin != IPL_ORIGIN_TL)
+            {
+                cvFlip(image, image, 0);
+            }
         }
+        
         return 1;
     }
     return 0;

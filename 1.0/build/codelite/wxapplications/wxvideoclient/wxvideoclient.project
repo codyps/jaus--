@@ -11,14 +11,6 @@
     <File Name="../../../../include/wxvisualsensor/imagepanel.h"/>
     <File Name="../../../../include/wxvisualsensor/videoclientframe.h"/>
   </VirtualDirectory>
-  <Dependencies Name="Debug">
-    <Project Name="cxutils"/>
-    <Project Name="libjmsg"/>
-    <Project Name="libjcmp"/>
-    <Project Name="libjsrvc"/>
-    <Project Name="libjvideo"/>
-    <Project Name="wxnodemanager"/>
-  </Dependencies>
   <Settings Type="Executable">
     <Configuration Name="Debug" CompilerType="gnu g++" DebuggerType="GNU gdb debugger" Type="Executable">
       <General OutputFile="../../../../bin/wxvideoclient_d" IntermediateDirectory="../../../../tmp/wxvideoclient_d" Command="./wxvideoclient_d" CommandArguments="1.1.37.1" WorkingDirectory="../../../../bin" PauseExecWhenProcTerminates="yes"/>
@@ -106,6 +98,14 @@
     </Configuration>
   </Settings>
   <Dependencies Name="Release">
+    <Project Name="cxutils"/>
+    <Project Name="libjmsg"/>
+    <Project Name="libjcmp"/>
+    <Project Name="libjsrvc"/>
+    <Project Name="libjvideo"/>
+    <Project Name="wxnodemanager"/>
+  </Dependencies>
+  <Dependencies Name="Debug">
     <Project Name="cxutils"/>
     <Project Name="libjmsg"/>
     <Project Name="libjcmp"/>

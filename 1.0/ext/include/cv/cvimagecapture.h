@@ -205,6 +205,7 @@ protected:
     CvCapture *mCapture;
     std::string mSourceName;    ///<  Name of video source.
     unsigned int mSources;      ///<  Number of sources on system.
+    bool mInterlacedFlag;       ///<  If true, images from camera are interlaced.
 };
 
 
