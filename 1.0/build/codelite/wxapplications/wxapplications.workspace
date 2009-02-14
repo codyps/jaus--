@@ -10,7 +10,7 @@
   <Project Name="wxvisualsensor" Path="wxvisualsensor/wxvisualsensor.project" Active="Yes"/>
   <Project Name="wxrangesensorclient" Path="wxrangesensorclient/wxrangesensorclient.project" Active="No"/>
   <BuildMatrix>
-    <WorkspaceConfiguration Name="Debug" Selected="no">
+    <WorkspaceConfiguration Name="Debug" Selected="yes">
       <Project Name="wxnodemanager" ConfigName="Debug"/>
       <Project Name="libjmsg" ConfigName="Debug"/>
       <Project Name="libjcmp" ConfigName="Debug"/>
@@ -21,7 +21,7 @@
       <Project Name="wxvisualsensor" ConfigName="Debug"/>
       <Project Name="wxrangesensorclient" ConfigName="Debug"/>
     </WorkspaceConfiguration>
-    <WorkspaceConfiguration Name="Release" Selected="yes">
+    <WorkspaceConfiguration Name="Release" Selected="no">
       <Project Name="wxnodemanager" ConfigName="Release"/>
       <Project Name="libjmsg" ConfigName="Release"/>
       <Project Name="libjcmp" ConfigName="Release"/>

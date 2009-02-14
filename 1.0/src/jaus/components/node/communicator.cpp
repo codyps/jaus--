@@ -386,6 +386,28 @@ bool Communicator::DefaultDataLink::Transmit(const Stream& data)
                 }// If shared memory, else send using UDP
             } // Send to non-broadcast destination.
         }
+
+        // If we were unable to send, see if we can create a 
+        // connection via shared memory.
+        if(result == false && header.mDestinationID.IsBroadcast() == false)
+        {
+            JSharedMemory* sharedMemory = new JSharedMemory();
+            if(sharedMemory->OpenInbox(header.mDestinationID) == OK &&
+                sharedMemory->EnqueueMessage(data) > 0)
+            {
+                mConnectionsMutex.Enter();
+                mSharedMemoryConnections[header.mDestinationID] = sharedMemory;
+                mConnectionsMutex.Leave();
+                sharedMemory = NULL;
+                result = true;
+            }
+            // Delete any failed connection attempt.
+            if(sharedMemory)
+            {
+                delete sharedMemory;
+                sharedMemory = NULL;
+            }
+        }
     }
 
     return result;

@@ -1152,13 +1152,14 @@ int NodeManager::ProcessQueryMessage(const Message* msg)
             Jaus::ReportSubsystemList response;
             response.SetSourceID(mNodeID);
             response.SetDestinationID(msg->GetSourceID());
+            
             mNodeMutex.Enter();
             if(mSubsystemDiscoveryFlag)
             {
                 mSubsystemList.insert(mNodeID);
             }
-            response.SetSubsystemList(mSubsystemList);
             mNodeMutex.Leave();
+            response.SetSubsystemList(GetSubsystemList());
             Send(&response);
         }
         break;
@@ -1813,9 +1814,31 @@ void NodeManager::ToggleBroadcastUDP(const bool on)
 Address::Set NodeManager::GetSubsystemList() const
 {
     Address::Set list;
+    
     mNodeMutex.Enter();
     list = mSubsystemList;
     mNodeMutex.Leave();
+    // Check for nodes we discovered through shared memory
+    // and add them to the list if needed.
+    Address::Set knownNodes = mpConnectionHandler->GetNodeConnections();
+    Address::Set::iterator node;
+    Address::Set::iterator ss;
+    for(node = knownNodes.begin(); node != knownNodes.end(); node++)
+    {
+        bool add = true;
+        for(ss = list.begin(); ss != list.end(); ss++)
+        {
+            if(ss->mSubsystem == node->mSubsystem)
+            {
+                add = false;
+                break;
+            }
+        }
+        if(add)
+        {
+            list.insert(*node);
+        }
+    }
     return list;
 }
 
@@ -2029,10 +2052,7 @@ void NodeManager::ReportSubsystemList(const Address& dest, const bool lockNode)
 
     report.SetSourceID(mNodeID);
     report.SetDestinationID(dest);
-
-    if(lockNode) { mNodeMutex.Enter(); }
-    report.SetSubsystemList(mSubsystemList);
-    if(lockNode) { mNodeMutex.Leave(); }
+    report.SetSubsystemList(GetSubsystemList());
 
     Send(&report);
 }
@@ -2053,10 +2073,7 @@ void NodeManager::ReportSubsystemList(const Event* eventInfo, const bool lockNod
 
     report.SetSourceID(mNodeID);
     report.SetDestinationID(eventInfo->GetEventProvider());
-
-    if(lockNode) { mNodeMutex.Enter(); }
-    report.SetSubsystemList(mSubsystemList);
-    if(lockNode) { mNodeMutex.Leave(); }
+    report.SetSubsystemList(GetSubsystemList());
 
     EventManager::GenerateEvent(eventInfo, &report, mpConnectionHandler);
 }
@@ -2166,9 +2183,10 @@ void NodeManager::ReportSubsystemListEvent(const bool lockNode, const bool lockE
     {
         mSubsystemList.insert(mNodeID);
     }
-    reportSubsystemList.SetSubsystemList(mSubsystemList);
 
     if(lockNode) { mNodeMutex.Leave(); }
+
+    reportSubsystemList.SetSubsystemList(GetSubsystemList());
 
     if(lockEvents) { mEvents.Lock(); }
 

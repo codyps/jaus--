@@ -1718,10 +1718,16 @@ int CvImageCapture::Start(const char *videoSource,
                           const bool interlace)
 {
     Stop();
+    // Check to see if the videoSource is a device enumeration, and if so
+    // use camera interface, otherwise try to open a file.
     mInterlacedFlag = interlace;
-    if( videoSource && (mCapture = cvCaptureFromFile(videoSource)) > 0) {
-        mSourceName = videoSource;
-        return 1;
+    if( videoSource && strstr(videoSource, "."))
+    {        
+        if( (mCapture = cvCaptureFromFile(videoSource)) > 0) 
+        {
+            mSourceName = videoSource;
+            return 1;
+        }
     }
     else if(videoSource && (mCapture = cvCreateCameraCapture(atoi(videoSource))) > 0) 
     {
@@ -1818,7 +1824,11 @@ int CvImageCapture::GetFrame(IplImage *&image, const bool block)
             image->roi != NULL              ||
             image->nChannels != mImage->nChannels)
         {
-            cvReleaseImage(&image);
+            if(image)
+            {
+                cvReleaseImage(&image);
+            }
+            
             image = cvCreateImage(cvSize(mImage->width, mImage->height),
                                   mImage->depth,
                                   mImage->nChannels);

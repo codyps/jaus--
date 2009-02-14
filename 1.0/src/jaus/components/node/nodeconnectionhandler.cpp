@@ -156,7 +156,15 @@ int NodeConnectionHandler::Initialize(const Byte sid,
             mTcpInput.SetNetworkInterface(mNetworkInterface);
             mMulticastUDP.SetNetworkInterface(mNetworkInterface);
             mBroadcastUDP.SetNetworkInterface(mNetworkInterface);
-            if(mUdpInput.Initialize(this, mMulticastAddress) || CxUtils::Socket::GetNumInterfaces() == 0)
+
+            bool noNetworkConnection = false;
+            std::vector<std::string> hostnames;
+            CxUtils::Socket::GetLocalhostNames(hostnames);
+            if(hostnames.size() == 0 || hostnames.size() == 1 && hostnames[0] == "127.0.0.1")
+            {
+                noNetworkConnection = true;
+            }
+            if(mUdpInput.Initialize(this, mMulticastAddress) || noNetworkConnection == true)
             {
                 #ifdef JAUS_DEBUG
                 cout << "Success!\n";
