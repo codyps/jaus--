@@ -134,7 +134,7 @@ namespace Jaus
                          const LongFloat lower, 
                          const ScaledInteger::Type type,
                          const unsigned int pos = UINT_MAX) const;        
-        virtual int Read(Stream& stream, Header* header = NULL);
+        virtual int Read(Stream& stream, Header& header, const unsigned int pos = UINT_MAX) const;
         
         int ReadMessage(const unsigned char* buff,
                         const unsigned int len,

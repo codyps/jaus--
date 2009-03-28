@@ -77,6 +77,9 @@ namespace Jaus
             std::string mActorName;         ///<  Name of the actor (instance of an model/object).
             CxUtils::Point3D mOrientation;  ///<  X = roll, Y = pitch, Z = yaw of entity in radians.
             CxUtils::Wgs mPosition;         ///<  Position of data in environment.
+            CxUtils::Wgs mVehiclePosition;  ///<  Position of the vehicle.
+            Float mDistance;                ///<  Distance to target.
+            Float mAngle;                   ///<  Angle relative to vehicle position that target is at.
         };
 
         ReportPixelOnScreen();

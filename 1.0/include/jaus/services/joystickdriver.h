@@ -174,6 +174,8 @@ namespace Jaus
         int TakeDriveControl(const bool enable = true);
         // Take/Release control of a subsystems visual sensor pose.
         int TakeCameraControl(const bool enable = true);
+        // Turn on or off automatic generation of resistive efforts.
+        void EnableAutoBrakingFlag(const bool enable = true);
         // Set joystick to control Primitive Driver or Global Vector Driver component.
         void SetPrimitiveDriverJoystick(const bool primitiveController = true);
         // Are we generating vectors or wrench efforts?
@@ -200,6 +202,7 @@ namespace Jaus
         Byte mCameraID;                   ///<  ID of the camera to control.
         Address mDriverID;                ///<  ID of driving component to control.
         Address mVisualSensorID;          ///<  ID of visual sensor to control.
+        bool mAutoBrakingFlag;            ///<  If true, joystick sends brake commands when any force wrench is 0.
         bool mTakeDriveControlFlag;       ///<  Take control of driver?
         bool mTakeCameraControlFlag;      ///<  Take control of camera.
         bool mVectorJoystickFlag;         ///<  Are we controlling a Global Vector Driver, or Primitive Driver?
