@@ -368,6 +368,14 @@
 						>
 					</File>
 				</Filter>
+				<Filter
+					Name="planning"
+					>
+					<File
+						RelativePath="..\..\..\..\src\jaus\messages\common\planning\mission.cpp"
+						>
+					</File>
+				</Filter>
 			</Filter>
 			<Filter
 				Name="command"
@@ -1043,6 +1051,14 @@
 					>
 					<File
 						RelativePath="..\..\..\..\include\jaus\messages\common\world\object.h"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="planning"
+					>
+					<File
+						RelativePath="..\..\..\..\include\jaus\messages\common\planning\mission.h"
 						>
 					</File>
 				</Filter>

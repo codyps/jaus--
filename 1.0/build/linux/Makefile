@@ -19,12 +19,6 @@ clean:
 	cd $(JAUSBUILDDIR); make clean
 	cd $(EXAMPLEBUILDDIR); make clean
 
-allclean:
-#	cd $(EXTBUILDDIR); make clean
-#	cd $(CXUTILSLINUXDIR); make clean
-	cd $(JAUSBUILDDIR); make allclean
-	cd $(EXAMPLEBUILDDIR); make allclean
-
 external:
 	cd $(EXTBUILDDIR); make configure
 	cd $(EXTBUILDDIR); make install

@@ -20,57 +20,41 @@ EXVISUALSENSORDIR       :=$(LINUXBUILDDIR)/example/example_visualsensor
 EXSMTESTDIR             :=$(LINUXBUILDDIR)/example/example_smtest
 
 all:
-	cd $(EXCOMPONENTDIR); make
-	cd $(EXCONTROLTRANSFERDIR); make
-	cd $(EXDISCOVERYDIR); make
-	cd $(EXEVENTSUBSCRIBERDIR); make
-	cd $(EXJOYSTICKDIR); make
-	cd $(EXMESSAGESDIR); make
-	cd $(EXNODEMANAGERDIR); make
-	cd $(EXPDCONTROLLERDIR); make
-	cd $(EXPOSESENSORDIR); make
-	cd $(EXPRIMITIVEDRIVERDIR); make
-	cd $(EXSCSUBSCRIBERDIR); make
-	cd $(EXVELOCITYSENSORDIR); make
-	cd $(EXIMAGESDIR); make
-	cd $(EXIMAGESUBSCRIBERDIR); make
-	cd $(EXVISUALSENSORDIR); make
+	cd $(EXCOMPONENTDIR); $(MAKE)
+	cd $(EXCONTROLTRANSFERDIR); $(MAKE)
+	cd $(EXDISCOVERYDIR); $(MAKE)
+	cd $(EXEVENTSUBSCRIBERDIR); $(MAKE)
+	cd $(EXJOYSTICKDIR); $(MAKE)
+	cd $(EXMESSAGESDIR); $(MAKE)
+	cd $(EXNODEMANAGERDIR); $(MAKE)
+	cd $(EXPDCONTROLLERDIR); $(MAKE)
+	cd $(EXPOSESENSORDIR); $(MAKE)
+	cd $(EXPRIMITIVEDRIVERDIR); $(MAKE)
+	cd $(EXSCSUBSCRIBERDIR); $(MAKE)
+	cd $(EXVELOCITYSENSORDIR); $(MAKE)
+	cd $(EXIMAGESDIR); $(MAKE)
+	cd $(EXIMAGESUBSCRIBERDIR); $(MAKE)
+	cd $(EXVISUALSENSORDIR); $(MAKE)
 #	cd $(EXSMTESTDIR); make
 
 
 clean:
-	cd $(EXCOMPONENTDIR); make clean
-	cd $(EXCONTROLTRANSFERDIR); make clean
-	cd $(EXDISCOVERYDIR); make clean
-	cd $(EXEVENTSUBSCRIBERDIR); make clean
-	cd $(EXIMAGESDIR); make clean
-	cd $(EXIMAGESUBSCRIBERDIR); make clean
-	cd $(EXJOYSTICKDIR); make clean
-	cd $(EXMESSAGESDIR); make clean
-	cd $(EXNODEMANAGERDIR); make clean
-	cd $(EXPDCONTROLLERDIR); make clean
-	cd $(EXPOSESENSORDIR); make clean
-	cd $(EXPRIMITIVEDRIVERDIR); make clean
-	cd $(EXSCSUBSCRIBERDIR); make clean
-	cd $(EXVELOCITYSENSORDIR); make clean
-	cd $(EXVISUALSENSORDIR); make clean
+	cd $(EXCOMPONENTDIR); $(MAKE) clean
+	cd $(EXCONTROLTRANSFERDIR); $(MAKE) clean
+	cd $(EXDISCOVERYDIR); $(MAKE) clean
+	cd $(EXEVENTSUBSCRIBERDIR); $(MAKE) clean
+	cd $(EXIMAGESDIR); $(MAKE) clean
+	cd $(EXIMAGESUBSCRIBERDIR); $(MAKE) clean
+	cd $(EXJOYSTICKDIR); $(MAKE) clean
+	cd $(EXMESSAGESDIR); $(MAKE) clean
+	cd $(EXNODEMANAGERDIR); $(MAKE) clean
+	cd $(EXPDCONTROLLERDIR); $(MAKE) clean
+	cd $(EXPOSESENSORDIR); $(MAKE) clean
+	cd $(EXPRIMITIVEDRIVERDIR); $(MAKE) clean
+	cd $(EXSCSUBSCRIBERDIR); $(MAKE) clean
+	cd $(EXVELOCITYSENSORDIR); $(MAKE) clean
+	cd $(EXVISUALSENSORDIR); $(MAKE) clean
 #	cd $(EXSMTESTDIR); make clean
 
-allclean:
-	cd $(EXCOMPONENTDIR); make allclean
-	cd $(EXCONTROLTRANSFERDIR); make allclean
-	cd $(EXDISCOVERYDIR); make allclean
-	cd $(EXEVENTSUBSCRIBERDIR); make allclean
-	cd $(EXIMAGESDIR); make allclean
-	cd $(EXIMAGESUBSCRIBERDIR); make allclean
-	cd $(EXJOYSTICKDIR); make allclean
-	cd $(EXMESSAGESDIR); make allclean
-	cd $(EXNODEMANAGERDIR); make allclean
-	cd $(EXPDCONTROLLERDIR); make allclean
-	cd $(EXPOSESENSORDIR); make allclean
-	cd $(EXPRIMITIVEDRIVERDIR); make allclean
-	cd $(EXSCSUBSCRIBERDIR); make allclean
-	cd $(EXVELOCITYSENSORDIR); make allclean
-	cd $(EXVISUALSENSORDIR); make allclean
-#	cd $(EXSMTESTDIR); make allclean
+
 	

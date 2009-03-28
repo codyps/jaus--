@@ -1,122 +1,64 @@
 # make file
- 
-ARCHIVE  	:= libjsrvc.1.0
-CC 		:= gcc
-CXX      	:= g++
-CXXFLAGS 	:= -g -c -fPIC -Wall
-
-JAUSDIR  := ../../../..
-DESTDIR  := $(JAUSDIR)/lib
-ODIR     := $(JAUSDIR)/obj
+ARCHIVE  		:= libjsrvc
+VER  			:= 1.0
+CXX      		:= g++
+CXXFLAGS 		:= -c -fPIC -Wall
+ROOTDIR			:= ../../../..
+INCDIR 			:= $(ROOTDIR)/include
+SRCDIR      	:= $(ROOTDIR)/src
+DESTDIR  		:= $(ROOTDIR)/lib
 INSTALLDIR   	:= /usr
+ODIR			:= $(ROOTDIR)/obj/$(ARCHIVE)
+LIBS			:= -lcxutils -ljmsg -ljcmp
+LIBDIR			:=	-L$(ROOTDIR)/lib
+INCS			:= -I$(INCDIR) -I$(ROOTDIR)/ext/include/tinyxml
+VPATH 			= $(SRCPATHS) 
 
 #--------------------------------------------
 #  Service source files directories
 #--------------------------------------------
-SRVSRC   	:= $(JAUSDIR)/src/jaus/services
-SRVSRCS		:=  $(SRVSRC)
+SRVSRC  	 	:= $(ROOTDIR)/src/jaus/services
+SRCPATHS		:=  $(SRVSRC)
 	
+INCPATHS := jaus
+SRCFILES	:= 	$(foreach DIR, $(SRCPATHS), $(wildcard $(DIR)/*.cpp))
+#INCFILES 	:= 	$(foreach DIR,$(INCPATHS), $(wildcard $(DIR)/*.h))
+OBJFILES	:=  $(subst .cpp,.o, $(addprefix $(ODIR)/, $(notdir $(SRCFILES))))
 
-#---------------------------------------
-#  Source and Object files for compiling
-#---------------------------------------
+.PHONY: help clean install uninstall
 
-SOURCEFILES	:= 	$(foreach DIR,$(SRVSRCS), $(addprefix $(DIR)/, $(notdir $(wildcard $(DIR)/*.cpp))))
-SOURCEFILENAMES := $(foreach DIR, $(SRVSRCS),$(notdir $(wildcard $(DIR)/*.cpp)))
-OBJECTFILENAMES	:=	$(foreach DIR, $(SOURCEFILENAMES),$(addprefix $(ODIR)/,$(DIR)))
-OBJECTFILES :=	$(SOURCEFILES:.cpp=.o)
+all: $(DESTDIR)/$(ARCHIVE).so $(DESTDIR)/$(ARCHIVE).a
 
-#---------------------------------------
-#   includes dirs
-#---------------------------------------
-SRVINC 		:= $(JAUSDIR)/include
-EXTINC		:= $(JAUSDIR)/ext/include
-VLDINC		:= $(EXTINC)/vld
-CVINC		:= $(EXTINC)/cv
-LIBPNGINC	:= $(EXTINC)/libpng
-TINYXMLINC	:= $(EXTINC)/tinyxml
-LIBJPEGINC	:= $(EXTINC)/libjpeg
-ZLIBINC		:= $(EXTINC)/zlib
-EXTINCS		:= $(VLDINC) \
-				$(CVINC) \
-				$(LIBPNGINC) \
-				$(TINYXMLINC) \
-				$(LIBJPEGINC) \
-				$(ZLIBINC) \
+%.so: $(OBJFILES)
+	$(CXX) -shared -o $@ $^ $(LIBDIR) $(LIBS)
 
-#---------------------------------------
-#  all Includes
-#---------------------------------------
+%.a: $(OBJFILES)
+	ar -rc $@ $^
 
-INCLUDES := $(SRVINC) $(EXTINCS)
+$(ODIR)/%.o: %.cpp $(INCFILES) $(ODIR) 
+	$(CXX) $(CXXFLAGS) -o $@ $< $(INCS) 
 
-#---------------------------------------
-#  Libraries
-#---------------------------------------
-EXTLIBSDIR     := $(JAUSDIR)/ext/lib
-
-LIBS := cxutils
-LIBPATH :=		$(INSTALLDIR)/lib \
-			$(JAUSDIR)/lib \
-			$(EXTLIBS)
-			
-#---------------------------------------
-#  dependencies
-#---------------------------------------
-
-
-#---------------------------------------
-#  rules
-#---------------------------------------
-
-
-all: $(ARCHIVE).a $(ARCHIVE).so
-
-$(ARCHIVE).so:
-	$(CXX) -shared -o  $(DESTDIR)/$@ $(OBJECTFILES) 
-
-$(ARCHIVE).a: $(OBJECTFILES)
-	ar -ruc $(DESTDIR)/$@ $?
-
-.cpp.o:
-	@echo $(CXX) $(CXXFLAGS) $(foreach INC, $(INCLUDES), -I$(INC)) -c $? -o $@
-	@$(CXX) $(CXXFLAGS) $(foreach INC, $(INCLUDES), -I$(INC)) -c $? -o $@
-	
-#depend:
-#	makedepend --  $(CXXFLAGS) $(foreach INC, $(INCLUDES), -I$(INC)) $(SOURCEFILES)
-	
-clean:
-	@echo cleaning up
-	@-rm -f $(foreach DIR,$(SRVSRCS), $(DIR)/*.o)
-	@-rm -f $(ODIR)/*.o
-
-allclean:
-	@echo cleaning up
-	@-rm -f $(foreach DIR,$(SRVSRCS), $(DIR)/*.o)
-	@-rm -f $(ODIR)/*.o
-	@-rm -f $(foreach DIR,$(SRVSRCS), $(DIR)/$(ARCHIVE).a)
-	@-rm -f $(DESTDIR)/$(ARCHIVE).a
-	@-rm -f $(foreach DIR,$(SRVSRCS), $(DIR)/$(ARCHIVE).so)
-	@-rm -f $(DESTDIR)/$(ARCHIVE).so
-	
-install:
-	cp -f $(DESTDIR)/$(ARCHIVE).so $(INSTALLDIR)/lib
-	cp -f $(DESTDIR)/$(ARCHIVE).a $(INSTALLDIR)/lib
-	if test -d $(INSTALLDIR)/include/jaus/services; \
-	then echo exists;                \
-	else mkdir $(INSTALLDIR)/include/jaus/services; \
+$(ODIR):
+	if test -d $@;\
+	then echo Directory exists...; \
+	else mkdir -p $@; \
 	fi
-	cp -rf $(JAUSDIR)/include/jaus/services/* $(INSTALLDIR)/include/jaus/services/
+
+help:
+	@echo $(SRCFILES)
+
+clean:
+	-rm -rf $(ODIR) $(DESTDIR)/$(ARCHIVE).so $(DESTDIR)/$(ARCHIVE).a
+
+install:
+	cp -f $(DESTDIR)/$(ARCHIVE).so $(INSTALLDIR)/lib/$(ARCHIVE).so.$(VER)
+	cp -f $(DESTDIR)/$(ARCHIVE).a $(INSTALLDIR)/lib/$(ARCHIVE).a.$(VER)
+	ln -s -f $(INSTALLDIR)/lib/$(ARCHIVE).so.$(VER) $(INSTALLDIR)/lib/$(ARCHIVE).so
+	ln -s -f $(INSTALLDIR)/lib/$(ARCHIVE).so.$(VER) $(INSTALLDIR)/lib/$(ARCHIVE).a
 	
 uninstall:
-	rm $(INSTALLDIR)/lib/$(ARCHIVE).so
-	rm $(INSTALLDIR)/lib/$(ARCHIVE).a
-	rm $(INSTALLDIR)/include/jaus/services/*.h
-	rm -rf $(INSTALLDIR)/include/jaus/services/	
-	
-help: 
-	@echo $(SRVSRCS)
-	@echo $@
-
-# DO NOT DELETE
+	rm -f $(INSTALLDIR)/lib/$(ARCHIVE).so.$(VER)
+	rm -f $(INSTALLDIR)/lib/$(ARCHIVE).a.$(VER)
+	rm -f $(INSTALLDIR)/lib/$(ARCHIVE).so
+	rm -f $(INSTALLDIR)/lib/$(ARCHIVE).a
 

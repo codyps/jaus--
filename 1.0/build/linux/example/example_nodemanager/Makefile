@@ -1,86 +1,42 @@
 # make file
- 
-TARGET		:= example_nodemanager
-CC 		:= gcc
-CXX      	:= g++
-CXXFLAGS 	:= -Wall
-
-JAUSDIR  := ../../../..
-DESTDIR  := $(JAUSDIR)/lib
-ODIR     := $(JAUSDIR)/bin
-
-#--------------------------------------------
-#  Example source files
-#--------------------------------------------
-SRCDIR   	:= $(JAUSDIR)/src/examples
-	
-#---------------------------------------
-#   external includes
-#---------------------------------------	
-EXTINC		:= $(JAUSDIR)/ext/include
-VLDINC		:= $(EXTINC)/vld
-CVINC		:= $(EXTINC)/cv
-LIBPNGINC	:= $(EXTINC)/libpng
-TINYXMLINC	:= $(EXTINC)/tinyxml
-LIBJPEGINC	:= $(EXTINC)/libjpeg
-ZLIBINC		:= $(EXTINC)/zlib
-EXTINCS		:= -I$(VLDINC) \
-			    -I$(CVINC) \
-				-I$(LIBPNGINC) \
-				-I$(TINYXMLINC) \
-				-I$(LIBJPEGINC) \
-				-I$(ZLIBINC) 
-
-#---------------------------------------
-#   includes
-#---------------------------------------
-JAUSINC		:= $(JAUSDIR)/include
-INCLUDES := 		-I$(JAUSINC) \
-			  $(EXTINCS)
+TARGET			:= example_nodemanager
+CXX      		:= g++
+CXXFLAGS 		:= 
+ROOTDIR			:= ../../../..
+INCDIR 			:= $(ROOTDIR)/include
+SRCDIR      	:= $(ROOTDIR)/src
+DESTDIR  		:= 
+INSTALLDIR   	:= /usr
+ODIR			:= $(ROOTDIR)/bin
+EXTERNALS 		:= 
+# standard libs -lcxutils -ljmsg -ljcmp -ljsrvc -ljvideo -ljpeg -lpng -lz
+LIBS			:= -ljmsg -ljcmp
+LIBDIR			:= -L$(ROOTDIR)/lib
+INCS			:= -I$(INCDIR) 
+VPATH 			= $(SRCPATHS)
 
 
-#---------------------------------------
-#  Libraries
-#---------------------------------------
-EXTLIBDIR     := $(JAUSDIR)/ext/lib
-JAUSLIBDIR		:= $(JAUSDIR)/lib
-LIBPATHS := 		-L$(JAUSLIBDIR) \
-			-L$(EXTLIBDIR) \
-			-L/usr/lib
+.PHONY: help clean install uninstall
+SRCPATHS := $(SRCDIR)/examples
 
-CXUTILSLIB	:= cxutils
-JMSGLIB		:= jmsg.1.0  
-JCMPLIB		:= jcmp.1.0
-TINYLIB		:= tinyxml
+SRCFILES	:= 	$(foreach DIR, $(SRCPATHS), $(wildcard $(DIR)/$(TARGET).cpp))
+OBJFILES	:=  $(subst .cpp,.out, $(addprefix $(ODIR)/, $(notdir $(SRCFILES))))
 
-LIBS		:= -l$(CXUTILSLIB) \
-		        -l$(JMSGLIB) \
-		        -l$(JCMPLIB) \
-                
+all: $(OBJFILES)
 
-#---------------------------------------
-#  rules
-#---------------------------------------
+$(ODIR)/%.out: %.cpp $(ODIR) 
+	$(CXX) $(CXXFLAGS) -o $@ $< $(INCS) $(LIBS) $(LIBDIR)
 
 
-all: 
-	$(CXX) $(CXXFLAGS) $(INCLUDES) $(LIBPATHS) $(LIBS) $(SRCDIR)/$(TARGET).cpp -o $(ODIR)/$(TARGET).out
-	
-#depend:
-#	makedepend --  $(CXXFLAGS) $(foreach INC, $(INCLUDES), -I$(INC)) $(SOURCEFILES)
-	
+$(ODIR):
+	if test -d $@;\
+	then echo Directory exists...; \
+	else mkdir -p $@; \
+	fi
+
+help:
+	@echo $(OBJFILES)
+
 clean:
-	@echo cleaning up
-	@-rm -f $(ODIR)/$(TARGET).out
-
-allclean:
-	@echo cleaning up
-	@-rm -f $(ODIR)/$(TARGET).out
-
-
-help: 
-	@echo $(VLDINC)
-	@echo $@
-
-# DO NOT DELETE
+	-rm -rf $(OBJFILES)
 

@@ -1,90 +1,42 @@
 # make file
- 
-TARGET		:= example_imagesubscriber
-CC 		:= gcc
-CXX      	:= g++
-CXXFLAGS 	:= -Wall
-
-JAUSDIR  := ../../../..
-DESTDIR  := $(JAUSDIR)/lib
-ODIR     := $(JAUSDIR)/bin
-
-#--------------------------------------------
-#  Example source files
-#--------------------------------------------
-SRCDIR   	:= $(JAUSDIR)/src/examples
-	
-#---------------------------------------
-#   external includes
-#---------------------------------------	
-EXTINC		:= $(JAUSDIR)/ext/include
-VLDINC		:= $(EXTINC)/vld
-CVINC		:= $(EXTINC)/cv
-
-TINYXMLINC	:= $(EXTINC)/tinyxml
-
-EXTINCS		:= -I$(VLDINC) \
-			    -I$(CVINC) \
-				-I$(TINYXMLINC) 
-
-#---------------------------------------
-#   includes
-#---------------------------------------
-JAUSINC		:= $(JAUSDIR)/include
-INCLUDES :=		-I$(JAUSINC) \
-			  $(EXTINCS)
-
-#---------------------------------------
-#  Libraries
-#---------------------------------------
-EXTLIBDIR     := $(JAUSDIR)/ext/lib
-JAUSLIBDIR		:= $(JAUSDIR)/lib
-LIBPATHS := -L$(CXUTILSLIBDIR) \
-			-L$(JAUSLIBDIR) \
-			-L$(EXTLIBDIR) \
-			-L/usr/lib
-
-CXUTILSLIB	:= cxutils
-JMSGLIB		:= jmsg.1.0  
-JCMPLIB		:= jcmp.1.0
-JVIDLIB		:= jvideo.1.0
-JSRVLIB		:= jsrvc.1.0
-TINYLIB		:= tinyxml
-LIBJPG		:= jpeg
-LIBPNG		:= png
-LIBZ		:= z
-
-LIBS		:= -l$(CXUTILSLIB) \
-			-l$(TINYLIB) \
-		        -l$(JMSGLIB) \
-		        -l$(JCMPLIB) \
-			-l$(JVIDLIB) \
-			-l$(LIBJPG) \
-			-l$(LIBPNG) 
-
-#---------------------------------------
-#  rules
-#---------------------------------------
+TARGET			:= example_imagesubscriber
+CXX      		:= g++
+CXXFLAGS 		:= 
+ROOTDIR			:= ../../../..
+INCDIR 			:= $(ROOTDIR)/include
+SRCDIR      	:= $(ROOTDIR)/src
+DESTDIR  		:= 
+INSTALLDIR   	:= /usr
+ODIR			:= $(ROOTDIR)/bin
+EXTERNALS 		:= 
+# standard libs -lcxutils -ljmsg -ljcmp -ljsrvc -ljvideo -ljpeg -lpng -lz
+LIBS			:= -ljmsg -ljcmp -ljsrvc -ljvideo -ljpeg -lpng
+LIBDIR			:= -L$(ROOTDIR)/ext/lib -L$(ROOTDIR)/lib
+INCS			:= -I$(INCDIR) 
+VPATH 			= $(SRCPATHS)
 
 
-all: 
-	$(CXX) $(CXXFLAGS) $(INCLUDES) $(LIBPATHS) $(LIBS) $(SRCDIR)/$(TARGET).cpp -o $(ODIR)/$(TARGET).out
-	
-#depend:
-#	makedepend --  $(CXXFLAGS) $(foreach INC, $(INCLUDES), -I$(INC)) $(SOURCEFILES)
-	
+.PHONY: help clean install uninstall
+SRCPATHS := $(SRCDIR)/examples
+
+SRCFILES	:= 	$(foreach DIR, $(SRCPATHS), $(wildcard $(DIR)/$(TARGET).cpp))
+OBJFILES	:=  $(subst .cpp,.out, $(addprefix $(ODIR)/, $(notdir $(SRCFILES))))
+
+all: $(OBJFILES)
+
+$(ODIR)/%.out: %.cpp $(ODIR) 
+	$(CXX) $(CXXFLAGS) -o $@ $< $(INCS) $(LIBS) $(LIBDIR)
+
+
+$(ODIR):
+	if test -d $@;\
+	then echo Directory exists...; \
+	else mkdir -p $@; \
+	fi
+
+help:
+	@echo $(OBJFILES)
+
 clean:
-	@echo cleaning up
-	@-rm -f $(ODIR)/$(TARGET).out
-
-allclean:
-	@echo cleaning up
-	@-rm -f $(ODIR)/$(TARGET).out
-
-
-help: 
-	@echo $(VLDINC)
-	@echo $@
-
-# DO NOT DELETE
+	-rm -rf $(OBJFILES)
 

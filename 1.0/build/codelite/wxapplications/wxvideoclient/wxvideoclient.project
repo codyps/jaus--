@@ -97,7 +97,7 @@
       </AdditionalRules>
     </Configuration>
   </Settings>
-  <Dependencies Name="Release">
+  <Dependencies Name="Debug">
     <Project Name="cxutils"/>
     <Project Name="libjmsg"/>
     <Project Name="libjcmp"/>
@@ -105,7 +105,7 @@
     <Project Name="libjvideo"/>
     <Project Name="wxnodemanager"/>
   </Dependencies>
-  <Dependencies Name="Debug">
+  <Dependencies Name="Release">
     <Project Name="cxutils"/>
     <Project Name="libjmsg"/>
     <Project Name="libjcmp"/>

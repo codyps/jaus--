@@ -13,14 +13,6 @@
     <File Name="../../../../include/wxvisualsensor/visualsensorframe.h"/>
     <File Name="../../../../ext/include/cv/cvimagecapture.h"/>
   </VirtualDirectory>
-  <Dependencies Name="Release">
-    <Project Name="cxutils"/>
-    <Project Name="libjcmp"/>
-    <Project Name="libjmsg"/>
-    <Project Name="libjsrvc"/>
-    <Project Name="libjvideo"/>
-    <Project Name="wxnodemanager"/>
-  </Dependencies>
   <Settings Type="Executable">
     <Configuration Name="Debug" CompilerType="gnu g++" DebuggerType="GNU gdb debugger" Type="Executable">
       <General OutputFile="../../../../bin/wxvisualsensor_d" IntermediateDirectory="../../../../tmp/wxvisualsensor_d" Command="./wxvisualsensor_d" CommandArguments="settings/cameras/cam_enum_example.xml" WorkingDirectory="../../../../bin" PauseExecWhenProcTerminates="yes"/>
@@ -114,6 +106,14 @@
     </Configuration>
   </Settings>
   <Dependencies Name="Debug">
+    <Project Name="cxutils"/>
+    <Project Name="libjcmp"/>
+    <Project Name="libjmsg"/>
+    <Project Name="libjsrvc"/>
+    <Project Name="libjvideo"/>
+    <Project Name="wxnodemanager"/>
+  </Dependencies>
+  <Dependencies Name="Release">
     <Project Name="cxutils"/>
     <Project Name="libjcmp"/>
     <Project Name="libjmsg"/>

@@ -6,11 +6,11 @@
   <Project Name="libjsrvc" Path="../jaus++/libjsrvc/libjsrvc.project" Active="No"/>
   <Project Name="libjvideo" Path="../jaus++/libjvideo/libjvideo.project" Active="No"/>
   <Project Name="cxutils" Path="../../../../../../cxutils/trunk/1.0/build/codelite/cxutils/cxutils.project" Active="No"/>
-  <Project Name="wxvideoclient" Path="wxvideoclient/wxvideoclient.project" Active="No"/>
-  <Project Name="wxvisualsensor" Path="wxvisualsensor/wxvisualsensor.project" Active="Yes"/>
+  <Project Name="wxvideoclient" Path="wxvideoclient/wxvideoclient.project" Active="Yes"/>
+  <Project Name="wxvisualsensor" Path="wxvisualsensor/wxvisualsensor.project" Active="No"/>
   <Project Name="wxrangesensorclient" Path="wxrangesensorclient/wxrangesensorclient.project" Active="No"/>
   <BuildMatrix>
-    <WorkspaceConfiguration Name="Debug" Selected="yes">
+    <WorkspaceConfiguration Name="Debug" Selected="no">
       <Project Name="wxnodemanager" ConfigName="Debug"/>
       <Project Name="libjmsg" ConfigName="Debug"/>
       <Project Name="libjcmp" ConfigName="Debug"/>
@@ -21,7 +21,7 @@
       <Project Name="wxvisualsensor" ConfigName="Debug"/>
       <Project Name="wxrangesensorclient" ConfigName="Debug"/>
     </WorkspaceConfiguration>
-    <WorkspaceConfiguration Name="Release" Selected="no">
+    <WorkspaceConfiguration Name="Release" Selected="yes">
       <Project Name="wxnodemanager" ConfigName="Release"/>
       <Project Name="libjmsg" ConfigName="Release"/>
       <Project Name="libjcmp" ConfigName="Release"/>
