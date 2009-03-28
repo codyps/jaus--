@@ -57,6 +57,8 @@ ReportPixelOnScreen::Data::Data()
     mY = 0.0f;
     mOrientation.Set(0, 0, 0);
     mPosition.Set(0, 0, 0);
+    mDistance = 0.0f;
+    mAngle = 0.0f;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////
@@ -91,6 +93,9 @@ ReportPixelOnScreen::Data& ReportPixelOnScreen::Data::operator=(const Data& data
     mActorName = data.mActorName;   
     mOrientation = data.mOrientation;
     mPosition = data.mPosition;
+    mVehiclePosition = data.mVehiclePosition;
+    mDistance = data.mDistance;
+    mAngle = data.mAngle;
 
     return *this;
 }
@@ -188,6 +193,18 @@ int ReportPixelOnScreen::WriteMessageBody(Stream& msg, const UShort version) con
             expected += JAUS_LONG_FLOAT_SIZE;
             written += msg.Write((LongFloat)data->mPosition.mElevation);
             expected += JAUS_LONG_FLOAT_SIZE;
+
+            written += msg.Write((LongFloat)data->mVehiclePosition.mLatitude);
+            expected += JAUS_LONG_FLOAT_SIZE;
+            written += msg.Write((LongFloat)data->mVehiclePosition.mLongitude);
+            expected += JAUS_LONG_FLOAT_SIZE;
+            written += msg.Write((LongFloat)data->mVehiclePosition.mElevation);
+            expected += JAUS_LONG_FLOAT_SIZE;
+
+            written += msg.Write(data->mDistance);
+            expected += JAUS_FLOAT_SIZE;
+            written += msg.Write(data->mAngle);
+            expected += JAUS_FLOAT_SIZE;
         }
 
         if( written == expected) 
@@ -271,6 +288,18 @@ int ReportPixelOnScreen::ReadMessageBody(const Stream& msg,
             read += msg.Read((LongFloat&)data.mPosition.mElevation);
             expected += JAUS_LONG_FLOAT_SIZE;
 
+            read += msg.Read((LongFloat&)data.mVehiclePosition.mLatitude);
+            expected += JAUS_LONG_FLOAT_SIZE;
+            read += msg.Read((LongFloat&)data.mVehiclePosition.mLongitude);
+            expected += JAUS_LONG_FLOAT_SIZE;
+            read += msg.Read((LongFloat&)data.mVehiclePosition.mElevation);
+            expected += JAUS_LONG_FLOAT_SIZE;
+
+            read += msg.Read(data.mDistance);
+            expected += JAUS_FLOAT_SIZE;
+            read += msg.Read(data.mAngle);
+            expected += JAUS_FLOAT_SIZE;
+
             mDataList.push_back(data);
         }
 
@@ -316,8 +345,9 @@ void ReportPixelOnScreen::PrintData() const
         data++)
     {
         cout << "Actor: " << data->mActorName << ", Model Type: " 
-             << data->mModelType << " WGS[" << data->mPosition.mLatitude << "," 
-             << data->mPosition.mLongitude << "]" << endl;
+             << data->mModelType << endl;
+        cout << "WGS[" << data->mPosition.mLatitude << ", " << data->mPosition.mLongitude << "] <" << data->mOrientation.mX << ", " << data->mOrientation.mY << ", " << data->mOrientation.mZ << endl;
+        cout << "Distance: " << data->mDistance << ", Angle: " << CxUtils::CxToDegrees(data->mAngle) << " degrees. " << endl;
     }
 }
 

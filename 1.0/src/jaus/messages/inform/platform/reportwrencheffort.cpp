@@ -537,6 +537,11 @@ int ReportWrenchEffort::WriteMessageBody(Stream& msg,
             expected +=  JAUS_SHORT_SIZE;
             written += msg.Write(mPropulsiveRotationalEffortZ, 100.0, -100.0, ScaledInteger::Short);
         }
+        if(BitVector::IsBitSet(mPresenceVector, VectorBit::ResistiveLinearEffortX))
+        {
+            expected +=  JAUS_SHORT_SIZE;
+            written += msg.Write(mResistiveLinearEffortX, 100.0, 0.0, ScaledInteger::Byte);
+        }
         if(BitVector::IsBitSet(mPresenceVector, VectorBit::ResistiveLinearEffortY))
         {
             expected +=  JAUS_SHORT_SIZE;
@@ -627,6 +632,11 @@ int ReportWrenchEffort::ReadMessageBody(const Stream& msg,
         {
             expected +=  JAUS_SHORT_SIZE;
             read += msg.Read(mPropulsiveRotationalEffortZ, 100.0, -100.0, ScaledInteger::Short);
+        }
+        if(BitVector::IsBitSet(mPresenceVector, VectorBit::ResistiveLinearEffortX))
+        {
+            expected +=  JAUS_SHORT_SIZE;
+            read += msg.Read(mResistiveLinearEffortX, 100.0, 0.0, ScaledInteger::Byte);
         }
         if(BitVector::IsBitSet(mPresenceVector, VectorBit::ResistiveLinearEffortY))
         {

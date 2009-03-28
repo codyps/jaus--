@@ -78,6 +78,7 @@ JoystickDriver::JoystickDriver()
     mCameraID = 1;    
     mVectorJoystickFlag = false;
     mControlledVehicleMaxSpeed = 0.0;
+    mAutoBrakingFlag = true;
 }
 
 
@@ -797,6 +798,25 @@ int JoystickDriver::TakeCameraControl(const bool enable)
 
 ////////////////////////////////////////////////////////////////////////////////////
 ///
+///   \brief Toggle on and off automatic generation of braking data (resistive
+///   efforts).
+///
+///   If set to true, then if any propulsive effort gets set to <= 1 then 
+///   this class will check to see if a countering resistive effort is
+///   supported by the Primitive Driver component and send 100% resistive
+///   effort.
+///
+///   \param enable If true enable automatic braking, if false do nothing.
+///
+////////////////////////////////////////////////////////////////////////////////////
+void JoystickDriver::EnableAutoBrakingFlag(const bool enable)
+{
+    mAutoBrakingFlag = enable;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////
+///
 ///   \brief Use this method to seet the joytick operating mode to controlling
 ///   a Primitive Driver or a Global Vector Driver component.
 ///
@@ -1160,8 +1180,14 @@ void JoystickDriver::JoystickCallback(const CxUtils::Joystick& joystick, void *a
                     Jaus::QueryPlatformSpecifications querySpecs;
                     querySpecs.SetPresenceVector(Jaus::QueryPlatformSpecifications::VectorMask::MaximumVelocityX);
                     querySpecs.SetSourceID(driver->GetID());
-                    querySpecs.SetDestinationID(Address(driver->mJoystickSubsystemID, 255, 255, 1));
-                    driver->Send(&querySpecs);
+                    Jaus::Platform platform = driver->GetPlatformInfo(driver->mDriverID.mSubsystem);
+                    Address::List components;
+                    components = platform.GetConfiguration()->GetComponentsOfType((Byte)Service::PrimitiveDriver);
+                    for(unsigned int i = 0; i < (unsigned int)components.size(); i++)
+                    {
+                        querySpecs.SetDestinationID(components[i]);
+                        driver->Send(&querySpecs);
+                    }
                 }
                 else
                 {
@@ -1497,7 +1523,55 @@ void JoystickDriver::JoystickCallback(const CxUtils::Joystick& joystick, void *a
         {
             driver->mWrenchEffort.SetSourceID(driver->GetID());
             driver->mWrenchEffort.SetDestinationID(driver->mDriverID);
+            // If auto braking is enabled, turn on resistive efforts as needed.
+            if(driver->mAutoBrakingFlag == true)
+            {
+                // Lookup the Primitive Driver service for the component
+                // we are driving
+                UShort pv = driver->mWrenchEffort.GetPresenceVector();
+                Configuration::Component config = *driver->GetPlatformInfo(driver->mDriverID.mSubsystem).GetConfiguration()->GetComponent(driver->mDriverID);
+                if(config.mpServices)
+                {
+                    Service::Set::iterator service;
+                    for(service = config.mpServices->begin();
+                        service != config.mpServices->end();
+                        service++)
+                    {
+                        if(service->GetType() == Service::PrimitiveDriver)
+                        {
+                            // We found the service, now check to see if braking is supported and
+                            // if so, enable braking as needed.
+
+                            // Check to see if we are setting a propulsive effort, and if it is 0, and 
+                            // we the component supports a countering resistive effort, set it to 100%
+                            if( BitVector::IsBitSet(pv, SetWrenchEffort::VectorBit::PropulsiveLinearEffortX) &&
+                                service->IsInputSupported(JAUS_SET_WRENCH_EFFORT, SetWrenchEffort::VectorMask::ResistiveLinearEffortX) )
+                            {             
+                                if(fabs(driver->mWrenchEffort.GetPropulsiveLinearEffortX()) <= 2)
+                                {
+                                    driver->mWrenchEffort.SetResistiveLinearEffortX(100); 
+                                }
+                                else
+                                {
+                                    driver->mWrenchEffort.SetResistiveLinearEffortX(0);
+                                }
+                            }
+
+                            break;
+                        }
+                        
+                    }
+                }
+                else
+                {
+                    QueryServices queryServices;
+                    queryServices.SetSourceID(driver->GetID());
+                    queryServices.SetDestinationID(driver->mDriverID);
+                    driver->Send(&queryServices);
+                }
+            }
             driver->Send(&driver->mWrenchEffort);
+            
         }
     }
 

@@ -280,7 +280,10 @@ int VisualSensor::SetCurrentFrame(const Byte * frame,
                                   const UShort maxHeight)
 {
     int result = JAUS_FAILURE;
-    
+    if(IsInitialized() == FAILURE)
+    {
+        return FAILURE;
+    }
     mImageMutex.Enter();
     // Copy the raw image data and perform any needed scaling.
     result = mRawImage.Create(width, height, channels, frame, maxWidth, maxHeight, vflip);

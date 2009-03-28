@@ -41,16 +41,21 @@
 ////////////////////////////////////////////////////////////////////////////////////
 #include <iostream>
 #include <algorithm>
-
+#ifdef WIN32
 #include <vld.h>
+#endif
 #include "jaus/messages/msglib.h"
 #include "jaus/messages/common/world/object.h"
+#include "jaus/messages/common/planning/mission.h"
+#include "jaus/messages/messagecreator.h"
+
 using namespace std;
 using namespace Jaus;
 
 int MessageExample();
 int MessageCreatorExample();
 int LargeDataSetExample();
+int MissionPlanningMessageExample();
 
 int main(int argc, char *argv[])
 {
@@ -59,6 +64,7 @@ int main(int argc, char *argv[])
     cout << "    1 - Run Simple Message Example/Test\n";
     cout << "    2 - Run Large Data Set Example/Test\n";
     cout << "    3 - Run Message Creator Example/Test\n";
+    cout << "    5 - Run Mission Planning Message Example/Test\n";
 
     if(argc > 1)
     {
@@ -81,6 +87,8 @@ int main(int argc, char *argv[])
 				}
 			}
 			break;
+        case 5:
+            MissionPlanningMessageExample();
         default:
             cout << "Invalid Value\n";
             break;
@@ -90,7 +98,9 @@ int main(int argc, char *argv[])
     {
         //MessageExample();
         //LargeDataSetExample();
-        MessageCreatorExample();
+        //MessageCreatorExample();
+        MissionPlanningMessageExample();
+        
     }
     return 0;
 }
@@ -109,7 +119,7 @@ int MessageExample()
     reportTime.SetAckNack( Header::AckNack::Request );
 
     // Now set the time.
-    reportTime.SetTimeStamp( Time::GetUtcTime() );
+    reportTime.SetTimeStamp( Jaus::Time::GetUtcTime() );
 
     // If we check the presence vector for this message, it will
     // have only time data, not date stamp.
@@ -376,4 +386,179 @@ int LargeDataSetExample()
     return 0;
 }
 
-/*  End of File */
+void AddTestTaskMessages(const int num, Mission::Task* task)
+{   // used for testing mission planning task message examples.
+    Mission::Task::Message* taskMessage = NULL;
+    for(int i = 0; i < num; i++)
+    {
+        taskMessage = new Mission::Task::Message();
+        taskMessage->mID = (UShort)i;
+
+        switch(i)
+        {
+        case 0:
+            taskMessage->mpMessage = MessageCreator::CreateMessage(JAUS_SET_WRENCH_EFFORT);
+            taskMessage->mpMessage->SetSourceID(Address(1, 1, 1, 1));
+            taskMessage->mpMessage->SetDestinationID(Address(2, 3, 4, 5));
+            break;
+        case 1:
+            taskMessage->mpMessage = MessageCreator::CreateMessage(JAUS_SET_GLOBAL_VECTOR);
+            taskMessage->mpMessage->SetSourceID(Address(1, 1, 1, 1));
+            taskMessage->mpMessage->SetDestinationID(Address(2, 3, 4, 5));
+
+            break;
+        case 2:
+            taskMessage->mpMessage = MessageCreator::CreateMessage(JAUS_SET_GLOBAL_WAYPOINT);
+            taskMessage->mpMessage->SetSourceID(Address(1, 1, 1, 1));
+            taskMessage->mpMessage->SetDestinationID(Address(2, 3, 4, 5));
+            break;
+        case 3:
+            taskMessage->mpMessage = MessageCreator::CreateMessage(JAUS_SET_LOCAL_WAYPOINT);
+            taskMessage->mpMessage->SetSourceID(Address(1, 1, 1, 1));
+            taskMessage->mpMessage->SetDestinationID(Address(2, 3, 4, 5));
+            break;
+        default:
+            taskMessage->mpMessage = MessageCreator::CreateMessage(JAUS_SET_WRENCH_EFFORT);
+            taskMessage->mpMessage->SetSourceID(Address(1, 1, 1, 1));
+            taskMessage->mpMessage->SetDestinationID(Address(2, 3, 4, 5));
+            break;
+        };
+        task->GetMessages()->insert(taskMessage);
+    }
+}
+
+int MissionPlanningMessageExample()
+{   // use for testing Mission Planning Task Messages functionalities.
+    Mission::Task::Message* taskMessage = NULL;
+
+    Mission::Task* root = new Mission::Task(1);  // create a root task
+    AddTestTaskMessages(3, root);                // add 3 task msgs to the root task
+    
+    Mission::Task* taskPtr = NULL;               // use for child task pointer
+
+    taskPtr = new Mission::Task(2);              // create a child task id 2
+    AddTestTaskMessages(2, taskPtr);             // add 2 msgs to the child task
+    root->AddChild(taskPtr);                     // test AddChild()
+
+    taskPtr = new Mission::Task(3);              // Create a child task id 3
+    AddTestTaskMessages(2, taskPtr);             // add 2 msgs to the task
+    root->AddChild(taskPtr);                     // add this child to the root as well 
+
+    taskPtr = new Mission::Task(4);              // Create a child task id 4
+    AddTestTaskMessages(2, taskPtr);             // add 2 msgs to the task
+    root->AddChild(taskPtr);                     // add this child to the root as well 
+
+    taskPtr = new Mission::Task(5);              // Create a child task id 5
+    AddTestTaskMessages(2, taskPtr);             // add 2 msgs to the task
+    root->GetChild(3)->AddChild(taskPtr);        // make this a child of task 3 
+
+    //root->PrintTask();                         // test PrintTask(), print current task tree
+    //system("pause");
+ 
+    taskPtr = new Mission::Task(2);              // create another task 2
+    AddTestTaskMessages(5, taskPtr);             // add 5 msgs to task 2
+
+    root->ReplaceChild(taskPtr);                 // test ReplaceChild()
+//    root->PrintTask();                         // should show the new task 2, old one is gone
+//    system("Pause");
+
+    taskPtr = new Mission::Task(3);              // create a new task 3
+    AddTestTaskMessages(3, taskPtr);             // add 3 msgs to task 3
+
+    Mission::Task* childPtr = new Mission::Task(6);
+    AddTestTaskMessages(4, childPtr);            // create task 6, add 4 msgs to it
+    taskPtr->AddChild(childPtr);                 // make task 6 a child of task 3
+
+    root->ReplaceChild(taskPtr);                 // replace the old task 3 with new along with its child task 6
+  //  root->PrintTask();                         // should show the new task 3
+//    system("Pause");
+    cout << "\n\n";
+
+    /* We know removing works.
+    root->RemoveChild(3);                        // test RemoveChild()
+    root->PrintTask();
+    system("pause");
+    cout << "\n\n";
+
+    */
+
+////////////////////////////////////////
+    Mission* mission;                            // test Mission Class
+    mission = new Mission();                     // create a mission
+    mission->AddTasks(root);                     // test AddTasks()
+
+    mission->PrintMission();                     // test PrintMission()
+    //system("Pause");
+
+    Mission* mission1 = new Mission();           // create another mission   
+    *mission1 = *mission;                        // test Assignment operator
+    
+    //mission1->PrintMission();
+
+    taskPtr = new Mission::Task(7);              // create task 7
+    AddTestTaskMessages(5, taskPtr);             // add 5 msgs
+
+    Mission* mission2 = new Mission();           // create mission 2
+    mission2->SetMissionID(2);
+    mission2->SetStatus(Mission::Pending);
+    mission2->AddTasks(taskPtr);                 // add task 7 into mission 2
+
+    mission->AppendMission(*mission2);           // test AppendMission()
+     mission->PrintMission();                    // appends mission 2 to mission 
+    //system("Pause");
+
+    mission1->GetTasks()->RemoveChild(2);        // test Removechild() from mission
+    mission1->PrintMission();
+    system("Pause");
+
+////////////////////////////////////////
+    Stream p;                                    // test TaskRead() and TaskWrite()
+    Mission::Task* taskRead = NULL;
+    taskRead = new Mission::Task(0);
+
+    if( mission1->GetTasks()->WriteTask(p)  == taskRead->ReadTask(0, p, NULL) ) 
+    {
+        cout << "\n\n data length written to and read out are equal. \n\n" << endl;
+    }
+    else {
+        cout << "\n\n data length written to and read out do NOT match. Debug! \n\n" << endl;
+    }
+
+    Mission* mission4 = new Mission();           // create mission4
+    mission4->AddTasks(taskRead);                // add taskRead into mission4 
+    mission4->PrintMission();                    // show the result after write and read
+    system("Pause");
+
+//////////////////////////////////////////// test CreateRootTask()
+    Mission* mission3 = new Mission();           // create mission 3
+    mission3->SetMissionID(3);
+    mission3->SetStatus(Mission::Pending);
+    taskPtr = new Mission::Task(9);              // create task 9
+    AddTestTaskMessages(3, taskPtr);             // add 3 msgs
+    mission3->AddTasks(taskPtr);                 // add task 9 into mission 3
+    mission3->PrintMission();                     
+    //system("Pause");
+    mission3->CreateRootTask();                  // test CreateRootTask()
+    mission3->PrintMission();                     
+    //system("Pause");
+    Mission::Task::Map mission4task = mission4->GetTaskMap();
+    mission4->GetTasks()->UpdateTaskMap(mission4task);
+    //mission4->GetTasks()->UpdateTaskMap((mission4->GetTaskMap()));
+    taskPtr = mission4->GetTask(6);              // test GetTask()
+    if (taskPtr)
+        taskPtr->PrintTask();
+    system("Pause");
+
+    //delete taskRead;
+    delete mission;
+    delete mission2;
+    delete mission1;
+    delete mission3;
+    delete mission4;
+    return 0;
+#if 0
+
+#endif
+    return 0;
+}
+    

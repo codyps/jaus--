@@ -41,7 +41,9 @@
 ////////////////////////////////////////////////////////////////////////////////////
 #include <iostream>
 #include <vector>
+#ifdef WIN32
 #include <vld.h>
+#endif
 #include "jaus/video/videosubscriber.h"
 
 #ifdef WIN32

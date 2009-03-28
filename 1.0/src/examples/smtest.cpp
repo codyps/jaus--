@@ -44,8 +44,9 @@
 ////////////////////////////////////////////////////////////////////////////////////
 #include <iostream>
 #include <algorithm>
-
+#ifdef WIN32
 #include <vld.h>
+#endif
 #include "jaus/components/cmplib.h"
 #include <cxutils/thread.h>
 #include <cxutils/timer.h>

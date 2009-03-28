@@ -44,8 +44,9 @@
 ////////////////////////////////////////////////////////////////////////////////////
 #include <iostream>
 #include <algorithm>
-
+#ifdef WIN32
 #include <vld.h>
+#endif
 #include "jaus/services/srvclib.h"
 
 #ifdef WIN32

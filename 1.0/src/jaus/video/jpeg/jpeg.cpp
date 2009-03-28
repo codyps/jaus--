@@ -43,7 +43,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
+extern "C"
+{
 #include <jpeglib.h>
+}
 #include <setjmp.h>
 
 #define JPEG_BUFFER_SIZE 4096

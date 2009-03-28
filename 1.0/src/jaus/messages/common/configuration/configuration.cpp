@@ -78,11 +78,7 @@ Configuration::Component::Component(const Component& c) : mID(c.mID),
                                                           mInstance(c.mInstance),
                                                           mpServices(NULL)
 {
-    if(c.mpServices)
-    {
-        mpServices = new Service::Set();
-        *mpServices = *c.mpServices;
-    }
+    *this = c;
 }
 
 
@@ -93,6 +89,11 @@ Configuration::Component::Component(const Component& c) : mID(c.mID),
 ////////////////////////////////////////////////////////////////////////////////////
 Configuration::Component::~Component()
 {
+    if(mpServices)
+    {
+        delete mpServices;
+    }
+    mpServices = NULL;
 }
 
 

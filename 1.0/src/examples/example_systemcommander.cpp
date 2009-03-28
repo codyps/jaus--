@@ -45,6 +45,7 @@
 #include <vector>
 #ifdef WIN32
 #include <conio.h>
+#include <vld.h>
 #endif
 
 using namespace std;
@@ -103,19 +104,35 @@ int main(int argc, char *argv[])
     while(!gExitFlag)
     {
 		// Get a copy of system configuration discovered.
+        /*
 		platforms = systemCommander.GetSystemConfiguration();
         for(p = platforms.begin();
             p != platforms.end();
             p++)
         {
-            p->second.Print();
+            //p->second.Print();
         }
-
-        if(CxUtils::GetChar() == 27)
+        */
+        int key = CxUtils::GetChar();
+        if(key != 0)
         {
-            gExitFlag = true;
+            if(key == 27)
+            {
+                gExitFlag = true;
+            }
+            if(key == 't')
+            {
+                systemCommander.InitializeJoystick("settings/joysticksettings.xml");
+                systemCommander.SetSubsystemToControl(systemCommander.GetID().mSubsystem);
+                systemCommander.TakeDriveControl(true);
+            }
+            if(key == 'r')
+            {
+                systemCommander.TakeDriveControl(false);
+                systemCommander.ShutdownJoystick();
+            }
         }
-        Sleep(200);
+        Sleep(100);
     }
 
     systemCommander.Shutdown();

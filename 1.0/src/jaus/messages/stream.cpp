@@ -1226,25 +1226,38 @@ int Stream::RunTestCase()
 ///
 ///   \param pack Copy of single stream read.
 ///   \param header Optional header information that was read.
+///   \param pos The byte position within the stream to read at.  If pos is
+///              equal to UINT_MAX, then the internal read position is used,
+///              which is the default behavior.
 ///
 ///   \return Number of bytes read, 0 on error and a ErrorHistory set.  If 0
 ///   bytes are read, then no packet/message extracted.
 ///
 ////////////////////////////////////////////////////////////////////////////////////
-int Stream::Read(Stream& pack, Header *header)
+int Stream::Read(Stream& pack, Header& header, const unsigned int pos) const
 {
-    int read = 0;
-    unsigned char *ptr = (unsigned char *)mpPacket + mReadPos;
     pack.Clear();
-
-    if( (read = pack.ReadMessage(ptr, (mLength - mReadPos), header)) > 0 )
+    if(pos != UINT_MAX)
     {
-        SetReadPos(mReadPos + read);
+        if(Read(header, pos))
+        {
+            if(Read(pack, JAUS_HEADER_SIZE + header.mDataSize, pos))
+            {
+                return (int)pack.Length();
+            }
+        }
     }
     else
-        SetJausError(ErrorCodes::ReadFailure);
-
-    return read;
+    {
+        if(Read(header, GetReadPos()))
+        {
+            if(Read(pack, JAUS_HEADER_SIZE + header.mDataSize))
+            {
+                return (int)pack.Length();
+            }
+        }
+    }
+    return 0;
 }
 
 

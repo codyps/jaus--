@@ -43,7 +43,9 @@
 ////////////////////////////////////////////////////////////////////////////////////
 #include <iostream>
 #include <vector>
+#ifdef WIN32
 #include <vld.h>
+#endif
 #include "jaus/video/videolib.h"
 
 #ifdef WIN32

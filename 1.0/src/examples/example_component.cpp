@@ -41,8 +41,9 @@
 ////////////////////////////////////////////////////////////////////////////////////
 #include <iostream>
 #include <algorithm>
-
+#ifdef WIN32
 #include <vld.h>
+#endif
 #include "jaus/components/cmplib.h"
 
 #ifdef WIN32
