@@ -102,6 +102,8 @@ namespace Jaus
                                           const SubscriberComponent::DiscoveryEvents eventType = SubsystemUpdate);
         // Check if the component has control of a component
         bool HaveComponentControl(const Address& id) const;
+        // Get updated configuration data for a subsystem.
+        bool QueryConfiguration(const Byte subsystemID);
         // Get a copy of all components being controlled.
         Address::Set GetControlledComponents() const;
         // Function called anytime a control event happens.

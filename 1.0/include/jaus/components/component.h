@@ -214,6 +214,8 @@ namespace Jaus
         void SetComponentAuthority(const Byte auth);
         // Reset the controller of this component.
         void ClearControllerID();
+        // Prints basic information about the component to the console.
+        virtual void PrintStatus() const;
         // Get the primary status of component.
         Component::Status::Primary GetPrimaryStatus() const;
         // Get the secondary status of component.

@@ -106,6 +106,7 @@ namespace Jaus
     const UShort JAUS_QUERY_CAMERA_CAPABILITIES                            =   0x2805;
     const UShort JAUS_QUERY_CAMERA_FORMAT_OPTIONS                          =   0x2806;
     const UShort JAUS_QUERY_IMAGE                                          =   0x2807;
+    const UShort JAUS_QUERY_WATER_DEPTH                                    =   0x280C;
     //  World Model Subgroup - Codes 2A00-2AFF
     const UShort JAUS_QUERY_VECTOR_KNOWLEDGE_STORE_FEATURE_CLASS_METADATA  =   0x2A21;
     const UShort JAUS_QUERY_VECTOR_KNOWLEDGE_STORE_BOUNDS                  =   0x2A22;

@@ -77,11 +77,11 @@
 #include "jaus/messages/query/environment/queryimage.h"
 #include "jaus/messages/query/environment/querycameraformatoptions.h"
 #include "jaus/messages/query/environment/querycamerapose.h"                //Added by C. Hollander 8/13/2008
-#include "jaus/messages/query/environment/querycameracount.h"                //Added by C. Hollander 8/14/2008
+#include "jaus/messages/query/environment/querycameracount.h"               //Added by C. Hollander 8/14/2008
 #include "jaus/messages/query/environment/queryrelativeobjectposition.h"    //Added by C. Hollander 8/14/2008
 #include "jaus/messages/query/environment/queryselectedcamera.h"            //Added by C. Hollander 8/14/2008
-#include "jaus/messages/query/environment/querycameracapabilities.h"            //Added by C. Hollander 8/14/2008
-
+#include "jaus/messages/query/environment/querycameracapabilities.h"        //Added by C. Hollander 8/14/2008
+#include "jaus/messages/query/environment/querywaterdepth.h"                //Added by D. Adams 4/4/2009
 
 #endif
 /*  End of File */

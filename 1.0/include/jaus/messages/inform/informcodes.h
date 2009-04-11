@@ -106,6 +106,7 @@ namespace Jaus
     const UShort JAUS_REPORT_CAMERA_CAPABILITIES                                = 0x4805;
     const UShort JAUS_REPORT_CAMERA_FORMAT_OPTIONS                              = 0x4806;
     const UShort JAUS_REPORT_IMAGE                                              = 0x4807;
+    const UShort JAUS_REPORT_WATER_DEPTH                                        = 0x480C;
     //  World Model Subgroup - Codes 4A00-4AFF
     const UShort JAUS_REPORT_VECTOR_KNOWLEDGE_STORE_OBJECTS_CREATION            = 0x4A20;
     const UShort JAUS_REPORT_VECTOR_KNOWLEDGE_STORE_FEATURE_CLASS_METADATA      = 0x4A21;

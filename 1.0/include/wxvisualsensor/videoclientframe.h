@@ -71,6 +71,7 @@ public:
     void OnSelectVisualSensor(wxCommandEvent& event);
     void OnTimer(wxTimerEvent& event);
     void OnDisconnect(wxCommandEvent& event);
+    void OnRecord(wxCommandEvent& event);
     bool SetVisualSensor(const Jaus::Address& id);
     static void ProcessMessageCallback(const Jaus::Message*, void*);
 private:
@@ -84,6 +85,8 @@ private:
     wxImagePanel* mpImagePanel; ///<  Panel for viewing image.
     unsigned int mFrameNumber;  ///<  Frame number.
     unsigned int mFrameUpdateTimeMs;    ///<  Timestamp of current frame number.
+    volatile bool mRecordFlag;          ///<  If true, images are saved to disk.
+    volatile unsigned int mRecordFrameNumber; ///<  Number of the recorded frame.
     CxUtils::Mutex mMutex;              ///<  Mutex for thread protection.
     Jaus::Image::Format mImageFormat;   ///<  Format of image data for decompression.
     Jaus::Image mCurrentImage;          ///<  Curent image received from the sensor.

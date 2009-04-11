@@ -63,10 +63,10 @@
 #include "jaus/messages/command/communications/setdatalinkstate.h"
 #include "jaus/messages/command/communications/setselecteddatalinkstate.h"
 
-#include "jaus/messages/command/environment/setcamerapose.h"                //added by C. Hollander 8/8/08
-#include "jaus/messages/command/environment/selectcamera.h"                    //added by C. Hollander 8/11/08
-#include "jaus/messages/command/environment/setcameracapabilities.h"        //added by C. Hollander 8/11/08
-#include "jaus/messages/command/environment/setcameraformatoptions.h"        //added by C. Hollander 8/13/08
+#include "jaus/messages/command/environment/setcamerapose.h"                
+#include "jaus/messages/command/environment/selectcamera.h"                 
+#include "jaus/messages/command/environment/setcameracapabilities.h"        
+#include "jaus/messages/command/environment/setcameraformatoptions.h"       
 
 #include "jaus/messages/command/events/createeventrequest.h"
 #include "jaus/messages/command/events/updateevent.h"
@@ -78,13 +78,15 @@
 #include "jaus/messages/command/platform/setglobalvector.h"
 #include "jaus/messages/command/platform/settravelspeed.h"
 #include "jaus/messages/command/platform/setdiscretedevices.h"
-#include "jaus/messages/command/platform/setlocalvector.h"                    //added by C. Hollander 8/21/08
-#include "jaus/messages/command/platform/setglobalwaypoint.h"                    //added by C. Hollander 8/22/08
-#include "jaus/messages/command/platform/setlocalwaypoint.h"                    //added by C. Hollander 8/22/08
-#include "jaus/messages/command/platform/setglobalpathsegment.h"                    //added by C. Hollander 8/22/08
-#include "jaus/messages/command/platform/setlocalpathsegment.h"                    //added by C. Hollander 8/22/08
+#include "jaus/messages/command/platform/setlocalvector.h"                    
+#include "jaus/messages/command/platform/setglobalwaypoint.h"                 
+#include "jaus/messages/command/platform/setlocalwaypoint.h"                  
+#include "jaus/messages/command/platform/setglobalpathsegment.h"              
+#include "jaus/messages/command/platform/setlocalpathsegment.h"               
 
 #include "jaus/messages/command/world/createvectorknowledgestoreobjects.h"
+
+#include "jaus/messages/command/planning/spoolmission.h"
 
 #endif
 /*  End of File */

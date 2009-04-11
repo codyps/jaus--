@@ -54,6 +54,7 @@
 #include "time.h"
 #include "errorhistory.h"
 #include "bitvector.h"
+#include <vector>
 
 namespace Jaus
 {
@@ -78,7 +79,8 @@ namespace Jaus
     ////////////////////////////////////////////////////////////////////////////////////
     class JAUS_MSG_DLL Message : public ErrorHistory
     {
-    public:        
+    public: 
+        typedef std::vector<Message*> List;
         // Sets message type.
         Message(const UShort ccode);
         // Destructor, does any cleanup.

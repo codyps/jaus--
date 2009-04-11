@@ -1,19 +1,18 @@
 ////////////////////////////////////////////////////////////////////////////////////
 ///
-///  \file experimentalcodes.h
-///  \brief This file lists all command code definitions for experimental 
-///         messeages.
+///  \file setwaterdepth.h
+///  \brief This message is used to set the water depth in meters.
 ///
-///  <br>Author(s): Daniel Barber
-///  <br>Created: 23 September 2007
-///  <br>Last Modified: 26 February 2008
-///  <br>Copyright (c) 2007
+///  <br>Author(s): David Adams
+///  <br>Created: 4 April 2009
+///  <br>Last Modified: 4 April 2009
+///  <br>Copyright (c) 2009
 ///  <br>Applied Cognition and Training in Immersive Virtual Environments
 ///  <br>(ACTIVE) Laboratory
 ///  <br>Institute for Simulation and Training (IST)
 ///  <br>University of Central Florida (UCF)
 ///  <br>All rights reserved.
-///  <br>Email: dbarber@ist.ucf.edu
+///  <br>Email: dadams@ist.ucf.edu
 ///  <br>Web:  http://active.ist.ucf.edu
 ///
 ///  Redistribution and use in source and binary forms, with or without
@@ -39,44 +38,54 @@
 ///  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ///
 ////////////////////////////////////////////////////////////////////////////////////
-#ifndef _JAUS_EXPERIMENTAL_CLASS_CODES_H
-#define _JAUS_EXPERIMENTAL_CLASS_CODES_H
+#ifndef _JAUS_SET_WATER_DEPTH_H
+#define _JAUS_SET_WATER_DEPTH_H
 
-#include "jaus/messages/types.h"
+#include "jaus/messages/message.h"
 
-namespace Jaus 
+namespace Jaus
 {
+
     ////////////////////////////////////////////////////////////////////////////////////
     ///
-    ///   \brief Checks if the message code is for an experimental message.
-    ///
-    ///   \param code The message code to check.
-    ///
-    ///   \return True if experimental message, otherwise false.
+    ///   \class SetWaterDepth
+    ///   \brief This message is used to provide the receiver the water depth in meters.
     ///
     ////////////////////////////////////////////////////////////////////////////////////
-    inline bool IsExperimentalMessage(const UShort code)
+    class JAUS_MSG_DLL SetWaterDepth : public Message
     {
-        if(code >= 0xD000)
+        ////////////////////////////////////////////////////////////////////////////////////
+        ///
+        ///   \class Limits
+        ///   \brief Contains constants for limit values of data members of class.
+        ///
+        ////////////////////////////////////////////////////////////////////////////////////
+        class JAUS_MSG_DLL Limits
         {
-            return true;
-        }
-        return false;
-    }
-    // Command Messages
-    const UShort JAUS_SET_WATER_DEPTH                                   =   0xD000;  //added by D.Adams 040309
+        public:
+            const static double MinWaterDepth;       ///<  Minimum depth. (0m)
+            const static double MaxWaterDepth;       ///<  Maximum depth. (20000m)
+        };
+    public:
+        SetWaterDepth();
+        SetWaterDepth(const SetWaterDepth &gp);
+        virtual ~SetWaterDepth();
+        virtual int WriteMessageBody(Stream& msg, const UShort version) const;
+        virtual int ReadMessageBody(const Stream& msg, const UShort version);
+        virtual Message* Clone() const { return new SetWaterDepth(*this); }
+        virtual UShort GetPresenceVectorSize(const UShort version = JAUS_DEFAULT_VERSION) const { return 0; }
+        virtual UInt GetPresenceVectorMask(const UShort version = JAUS_DEFAULT_VERSION) const { return 0; }
+        virtual void ClearMessageBody();
+        SetWaterDepth &operator=(const SetWaterDepth &gp);
 
-    // Query Messages
-    const UShort JAUS_QUERY_SICK_LIDAR                                  =   0xD300;
-    const UShort JAUS_QUERY_PIXEL_ON_SCREEN                             =   0xD301;
-
-
-    // Report Messages
-    const UShort JAUS_REPORT_SICK_LIDAR                                 =   0xD900;    
-    const UShort JAUS_REPORT_PIXEL_ON_SCREEN                            =   0xD901;
+        double GetDepth ()const {return mWaterDepth;}
+        int SetDepth(const double value);
+    protected:
+        double mWaterDepth; ///< Water depth in meters. [0,20000]
+    };
 
 
 }
 
 #endif
-/*  End of File */
+/* End of File */

@@ -47,5 +47,6 @@
 #include "jaus/messages/experimental/video/querypixelonscreen.h"
 #include "jaus/messages/experimental/video/reportpixelonscreen.h"
 
+#include "jaus/messages/experimental/waterdepth/setwaterdepth.h"  //added by D.Adams 04/04/09
 #endif
 /*  End of File */

@@ -215,7 +215,7 @@ namespace Jaus
 
         inline Status GetStatus() const { return mStatus; }       ///<   Gets Status of the mission.
         inline UShort GetMissionID() const { return mMissionID; } ///<   Gets the mission id.
-        inline Task::Map GetTaskMap() const { return mTaskMap; }  ///<   Gets task map.
+        inline void UpdateMissionTaskMap() { mpTask->UpdateTaskMap(mTaskMap);} ///< Updates the protected member mTaskMap 
         void ClearMission();
         void PrintMission() const;
         Task* GetTask(const UShort id);
