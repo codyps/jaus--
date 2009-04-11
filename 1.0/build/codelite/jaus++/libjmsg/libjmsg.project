@@ -75,6 +75,9 @@
         <File Name="../../../../src/jaus/messages/command/platform/setwrencheffort.cpp"/>
       </VirtualDirectory>
       <VirtualDirectory Name="world"/>
+      <VirtualDirectory Name="planning">
+        <File Name="../../../../src/jaus/messages/command/planning/spoolmission.cpp"/>
+      </VirtualDirectory>
     </VirtualDirectory>
     <VirtualDirectory Name="inform">
       <VirtualDirectory Name="communications">
@@ -102,6 +105,7 @@
         <File Name="../../../../src/jaus/messages/inform/environment/reportimage.cpp"/>
         <File Name="../../../../src/jaus/messages/inform/environment/reportrelativeobjectposition.cpp"/>
         <File Name="../../../../src/jaus/messages/inform/environment/reportselectedcamera.cpp"/>
+        <File Name="../../../../src/jaus/messages/inform/environment/reportwaterdepth.cpp"/>
       </VirtualDirectory>
       <VirtualDirectory Name="events">
         <File Name="../../../../src/jaus/messages/inform/events/eventmessage.cpp"/>
@@ -173,6 +177,7 @@
         <File Name="../../../../src/jaus/messages/query/platform/queryvelocitystate.cpp"/>
         <File Name="../../../../src/jaus/messages/query/platform/querywaypointcount.cpp"/>
         <File Name="../../../../src/jaus/messages/query/platform/querywrencheffort.cpp"/>
+        <File Name="../../../../src/jaus/messages/query/environment/querywaterdepth.cpp"/>
       </VirtualDirectory>
     </VirtualDirectory>
     <VirtualDirectory Name="experimental">
@@ -183,6 +188,9 @@
       <VirtualDirectory Name="video">
         <File Name="../../../../src/jaus/messages/experimental/video/querypixelonscreen.cpp"/>
         <File Name="../../../../src/jaus/messages/experimental/video/reportpixelonscreen.cpp"/>
+      </VirtualDirectory>
+      <VirtualDirectory Name="waterdepth">
+        <File Name="../../../../src/jaus/messages/experimental/waterdepth/setwaterdepth.cpp"/>
       </VirtualDirectory>
     </VirtualDirectory>
     <File Name="../../../../src/jaus/messages/address.cpp"/>
@@ -274,6 +282,9 @@
       </VirtualDirectory>
       <File Name="../../../../include/jaus/messages/command/commandcodes.h"/>
       <File Name="../../../../include/jaus/messages/command/commandmessages.h"/>
+      <VirtualDirectory Name="planning">
+        <File Name="../../../../include/jaus/messages/command/planning/spoolmission.h"/>
+      </VirtualDirectory>
     </VirtualDirectory>
     <VirtualDirectory Name="inform">
       <VirtualDirectory Name="communications">
@@ -301,6 +312,7 @@
         <File Name="../../../../include/jaus/messages/inform/environment/reportimage.h"/>
         <File Name="../../../../include/jaus/messages/inform/environment/reportrelativeobjectposition.h"/>
         <File Name="../../../../include/jaus/messages/inform/environment/reportselectedcamera.h"/>
+        <File Name="../../../../include/jaus/messages/inform/environment/reportwaterdepth.h"/>
       </VirtualDirectory>
       <VirtualDirectory Name="events">
         <File Name="../../../../include/jaus/messages/inform/events/eventmessage.h"/>
@@ -355,6 +367,7 @@
         <File Name="../../../../include/jaus/messages/query/environment/queryimage.h"/>
         <File Name="../../../../include/jaus/messages/query/environment/queryrelativeobjectposition.h"/>
         <File Name="../../../../include/jaus/messages/query/environment/queryselectedcamera.h"/>
+        <File Name="../../../../include/jaus/messages/query/environment/querywaterdepth.h"/>
       </VirtualDirectory>
       <VirtualDirectory Name="events">
         <File Name="../../../../include/jaus/messages/query/events/queryevents.h"/>
@@ -390,6 +403,9 @@
       <VirtualDirectory Name="video">
         <File Name="../../../../include/jaus/messages/experimental/video/querypixelonscreen.h"/>
         <File Name="../../../../include/jaus/messages/experimental/video/reportpixelonscreen.h"/>
+      </VirtualDirectory>
+      <VirtualDirectory Name="waterdepth">
+        <File Name="../../../../include/jaus/messages/experimental/waterdepth/setwaterdepth.h"/>
       </VirtualDirectory>
     </VirtualDirectory>
     <File Name="../../../../include/jaus/messages/address.h"/>

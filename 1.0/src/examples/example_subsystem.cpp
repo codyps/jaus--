@@ -334,7 +334,7 @@ int main(int argc, char *argv[])
     Jaus::Image imageData;
     unsigned int frameNumber = 0;
     char fname[512];
-    sprintf(fname, "video/mgs_frames/mgs_image_%0.3d.jpg", frameNumber++);
+    sprintf(fname, "video/mgs_frames/mgs_image_%03d.jpg", frameNumber++);
         
     if(imageData.LoadFrame(fname) == Jaus::FAILURE)
     {
@@ -439,12 +439,12 @@ int main(int argc, char *argv[])
         }
 
         // Load the next frame.
-        sprintf(fname, "video/mgs_frames/mgs_image_%0.3d.jpg", frameNumber++);
+        sprintf(fname, "video/mgs_frames/mgs_image_%03d.jpg", frameNumber++);
         if(imageData.LoadFrame(fname) == Jaus::FAILURE)
         {
             // Loop forever (start over at image 0).
             frameNumber = 0;
-            sprintf(fname, "video/mgs_frames/mgs_image_%0.3d.jpg", frameNumber++);
+            sprintf(fname, "video/mgs_frames/mgs_image_%03d.jpg", frameNumber++);
             imageData.LoadFrame(fname);
         }
 

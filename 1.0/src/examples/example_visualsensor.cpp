@@ -122,12 +122,12 @@ int main(int argc, char *argv[])
     while(!gExitFlag)
     {
         // Load the next frame.
-        sprintf(fname, "video/mgs_frames/mgs_image_%0.3d.jpg", frameNumber++);
+        sprintf(fname, "video/mgs_frames/mgs_image_%03d.jpg", frameNumber++);
         if(original.LoadFrame(fname) == FAILURE)
         {
             // Loop forever (start over at image 0).
             frameNumber = 0;
-            sprintf(fname, "video/mgs_frames/mgs_image_%0.3d.jpg", frameNumber++);
+            sprintf(fname, "video/mgs_frames/mgs_image_%03d.jpg", frameNumber++);
             original.LoadFrame(fname);
         }
 
