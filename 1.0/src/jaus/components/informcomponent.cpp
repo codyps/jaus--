@@ -241,7 +241,7 @@ int InformComponent::Shutdown()
 ///   all core services supported by the component.
 ///
 ///   If a component ID is specified in the RA, it may report only one
-///   service in beyond the core message support, and this ervice must be
+///   service in beyond the core message support, and this service must be
 ///   equal to the component ID.  If a component ID is not listed in the
 ///   RA, it may report any number of services.  For example, an component
 ///   with ID 33 must provide only serive 33.  The exception to this rule

@@ -87,7 +87,7 @@ int main(int argc, char *argv[])
     // Intialize global pose data.
     globalPose.SetPosition(34.3543, -115.817389, 0.0);
     globalPose.SetAttitude(0.0, 0.0, 0.0);
-    globalPose.SetTimeStamp(Time::GetUtcTime());
+    globalPose.SetTimeStamp(Jaus::Time::GetUtcTime());
 
     // At this point, we must add support for the
     // service of Global Pose Sensor.  This MUST be done
@@ -156,7 +156,7 @@ int main(int argc, char *argv[])
         else
             globalPose.SetYaw(globalPose.GetYaw() + JAUS_DEG2RAD(.2));
         
-        globalPose.SetTimeStamp(Time::GetUtcTime());
+        globalPose.SetTimeStamp(Jaus::Time::GetUtcTime());
 
         //  Set the new global pose.  This will
         //  save the data internally and generate 

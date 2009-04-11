@@ -45,9 +45,11 @@
 #include <wx/image.h>
 #include <wx/aboutdlg.h>
 #include <wx/numdlg.h>
+#include <cxutils/fileio.h>
 
 #define TIMER_ID 1000
 #define DISCONNECT_ID 1001
+#define RECORD_ID     1002
 
 // specialized definese used in wxwidgets programming
 BEGIN_EVENT_TABLE(VideoClientFrame, wxFrame)
@@ -55,6 +57,7 @@ BEGIN_EVENT_TABLE(VideoClientFrame, wxFrame)
     EVT_MENU(wxID_NEW, VideoClientFrame::OnSelectVisualSensor)
     EVT_MENU(wxID_EXIT, VideoClientFrame::OnQuit)
     EVT_MENU(DISCONNECT_ID, VideoClientFrame::OnDisconnect)
+    EVT_MENU(RECORD_ID, VideoClientFrame::OnRecord)
     EVT_TIMER(TIMER_ID, VideoClientFrame::OnTimer)
 END_EVENT_TABLE()
 
@@ -78,6 +81,7 @@ VideoClientFrame::VideoClientFrame(wxWindow* parent,
                                                          size,
                                                          style)
 {
+    mRecordFlag = false;
     mShutdownFlag = false;
     mpTimer = NULL;
     mpFileMenu = NULL;
@@ -87,10 +91,12 @@ VideoClientFrame::VideoClientFrame(wxWindow* parent,
     mpImagePanel = NULL;
     mFrameNumber = 0;
     mFrameUpdateTimeMs = 0;
+    mRecordFrameNumber = 0;
 
     mpFileMenu = new wxMenu;
     mpFileMenu->Append(wxID_NEW, wxT("Select &Sensor\tAlt-S"), wxT("Select Visual Sensor"));
     mpFileMenu->Append(DISCONNECT_ID, wxT("&Disconnect\tAtl-A"), wxT("Disconnect from Sensor"));
+    mpFileMenu->Append(RECORD_ID, wxT("&Record\tAtl-R"), wxT("Record from Sensor"));
     mpFileMenu->Append(wxID_ABOUT, wxT("&About Client\tAtl-A"), wxT("About Video Client"));    
     mpFileMenu->Append(wxID_EXIT, wxT("E&xit\tAlt-X"), wxT("Exit Program"));
     
@@ -277,9 +283,37 @@ void VideoClientFrame::OnDisconnect(wxCommandEvent& event)
     mpImagePanel->SetImage(image);
     mFrameNumber = 0;
     mMutex.Leave();
-
+    mRecordFlag = false;
     mClient.CancelEvents(id);
 }
+
+
+////////////////////////////////////////////////////////////////////////////////////
+///
+///  \brief Method called when an On Record Video event triggered from menu.
+///
+////////////////////////////////////////////////////////////////////////////////////
+void VideoClientFrame::OnRecord(wxCommandEvent& event)
+{
+    wxMessageDialog quitDialog(NULL, TEXT_TYPE("Record Image Data"), TEXT_TYPE("Record Video?"), wxNO_DEFAULT|wxYES_NO|wxICON_QUESTION);
+
+    switch (quitDialog.ShowModal())
+    {
+    case wxID_YES:
+        mRecordFlag = true;
+        mRecordFrameNumber = 0;
+        CxUtils::FileIO::CreateDir("video");
+        CxUtils::FileIO::CreateDir("video/log");
+        break;
+    case wxID_NO:
+        mRecordFlag = false;
+        mRecordFrameNumber = 0;
+        break;
+    default:
+        break;
+    }
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////////
 ///
@@ -418,6 +452,12 @@ void VideoClientFrame::OnTimer(wxTimerEvent& event)
             mpImagePanel->SetClientSize(imageSize);
             SetClientSize(mpImagePanel->GetBestSize());    
             mpImagePanel->SetImage(&image);
+            if(mRecordFlag)
+            {
+                char buffer[256];
+                sprintf(buffer, "video/log/%05d.jpg", mRecordFrameNumber++);
+                mCurrentImage.SaveFrame(buffer);
+            }
         }               
     }
     

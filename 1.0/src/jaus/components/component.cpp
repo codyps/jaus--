@@ -801,7 +801,7 @@ int Component::Resume()
 ///   all core services supported by the component.
 ///
 ///   If a component ID is specified in the RA, it may report only one
-///   service in beyond the core message support, and this ervice must be
+///   service in beyond the core message support, and this service must be
 ///   equal to the component ID.  If a component ID is not listed in the
 ///   RA, it may report any number of services.  For example, an component
 ///   with ID 33 must provide only serive 33.  The exception to this rule
@@ -831,7 +831,7 @@ int Component::SetupCoreService()
 ///   component supports.
 ///
 ///   If a component ID is specified in the RA, it may report only one
-///   service in beyond the core message support, and this ervice must be
+///   service in beyond the core message support, and this service must be
 ///   equal to the component ID.  If a component ID is not listed in the
 ///   RA, it may report any number of services.  For example, an component
 ///   with ID 33 must provide only serive 33.  The exception to this rule
@@ -1142,6 +1142,7 @@ int Component::ProcessCommandMessage(const Message* msg, const Byte commandAutho
                 if(mPrimaryStatus == Component::Status::Ready)
                 {
                     SetPrimaryStatus(Component::Status::Standby);
+                    std::cout << GetID().ToString() << " Received Standby Command from " << msg->GetSourceID().ToString() << "\n";
                     Standby();                    
                 }
             }
@@ -1155,6 +1156,7 @@ int Component::ProcessCommandMessage(const Message* msg, const Byte commandAutho
                 if(mPrimaryStatus == Component::Status::Standby)
                 {
                     SetPrimaryStatus(Component::Status::Ready);
+                    std::cout << GetID().ToString() << " Received Resume Command from " << msg->GetSourceID().ToString() << "\n";
                     Resume();                    
                 }
             }
@@ -1845,6 +1847,45 @@ void Component::ClearControllerID()
     mControllerID(0, 0, 0, 0);
     mControllerAuthorityCode = 0;
     mComponentMutex.Leave();
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////
+///
+///   \brief  Prints information about the component to the console window.
+///
+////////////////////////////////////////////////////////////////////////////////////
+void Component::PrintStatus() const
+{
+    static CxUtils::Mutex sPrintMutex;
+
+    sPrintMutex.Lock();
+
+    std::cout << GetName() << " - " << GetID().ToString() << " - ";
+    switch(GetPrimaryStatus())
+    {
+    case Status::Ready:
+        std::cout << "Ready" << std::endl;
+        break;
+    case Status::Standby:
+        std::cout << "Standby" << std::endl;
+        break;
+    case Status::Shutdown:
+        std::cout << "Shutdown" << std::endl;
+        break;
+    case Status::Failure:
+        std::cout << "Failure" << std::endl;
+        break;
+    default:
+        std::cout << "Initialized" << std::endl;
+        break;
+    }
+    if(IsControlled())
+    {
+        std::cout << "Controlled by: " << GetControllerID().ToString() << std::endl;
+    }
+
+    sPrintMutex.Unlock();
 }
 
 

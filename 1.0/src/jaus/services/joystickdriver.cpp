@@ -140,6 +140,13 @@ int JoystickDriver::InitializeJoystick(const std::string& settingsXML)
     mTakeCameraControlFlag = false;
 
     int result = JAUS_FAILURE;
+    
+    mAxesMapping.clear();
+    mAxesMappingVectors.clear();
+    mCameraAxesMapping.clear();
+    mInvertFlags.clear();
+    mDeadZones.clear();
+    mButtonsMap.clear();
 
     TiXmlDocument xml;
     if(!xml.LoadFile(settingsXML.c_str()))
@@ -765,8 +772,11 @@ int JoystickDriver::TakeDriveControl(const bool enable)
     mTakeDriveControlFlag = enable;
     if(mTakeDriveControlFlag == false && mDriverID.IsValid())
     {
-        SendStandbyCommand(mDriverID);
-        ReleaseComponentControl(mDriverID, 50);
+        if(HaveComponentControl(mDriverID))
+        {
+            SendStandbyCommand(mDriverID);
+            ReleaseComponentControl(mDriverID, 50);
+        }
     }
     mJoystickMutex.Leave();
 
@@ -1451,7 +1461,7 @@ void JoystickDriver::JoystickCallback(const CxUtils::Joystick& joystick, void *a
 
             if(Time::GetUtcTimeMs() - queryTimeMs > 1000)
             {
-                QueryConfiguration queryConfiguration;
+                Jaus::QueryConfiguration queryConfiguration;
                 queryConfiguration.SetSourceID(driver->GetID());
                 queryConfiguration.SetDestinationID(Address(driver->mJoystickSubsystemID,
                                                             255, 1, 1));

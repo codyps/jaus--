@@ -48,9 +48,11 @@
 #include "jaus/messages/command/core/releasecomponentcontrol.h"
 #include "jaus/messages/query/core/querycomponentcontrol.h"
 #include "jaus/messages/query/core/querycomponentstatus.h"
+#include "jaus/messages/query/configuration/querysubsystemlist.h"
+#include "jaus/messages/query/configuration/queryconfiguration.h"
+#include "jaus/messages/inform/configuration/reportsubsystemlist.h"
 #include "jaus/messages/inform/core/reportcomponentcontrol.h"
 #include "jaus/messages/inform/core/reportcomponentstatus.h"
-
 
 using namespace Jaus;
 
@@ -145,7 +147,7 @@ int CommandComponent::Reset()
 ///   all core services supported by the component.
 ///
 ///   If a component ID is specified in the RA, it may report only one
-///   service in beyond the core message support, and this ervice must be
+///   service in beyond the core message support, and this service must be
 ///   equal to the component ID.  If a component ID is not listed in the
 ///   RA, it may report any number of services.  For example, an component
 ///   with ID 33 must provide only serive 33.  The exception to this rule
@@ -336,6 +338,15 @@ int CommandComponent::ReleaseComponentControl(const Address& id,
 int CommandComponent::SendResumeCommand(const Address& id, const bool queryStatus)
 {
     Jaus::Resume command;
+    int result = Jaus::FAILURE;
+    bool sendReleaseFlag = false;
+    if(!HaveComponentControl(id) )
+    {
+        if(this->RequestComponentControl(id, 250))
+        {
+            sendReleaseFlag = true;
+        }
+    }
     command.SetSourceID(GetID());
     command.SetDestinationID(id);
     if(Send(&command))
@@ -346,23 +357,29 @@ int CommandComponent::SendResumeCommand(const Address& id, const bool queryStatu
             Receipt receipt;
             query.SetSourceID(GetID());
             query.SetDestinationID(id);
-            if(Send(&query, receipt) == JAUS_OK)
+            if(Send(&query, receipt, 0, 250, 1) == JAUS_OK)
             {
                 const Jaus::ReportComponentStatus* report = 
                     dynamic_cast<const Jaus::ReportComponentStatus*>(receipt.GetResponseMessage());
                 if(report &&
                     report->GetPrimaryStatusCode() == Jaus::ReportComponentStatus::Status::Ready)
                 {
-                    return JAUS_OK;
+                    result = JAUS_OK;
                 }
             }
         }
         else
         {
-            return JAUS_OK;
+            result = JAUS_OK;
         }
     }
-    return JAUS_FAILURE;
+
+    if(sendReleaseFlag)
+    {
+        this->ReleaseComponentControl(id);
+    }
+
+    return result;
 }
 
 
@@ -381,8 +398,20 @@ int CommandComponent::SendResumeCommand(const Address& id, const bool queryStatu
 int CommandComponent::SendStandbyCommand(const Address& id, const bool queryStatus)
 {
     Jaus::Standby command;
+
+    int result = Jaus::FAILURE;
+    bool sendReleaseFlag = false;
+    if(!HaveComponentControl(id) )
+    {
+        if(this->RequestComponentControl(id, 250))
+        {
+            sendReleaseFlag = true;
+        }
+    }
+
     command.SetSourceID(GetID());
     command.SetDestinationID(id);
+
     if(Send(&command))
     {
         if(queryStatus)
@@ -391,23 +420,29 @@ int CommandComponent::SendStandbyCommand(const Address& id, const bool queryStat
             Receipt receipt;
             query.SetSourceID(GetID());
             query.SetDestinationID(id);
-            if(Send(&query, receipt) == JAUS_OK)
+            if(Send(&query, receipt, 0, 250, 1) == JAUS_OK)
             {
                 const Jaus::ReportComponentStatus* report = 
                     dynamic_cast<const Jaus::ReportComponentStatus*>(receipt.GetResponseMessage());
                 if(report &&
                     report->GetPrimaryStatusCode() == Jaus::ReportComponentStatus::Status::Standby)
                 {
-                    return JAUS_OK;
+                    result = JAUS_OK;
                 }
             }
         }
         else
         {
-            return JAUS_OK;
+            result = JAUS_OK;
         }
     }
-    return JAUS_FAILURE;
+
+    if(sendReleaseFlag)
+    {
+        this->ReleaseComponentControl(id);
+    }
+
+    return result;
 }
 
 
@@ -595,6 +630,44 @@ bool CommandComponent::HaveComponentControl(const Address& id) const
         mControlledComponentsMutex.Leave();
     }
     return result;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////
+///
+///   \brief Sends a Query Configuration message to the subsystem.
+///
+///   \param subsystemID ID of the subsystem to query for configuration data.
+///
+///   \return True on success, false on failure.
+///
+////////////////////////////////////////////////////////////////////////////////////
+bool CommandComponent::QueryConfiguration(const Byte subsystemID)
+{
+    Jaus::QuerySubsystemList querySubsystem;
+    Receipt receipt;
+    querySubsystem.SetSourceID(GetID());
+    querySubsystem.SetDestinationID(Address(GetID().mSubsystem, GetID().mNode, 1, 1));
+    if(Send(&querySubsystem, receipt, 0, 100, 1))
+    {
+        ReportSubsystemList *reportSubsystemList = (ReportSubsystemList *)receipt.GetResponseMessage();
+        Jaus::QueryConfiguration queryConfig;
+        queryConfig.SetSourceID(GetID());
+        queryConfig.SetDestinationID(Address(subsystemID, 255, 1, 1));
+
+        Address::Set::const_iterator id;
+        for(id = reportSubsystemList->GetSubsystemList()->begin(); 
+            id != reportSubsystemList->GetSubsystemList()->end(); 
+            id++)
+        {
+            if(id->mSubsystem == subsystemID)
+            {
+                queryConfig.SetDestinationID(*id);
+            }
+        }
+        return Send(&queryConfig) == JAUS_OK ? true : false;
+    }
+    return false;
 }
 
 

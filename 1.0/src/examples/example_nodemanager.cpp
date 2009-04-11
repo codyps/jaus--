@@ -120,7 +120,7 @@ int main(int argc, char *argv[])
             gExitFlag = true;
         }
         // Display node configuration data and current time.
-        Time::GetUtcTime().PrintTime();
+        Jaus::Time::GetUtcTime().PrintTime();
         node.GetSubsystemConfiguration().Print();
         CxUtils::SleepMs(1000);
     }
@@ -153,7 +153,7 @@ void NodeManagerTest()
                 node.GetSubsystemConfiguration().Print();
             }
 
-            if( Time::GetUtcTimeMs() - updateTimeMs > 5000)
+            if( Jaus::Time::GetUtcTimeMs() - updateTimeMs > 5000)
             {
                 if(componentList.size() == 0)
                 {
@@ -197,7 +197,7 @@ void NodeManagerTest()
                     }
                     componentList.clear();
                 }
-                updateTimeMs = Time::GetUtcTimeMs();
+                updateTimeMs = Jaus::Time::GetUtcTimeMs();
             }
             if(CxUtils::GetChar() == 27)
             {

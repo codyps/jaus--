@@ -398,6 +398,9 @@ UShort MessageCreator::GetInformQueryType(const UShort informCode)
         case JAUS_REPORT_IMAGE:
             code = JAUS_QUERY_IMAGE;
             break;
+        case JAUS_REPORT_WATER_DEPTH:
+            code = JAUS_QUERY_WATER_DEPTH;
+            break;
 
         // World Model Subgroup
         case JAUS_REPORT_VECTOR_KNOWLEDGE_STORE_FEATURE_CLASS_METADATA:
@@ -602,6 +605,9 @@ UShort MessageCreator::GetQueryResponseType(const UShort queryCode)
             break;
         case JAUS_QUERY_IMAGE:
             code = JAUS_REPORT_IMAGE;
+            break;
+        case JAUS_QUERY_WATER_DEPTH:
+            code = JAUS_REPORT_WATER_DEPTH;
             break;
 
         // World Model Subgroup
@@ -1432,6 +1438,9 @@ std::string MessageCreator::GetInformMessageString(const UShort code)
     case JAUS_REPORT_MISSION_STATUS:
         str = "Report Mission Status";
         break;
+    case JAUS_REPORT_WATER_DEPTH:
+        str = "Report Water Depth";
+        break;
     default:
         {
             char buff[10];
@@ -1752,14 +1761,14 @@ Message* MessageCreator::CreateCommandMessage(const UShort code)
         break;
     //  World Model Subgroup
     case JAUS_CREATE_VECTOR_KNOWLEDGE_STORE_OBJECTS:
- //       msg = new CreateVectorKnowledgeStoreObjects();
+    //  msg = new CreateVectorKnowledgeStoreObjects();
         break;
-    ////  Dynamic Configuration Subgroup
-    ////  Payload Subgroup
-    ////  Planning Subgroup
-    //case JAUS_SPOOL_MISSION:
-    //    msg = new SpoolMission();
-    //    break;
+    //  Dynamic Configuration Subgroup
+    //  Payload Subgroup
+    //  Planning Subgroup
+    case JAUS_SPOOL_MISSION:
+        msg = new SpoolMission();
+        break;
     //case JAUS_RUN_MISSION:
     //    msg = new RunMission();
     //    break;
@@ -1920,6 +1929,9 @@ Message* MessageCreator::CreateQueryMessage(const UShort code)
          break;
     case JAUS_QUERY_IMAGE:
          msg = new QueryImage();
+         break;
+    case JAUS_QUERY_WATER_DEPTH:
+         msg = new QueryWaterDepth();
          break;
     ////  World Model Subgroup
     //  Dynamic Configuration (Discovery) Subgroup
@@ -2100,6 +2112,9 @@ Message* MessageCreator::CreateInformMessage(const UShort code)
     case JAUS_REPORT_CONFIGURATION:
         msg = new ReportConfiguration();
         break;
+    case JAUS_REPORT_WATER_DEPTH:
+        msg = new ReportWaterDepth();
+        break;
     //// Planning Subgroup
     //case JAUS_REPORT_SPOOLING_PREFERENCE:
     //    msg = new ReportSpoolingPreference();
@@ -2147,6 +2162,8 @@ Message* MessageCreator::CreateExperimentalMessage(const UShort code)
     case JAUS_REPORT_PIXEL_ON_SCREEN:
         msg = new ReportPixelOnScreen();
         break;
+    case JAUS_SET_WATER_DEPTH:
+        msg = new SetWaterDepth();
     //  COULD NOT FIND MESSAGE!
     default:
         msg = NULL;

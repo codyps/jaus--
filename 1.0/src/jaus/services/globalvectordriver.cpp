@@ -1150,6 +1150,8 @@ void GlobalVectorDriver::GlobalVectorDriverThread(void *args)
             // If not in a ready state, then we must release control
             // of all components being commanded and stop
             // any active subscriptions (this will reduce bandwidth).
+
+            /*  Keep events for now, may add this code back in later.
             if(driver->mGlobalPoseSensorID.IsValid())
             {
                 driver->CancelEvents(driver->mGlobalPoseSensorID);
@@ -1158,6 +1160,8 @@ void GlobalVectorDriver::GlobalVectorDriverThread(void *args)
             {
                 driver->CancelEvents(driver->mVelocityStateSensorID);
             }
+            */
+
             if(driver->mPrimitiveDriverID.IsValid() &&
                 driver->HaveComponentControl(driver->mPrimitiveDriverID))
             {

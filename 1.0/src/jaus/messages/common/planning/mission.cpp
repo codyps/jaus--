@@ -868,7 +868,7 @@ unsigned int Mission::Task::ReadTask(const UShort pos, const Stream& packet, Tas
     if( numChildren > 0 )
     {
         childTaskIndex = new UInt[numChildren];
-        //assert(childTaskIndex);
+        assert(childTaskIndex);
     }
     //read children tasks positions from the packet into array childTaskIndex
     for(unsigned int i = 0; i < numChildren; i++)
@@ -921,8 +921,12 @@ unsigned int Mission::Task::ReadTask(const UShort pos, const Stream& packet, Tas
 ///  structure organized by task ID.
 ///
 ////////////////////////////////////////////////////////////////////////////////////
-void Mission::Task::UpdateTaskMap(Map & mapping)
+void Mission::Task::UpdateTaskMap(Map&  mapping)
 {
+    if(this == mpRoot)
+    {
+        mapping.clear();
+    }
     mapping[mTaskID] = this;
     if( mChildTasks.size() > 0 )
     {

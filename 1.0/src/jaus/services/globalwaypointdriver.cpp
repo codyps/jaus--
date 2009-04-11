@@ -187,7 +187,6 @@ int GlobalWaypointDriver::Shutdown()
 ///   \return JAUS_OK on success, otherwise JAUS_FAILURE.
 ///
 ////////////////////////////////////////////////////////////////////////////////////
-
 int GlobalWaypointDriver::SetupService()
 {
     UInt globalWaypointPV = GetSetGlobalWaypointPresenceVector();
@@ -217,6 +216,7 @@ int GlobalWaypointDriver::SetupService()
     return JAUS_OK;
 }
 
+
 ////////////////////////////////////////////////////////////////////////////////////
 ///
 ///   \brief Sets the update rate for generating Set Global Vector commands for
@@ -236,6 +236,7 @@ int GlobalWaypointDriver::SetUpdateRate(const double rate)
     }
     return JAUS_FAILURE;
 }
+
 
 ////////////////////////////////////////////////////////////////////////////////////
 ///
@@ -300,6 +301,7 @@ int GlobalWaypointDriver::ProcessCommandMessage(const Message* msg,
     return result;
 }
 
+
 ////////////////////////////////////////////////////////////////////////////////////
 ///
 ///   \brief Overloaded method to process query messages.
@@ -312,7 +314,6 @@ int GlobalWaypointDriver::ProcessCommandMessage(const Message* msg,
 ///   \return JAUS_OK on success, otherwise JAUS_FAILURE.
 ///
 ////////////////////////////////////////////////////////////////////////////////////
-// Processes query messages.
 int GlobalWaypointDriver::ProcessQueryMessage(const Message* msg)
 {
     int result = JAUS_OK;
@@ -459,6 +460,7 @@ int GlobalWaypointDriver::ProcessInformMessage(const Message* msg)
 
 }
 
+
 ////////////////////////////////////////////////////////////////////////////////////
 ///
 ///   \brief This command is called whenever the size of the waypoint list changes.
@@ -490,6 +492,7 @@ void GlobalWaypointDriver::WaypointCountUpdated()
 
     mEventManager.Unlock();
 }
+
 
 ////////////////////////////////////////////////////////////////////////////////////
 ///
@@ -716,26 +719,35 @@ void GlobalWaypointDriver::GlobalWaypointDriverThread(void *args)
 {   
     GlobalWaypointDriver* driver = (GlobalWaypointDriver*)(args);
     Jaus::SetGlobalWaypoint globalWaypoint;
-    Jaus::SetGlobalVector globalVector;
+    Message::List commands;
+    Message::List::iterator toSend;
+
     while(driver && !driver->mGlobalWaypointDriverThread.QuitThreadFlag())
     {
+        // Delete commands.
+        if(commands.size() > 0)
+        {
+            for(toSend = commands.begin();
+                toSend != commands.end();
+                toSend++)
+            {
+                delete *toSend;
+            }
+            commands.clear();
+        }
+
 		//std::cout << driver->GetTravelSpeed() << "   ";
 		//std::cout << driver->mWaypointList.size() << "   ";
 		//std::cout << driver->IsGlobalPoseSubscriptionReady() << "   ";
 		//std::cout << driver->HaveControlOfGlobalVectorDriver() << "     ";
-        // If we are in a ready state, and we have the necessary
-        // sensor data required, and control of a primitive driver
-        // then generate wrench efforts!
-        if(driver->GetPrimaryStatus() == Component::Status::Ready &&
-            driver->IsGlobalPoseSubscriptionReady() &&
-            !driver->mWaypointList.empty() &&
-            driver->HaveControlOfGlobalVectorDriver()
-            )
+        
+        if(driver->IsGlobalPoseSubscriptionReady())
         {
-			
-            // Generate the global vector to send to the
-            // global vector driver component.
-            if(driver->IsWaypointAchieved(driver->GetCurrentDesiredGlobalWaypoint()))
+            // See if we need to remove waypoints from the waypoint list.
+            // This is done regardless of whether or not the Waypoint Driver is
+            // in a ready state.
+            if(driver->mWaypointList.size() > 0 &&
+               driver->IsWaypointAchieved(driver->GetCurrentDesiredGlobalWaypoint()))
             {
                 // Remove current waypoint
                 WaypointList::iterator wpl_itr = driver->mWaypointList.begin();
@@ -743,55 +755,46 @@ void GlobalWaypointDriver::GlobalWaypointDriverThread(void *args)
                 driver->WaypointCountUpdated();
             }
             
-            //if this is true, it means that we just removed the last waypoint from the list.
-            if(driver->mWaypointList.empty())
+            if(driver->GetPrimaryStatus() == Component::Status::Ready &&
+                driver->HaveControlOfGlobalVectorDriver())
             {
-                globalVector.SetSpeed(0.0);
-            }
-            else
-            {
-                driver->GenerateGlobalVector(driver->GetCurrentDesiredGlobalWaypoint(), globalVector);
-            }
-            
-            globalVector.SetDestinationID(driver->GetGlobalVectorDriverID());
-            globalVector.SetSourceID(driver->GetID());
-            // Send the command.
-            driver->Send(&globalVector);
+                //if this is true, it means that we just removed the last waypoint from the list.
+                if(driver->mWaypointList.empty() == true)
+                {
+                    driver->GenerateDefaultCommands(commands);
+                }
+                else
+                {
+                    driver->GenerateCommands(driver->GetCurrentDesiredGlobalWaypoint(), commands);
+                }
 
-            if(driver->mWaypointList.empty())
-            {
-				driver->SendStandbyCommand(driver->mGlobalVectorDriverID);
-                driver->ReleaseComponentControl(driver->mGlobalVectorDriverID);
+                // Send commands.
+                for(toSend = commands.begin();
+                    toSend != commands.end();
+                    toSend++)
+                {
+                    // Make sure Source ID is et.
+                    (*toSend)->SetSourceID(driver->GetID());
+                    driver->Send(*toSend);
+                    delete *toSend;
+                }
+                commands.clear();
             }
+            else if(driver->GetPrimaryStatus() == Component::Status::Standby)
+            {
+                if(driver->HaveComponentControl(driver->mGlobalVectorDriverID))
+                {
+                    driver->SendStandbyCommand(driver->mGlobalVectorDriverID);
+                    driver->ReleaseComponentControl(driver->mGlobalVectorDriverID);
+                }
+            }
+
         }
-        else if(driver->GetPrimaryStatus() != Component::Status::Ready)
-        {
-            // If not in a ready state, then we must release control
-            // of all components being commanded and stop
-            // any active subscriptions (this will reduce bandwidth).
-            if(driver->mGlobalPoseSensorID.IsValid())
-            {
-                driver->CancelEvents(driver->mGlobalPoseSensorID);
-            }
-            if(driver->mGlobalVectorDriverID.IsValid())
-            {
-                driver->CancelEvents(driver->mGlobalVectorDriverID);
-            }
-			if(driver->GetPrimaryStatus() != Component::Status::Standby)
-			{
-				driver->mGlobalWaypointDriverMutex.Enter();
-				driver->mWaypointList.clear();
-				driver->mGlobalWaypointDriverMutex.Leave();
-			}
-            if(driver->HaveComponentControl(driver->mGlobalVectorDriverID))
-            {
-                driver->SendStandbyCommand(driver->mGlobalVectorDriverID);
-                driver->ReleaseComponentControl(driver->mGlobalVectorDriverID);
-            }            
-        }
+        
         // Delay refresh based on update rate set.
         CxUtils::SleepMs( (unsigned int)(1000.0/driver->mGlobalWaypointDriverUpdateRateHz) );
     }
+
     // If not in a ready state, then we must release control
     // of all components being commanded and stop
     // any active subscriptions (this will reduce bandwidth).
@@ -809,8 +812,11 @@ void GlobalWaypointDriver::GlobalWaypointDriverThread(void *args)
     driver->WaypointCountUpdated();
     driver->mGlobalWaypointDriverMutex.Leave();
     
-    driver->SendStandbyCommand(driver->mGlobalVectorDriverID);
-    driver->ReleaseComponentControl(driver->mGlobalVectorDriverID);
+    if(driver->HaveComponentControl(driver->mGlobalVectorDriverID))
+    {
+        driver->SendStandbyCommand(driver->mGlobalVectorDriverID);
+        driver->ReleaseComponentControl(driver->mGlobalVectorDriverID);
+    }
     driver->Standby();
 }
 

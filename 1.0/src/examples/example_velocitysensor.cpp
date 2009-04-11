@@ -128,7 +128,7 @@ int main(int argc, char *argv[])
     // Intialize velocity state data.
     velocityState.SetVelocityX(0);
     velocityState.SetYawRate(0);
-    velocityState.SetTimeStamp(Time::GetUtcTime());
+    velocityState.SetTimeStamp(Jaus::Time::GetUtcTime());
 
     // Set the maximum update rate of the sensor.
     sensor.SetSensorUpdateRate(50);
@@ -168,7 +168,7 @@ int main(int argc, char *argv[])
         else
             velocityState.SetYawRate(velocityState.GetYawRate() + 0.2);
         
-        velocityState.SetTimeStamp(Time::GetUtcTime());
+        velocityState.SetTimeStamp(Jaus::Time::GetUtcTime());
 
         //  Set the new velocity state.  This will
         //  save the data internally and generate 
