@@ -39,7 +39,7 @@ libjpeg:
 	cd $(LIBJPEGBUILDDIR); ./configure
 	cd $(LIBJPEGBUILDDIR); make clean
 	cd $(LIBJPEGBUILDDIR); make
-	cd $(LIBJPEGBUILDDIR); make install
+	cd $(LIBJPEGBUILDDIR); make install-lib
 libpng:
 	cd $(LIBPNGBUILDDIR); ./configure
 	cd $(LIBPNGBUILDDIR); make clean
