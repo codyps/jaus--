@@ -20,8 +20,10 @@ clean:
 	cd $(EXAMPLEBUILDDIR); make clean
 
 external:
-	cd $(EXTBUILDDIR); make configure
-	cd $(EXTBUILDDIR); make install
+	cd $(EXTBUILDDIR); make libz
+	cd $(EXTBUILDDIR); make libpng
+	cd $(EXTBUILDDIR); make libjpeg
+	cd $(EXTBUILDDIR); make libtinyxml
 
 help:
 	echo $(JAUSBUILDDIR)

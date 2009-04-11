@@ -32,7 +32,8 @@ MSGCMDEVENSRC	:= $(MSGCMDSRC)/events
 MSGCMDPLATSRC	:= $(MSGCMDSRC)/platform
 MSGCMDWRLDSRC	:= $(MSGCMDSRC)/world
 MSGCMDCOMMSRC	:= $(MSGCMDSRC)/communications
-MSGCMDENVISRC    := $(MSGCMDSRC)/environment
+MSGCMDENVISRC   := $(MSGCMDSRC)/environment
+MSGCMDPLANSRC   := $(MSGCMDSRC)/planning 
 
 MSGINFSRC	:= $(MSGSRC)/inform
 MSGINFCOMMSRC	:= $(MSGINFSRC)/communications
@@ -54,7 +55,7 @@ MSGQUEPLATSRC	:= $(MSGQUESRC)/platform
 MSGEXPSRC	:= $(MSGSRC)/experimental
 MSGEXPSRC_SICK	:= $(MSGSRC)/experimental/sick
 MSGEXPSRC_VIDEO := $(MSGSRC)/experimental/video
-
+MSGEXPSRC_DEPTH := $(MSGSRC)/experimental/waterdepth
 SRCPATHS	:= $(MSGSRC) \
 			$(MSGCOMSRC) \
 			$(MSGCOMCONFSRC) \
@@ -62,11 +63,14 @@ SRCPATHS	:= $(MSGSRC) \
 			$(MSGCOMPLATSRC) \
 			$(MSGCOMWRLDSRC) \
 			$(MSGCOMPLANSRC) \
-			$(MSGCMDSRC) \			$(MSGCMDCORESRC) \			$(MSGCMDEVENSRC) \
+			$(MSGCMDSRC) \
+			$(MSGCMDCORESRC) \
+			$(MSGCMDEVENSRC) \
 			$(MSGCMDPLATSRC) \
 			$(MSGCMDWRLDSRC) \
 			$(MSGCMDCOMMSRC) \
 			$(MSGCMDENVISRC) \
+			$(MSGCMDPLANSRC) \
 			$(MSGINFSRC) \
 			$(MSGINFCOMMSRC) \
 			$(MSGINFCONFSRC) \
@@ -84,7 +88,8 @@ SRCPATHS	:= $(MSGSRC) \
 			$(MSGQUEPLATSRC) \
 			$(MSGEXPSRC) \
 			$(MSGEXPSRC_SICK) \
-			$(MSGEXPSRC_VIDEO)
+			$(MSGEXPSRC_VIDEO) \
+			$(MSGEXPSRC_DEPTH)
 	
 
 SRCFILES	:= 	$(foreach DIR, $(SRCPATHS), $(wildcard $(DIR)/*.cpp))

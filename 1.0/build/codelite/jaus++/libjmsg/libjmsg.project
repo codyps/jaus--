@@ -21,6 +21,9 @@
       <VirtualDirectory Name="world">
         <File Name="../../../../src/jaus/messages/common/world/object.cpp"/>
       </VirtualDirectory>
+      <VirtualDirectory Name="planning">
+        <File Name="../../../../src/jaus/messages/common/planning/mission.cpp"/>
+      </VirtualDirectory>
     </VirtualDirectory>
     <VirtualDirectory Name="command">
       <VirtualDirectory Name="communications">
@@ -212,6 +215,9 @@
       </VirtualDirectory>
       <VirtualDirectory Name="world">
         <File Name="../../../../include/jaus/messages/common/world/object.h"/>
+      </VirtualDirectory>
+      <VirtualDirectory Name="planning">
+        <File Name="../../../../include/jaus/messages/common/planning/mission.h"/>
       </VirtualDirectory>
     </VirtualDirectory>
     <VirtualDirectory Name="command">
