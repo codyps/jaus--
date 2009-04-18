@@ -1,42 +1,42 @@
-//////////////////////////////////////////////////////////////////////////////////////
-/////
-/////  \file spoolmission.cpp
-/////  \brief This file contains data structure for the JAUS_SPOOL_MISSION message.
-/////
-/////  <br>Author(s): Daniel Barber, Cathy Yen
-/////  <br>Created: 25 March 2009
-/////  <br>Last Modified: 12 March 2009
-/////  <br>Copyright (c) 2009
-/////  <br>Applied Cognition and Training in Immersive Virtual Environments
-/////  <br>(ACTIVE) Laboratory
-/////  <br>Institute for Simulation and Training (IST)
-/////  <br>University of Central Florida (UCF)
-/////  <br>Email: dbarber@ist.ucf.edu
-/////  <br>Web:  http://active.ist.ucf.edu
-/////
-/////  Redistribution and use in source and binary forms, with or without
-/////  modification, are permitted provided that the following conditions are met:
-/////      * Redistributions of source code must retain the above copyright
-/////        notice, this list of conditions and the following disclaimer.
-/////      * Redistributions in binary form must reproduce the above copyright
-/////        notice, this list of conditions and the following disclaimer in the
-/////        documentation and/or other materials provided with the distribution.
-/////      * Neither the name of the ACTIVE LAB, IST, UCF, nor the
-/////        names of its contributors may be used to endorse or promote products
-/////        derived from this software without specific prior written permission.
-///// 
-/////  THIS SOFTWARE IS PROVIDED BY THE ACTIVE LAB''AS IS'' AND ANY
-/////  EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-/////  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-/////  DISCLAIMED. IN NO EVENT SHALL UCF BE LIABLE FOR ANY
-/////  DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-/////  (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-/////  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-/////  ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-/////  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-/////  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-/////
-//////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////
+///
+///  \file spoolmission.cpp
+///  \brief This file contains data structure for the JAUS_SPOOL_MISSION message.
+///
+///  <br>Author(s): Daniel Barber, Cathy Yen
+///  <br>Created: 25 March 2009
+///  <br>Last Modified: 12 March 2009
+///  <br>Copyright (c) 2009
+///  <br>Applied Cognition and Training in Immersive Virtual Environments
+///  <br>(ACTIVE) Laboratory
+///  <br>Institute for Simulation and Training (IST)
+///  <br>University of Central Florida (UCF)
+///  <br>Email: dbarber@ist.ucf.edu
+///  <br>Web:  http://active.ist.ucf.edu
+///
+///  Redistribution and use in source and binary forms, with or without
+///  modification, are permitted provided that the following conditions are met:
+///      * Redistributions of source code must retain the above copyright
+///        notice, this list of conditions and the following disclaimer.
+///      * Redistributions in binary form must reproduce the above copyright
+///        notice, this list of conditions and the following disclaimer in the
+///        documentation and/or other materials provided with the distribution.
+///      * Neither the name of the ACTIVE LAB, IST, UCF, nor the
+///        names of its contributors may be used to endorse or promote products
+///        derived from this software without specific prior written permission.
+/// 
+///  THIS SOFTWARE IS PROVIDED BY THE ACTIVE LAB''AS IS'' AND ANY
+///  EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+///  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+///  DISCLAIMED. IN NO EVENT SHALL UCF BE LIABLE FOR ANY
+///  DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+///  (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+///  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+///  ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+///  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+///  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+///
+////////////////////////////////////////////////////////////////////////////////////
 #include "jaus/messages/command/planning/spoolmission.h"
 #include "jaus/messages/command/commandcodes.h"
 #include "jaus/messages/command/commandmessages.h"
@@ -82,6 +82,7 @@ SpoolMission::~SpoolMission()
 ////////////////////////////////////////////////////////////////////////////////////
 ///
 ///  \brief Sets append flag.
+///
 ///  \param flag Append flag options.
 ///         <br>0 = Replace the current mission. 
 ///         <br>1 = Append to current mission. 
@@ -105,6 +106,7 @@ SpoolMission::AppendFlag SpoolMission::GetAppendFlag() const
 ////////////////////////////////////////////////////////////////////////////////////
 ///
 ///  \brief Sets a mission object.
+///
 ///  \param mission Mission reference passed to set up.
 ///
 ////////////////////////////////////////////////////////////////////////////////////
@@ -117,6 +119,8 @@ void SpoolMission::SetMission(const Mission& mission)
 ///
 ///  \brief Gets mission object inside the class.
 ///
+///  \return mission. 
+///
 ////////////////////////////////////////////////////////////////////////////////////
 const Jaus::Mission* SpoolMission::GetMission() const
 {
@@ -127,8 +131,10 @@ const Jaus::Mission* SpoolMission::GetMission() const
 ///
 ///  \brief Gets mission object inside the class.
 ///
+///  \return mission.
+///
 ////////////////////////////////////////////////////////////////////////////////////
-const Jaus::Mission* SpoolMission::GetMission()
+Jaus::Mission* SpoolMission::GetMission()
 {
     return &mMission;
 }
@@ -277,6 +283,9 @@ SpoolMission& SpoolMission::operator=(const SpoolMission &msg)
     return *this;
 }
 
+
+void AddTestTaskMessages(const int num, Mission::Task* task);
+
 ////////////////////////////////////////////////////////////////////////////////////
 ///
 ///   \brief Runs spoolmission test.
@@ -313,12 +322,10 @@ int SpoolMission::RunTestCase() const
     SpoolMission sendSpoolmission;               // let this be the sender spoolmission
 
     // preparing a mission the task msg tree belong to
-    sendSpoolmission.mMission.SetMissionID(1);
-    sendSpoolmission.mMission.AddTasks(root);                     // adds the task msg tree to mission
+    sendSpoolmission.GetMission()->SetMissionID(1);
+    sendSpoolmission.GetMission()->AddTasks(root); // adds the task msg tree to mission
 
-    //sendSpoolmission.SetMission(mission);        // set mission in spoolmission
-
-    SpoolMission receiveSpoolmission;            // let this be the reveiver spoolmission
+    SpoolMission receiveSpoolmission;              // let this be the reveiver spoolmission
 
     // header settings can also be done from the calling object first.
     sendSpoolmission.SetDestinationID( Address(1, 2, 3, 4) );
@@ -340,8 +347,6 @@ int SpoolMission::RunTestCase() const
         sendSpoolmission.Print();   // the original data
         cout << std::dec <<  "Size of serialized data is (including header): " << packet.Length() << endl;
 
-
-         
         // Now lets pretend we just received a message stream (serialized data)
         // and read it out (de-serialize).
         if(receiveSpoolmission.Read(packet))
@@ -363,13 +368,17 @@ int SpoolMission::RunTestCase() const
 
     sendSpoolmission.ClearMessageBody();
     receiveSpoolmission.ClearMessageBody();
-  
-
 
     return JAUS_OK;
 }
 
-void SpoolMission::AddTestTaskMessages(const int num, Mission::Task* task)const
+/////////////////////////////////////////////////////////////////////
+///
+///  \brief creates various sample messages for testing purpose. 
+///         called from RunTestCase().
+///
+/////////////////////////////////////////////////////////////////////
+void AddTestTaskMessages(const int num, Mission::Task* task)
 {   // used for testing mission planning task message examples.
     Mission::Task::Message* taskMessage = NULL;
     for(int i = 0; i < num; i++)
@@ -380,36 +389,64 @@ void SpoolMission::AddTestTaskMessages(const int num, Mission::Task* task)const
         switch(i)
         {
         case 0:
-            taskMessage->mpMessage = MessageCreator::CreateMessage(JAUS_SET_WRENCH_EFFORT);
-            taskMessage->mpMessage->SetSourceID(Address(1, 1, 1, 1));
-            taskMessage->mpMessage->SetDestinationID(Address(2, 3, 4, 5));
+            {
+                Jaus::SetWrenchEffort* wrenchEffort;
+                taskMessage->mpMessage = MessageCreator::CreateMessage(JAUS_SET_WRENCH_EFFORT);
+                wrenchEffort = ((Jaus::SetWrenchEffort*)(taskMessage->mpMessage));
+                wrenchEffort->SetSourceID(Address(1, 1, 1, 1));
+                wrenchEffort->SetDestinationID(Address(2, 3, 4, 5));
+                wrenchEffort->SetPropulsiveLinearEffortX(100.0*rand()/RAND_MAX);
+                wrenchEffort->SetPropulsiveLinearEffortY(100.0*rand()/RAND_MAX);
+            }
             break;
         case 1:
-            taskMessage->mpMessage = MessageCreator::CreateMessage(JAUS_SET_GLOBAL_VECTOR);
-            taskMessage->mpMessage->SetSourceID(Address(1, 1, 1, 1));
-            taskMessage->mpMessage->SetDestinationID(Address(2, 3, 4, 5));
-
+            {
+                Jaus::SetGlobalVector* globalVector;
+                taskMessage->mpMessage = MessageCreator::CreateMessage(JAUS_SET_GLOBAL_VECTOR);
+                globalVector = ((Jaus::SetGlobalVector*)(taskMessage->mpMessage));
+                globalVector->SetSourceID(Address(1, 1, 1, 1));
+                globalVector->SetDestinationID(Address(2, 3, 4, 5));
+                globalVector->SetElevation(100);
+                globalVector->SetHeading(10);
+            }
             break;
         case 2:
-            taskMessage->mpMessage = MessageCreator::CreateMessage(JAUS_SET_GLOBAL_WAYPOINT);
-            taskMessage->mpMessage->SetSourceID(Address(1, 1, 1, 1));
-            taskMessage->mpMessage->SetDestinationID(Address(2, 3, 4, 5));
+            {
+                Jaus::SetLocalWaypoint* localWaypoint;
+                taskMessage->mpMessage = MessageCreator::CreateMessage(JAUS_SET_GLOBAL_WAYPOINT);
+                localWaypoint = ((Jaus::SetLocalWaypoint*)(taskMessage->mpMessage));
+                localWaypoint->SetSourceID(Address(1, 1, 1, 1));
+                localWaypoint->SetDestinationID(Address(2, 3, 4, 5));
+                localWaypoint->SetRoll(23);
+                localWaypoint->SetPitch(45);
+            }
             break;
         case 3:
-            taskMessage->mpMessage = MessageCreator::CreateMessage(JAUS_SET_LOCAL_WAYPOINT);
-            taskMessage->mpMessage->SetSourceID(Address(1, 1, 1, 1));
-            taskMessage->mpMessage->SetDestinationID(Address(2, 3, 4, 5));
-            break;
+            {
+                Jaus::SetGlobalWaypoint* globalWaypoint;
+                taskMessage->mpMessage = MessageCreator::CreateMessage(JAUS_SET_GLOBAL_WAYPOINT);
+                globalWaypoint = ((Jaus::SetGlobalWaypoint*)(taskMessage->mpMessage));
+                globalWaypoint->SetSourceID(Address(1, 1, 1, 1));
+                globalWaypoint->SetDestinationID(Address(2, 3, 4, 5));
+                globalWaypoint->SetRoll(100);
+                globalWaypoint->SetPitch(345);
+            }
+             break;
         default:
-            taskMessage->mpMessage = MessageCreator::CreateMessage(JAUS_SET_WRENCH_EFFORT);
-            taskMessage->mpMessage->SetSourceID(Address(1, 1, 1, 1));
-            taskMessage->mpMessage->SetDestinationID(Address(2, 3, 4, 5));
+            {
+                Jaus::SetLocalPathSegment* localPathsegment;
+                taskMessage->mpMessage = MessageCreator::CreateMessage(JAUS_SET_GLOBAL_WAYPOINT);
+                localPathsegment = ((Jaus::SetLocalPathSegment*)(taskMessage->mpMessage));
+                localPathsegment->SetSourceID(Address(1, 1, 1, 1));
+                localPathsegment->SetDestinationID(Address(2, 3, 4, 5));
+                localPathsegment->SetP1X(100.0*rand()/RAND_MAX);
+                localPathsegment->SetP1Y(100.0*rand()/RAND_MAX);
+            }
             break;
         };
         task->GetMessages()->insert(taskMessage);
     }
 }
-
 
 
 /* end of file */

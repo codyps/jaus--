@@ -104,18 +104,21 @@ JoystickDriver::~JoystickDriver()
 ///
 ///   \param i Joystick number, using UINT_MAX to connect to first available. 
 ///            values range from [0,12].
+///   \param calibrationFile In linux, this is a joystick calibration file data.
 ///
 ///   \return JAUS_OK on success, otherwise JAUS_FAILURE.
 ///
 ////////////////////////////////////////////////////////////////////////////////////
-int JoystickDriver::InitializeJoystick(const unsigned int i)
+int JoystickDriver::InitializeJoystick(const unsigned int i,
+                                       const std::string& calibrationFile)
 {
     mpJoystick->Shutdown();
     memset(mButtonValues, 0, sizeof(int)*32);
     mTakeDriveControlFlag = false;
     mTakeCameraControlFlag = false;
-    if(mpJoystick->Initialize(i))
+    if(mpJoystick->Initialize(i, 25, calibrationFile))
     {
+        mJoyCalibrationFile = calibrationFile;
         mpJoystick->RegisterCallback(JoystickDriver::JoystickCallback, this);
         return JAUS_OK;
     }
@@ -164,6 +167,12 @@ int JoystickDriver::InitializeJoystick(const std::string& settingsXML)
     TiXmlHandle docHandle(&xml);
     TiXmlNode* node;
 
+    node = docHandle.FirstChild("Jaus").FirstChild("JoystickDriverComponent").FirstChild("CalibrationFile").ToNode();
+    if(node && node->FirstChild())
+    {
+        mJoyCalibrationFile = node->FirstChild()->Value();
+    }
+
     node = docHandle.FirstChild("Jaus").FirstChild("JoystickDriverComponent").FirstChild("ComponentAuthority").ToNode();
     if(node)
     {
@@ -182,7 +191,7 @@ int JoystickDriver::InitializeJoystick(const std::string& settingsXML)
     node = docHandle.FirstChild("Jaus").FirstChild("JoystickDriverComponent").FirstChild("JoystickID").ToNode();
     if(node)
     {
-        if(this->InitializeJoystick(atoi(node->FirstChild()->Value())))
+        if(this->InitializeJoystick(atoi(node->FirstChild()->Value()), mJoyCalibrationFile))
         {
             result = JAUS_OK;
         }
@@ -389,7 +398,7 @@ int JoystickDriver::InitializeJoystick(const std::string& settingsXML)
     if(node)
     {
         MapButtonToFunction(atoi(node->FirstChild()->Value()), ResetCameraPose);
-    }
+    }   
 
     result = JAUS_OK;
 

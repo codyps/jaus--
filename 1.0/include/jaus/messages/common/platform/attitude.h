@@ -104,6 +104,9 @@ namespace Jaus
         static double GetHeadingDifferance(const double currentAngle, 
                                            const double desiredAngle, 
                                            const bool degrees = false);
+        static double AddAngle(const double currentAngle, 
+                               const double angleDelta, 
+                               const bool degrees = false);
         Attitude &operator=(const Attitude &att);
     protected:
         double mRoll;           ///<  Roll in radians [-PI,PI].  Rotation around x-axis.

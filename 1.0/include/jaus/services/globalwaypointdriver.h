@@ -83,10 +83,10 @@ namespace Jaus
         virtual UShort GetSetGlobalWaypointPresenceVector() const = 0;
         // Returns a presence vector indicating what fields of the Set Global Vector Command are supported.
         virtual Byte GetSetGlobalVectorPresenceVector() const = 0;
-        // Method takes the desired destination and generates commands for the Global Vector Driver(messages will be deleted automatically)..
-        virtual int GenerateCommands(const Jaus::SetGlobalWaypoint& desiredDestination, Message::List& commands) = 0;
-        // Method called when there are no waypoints to travel to (messages will be deleted automatically).
-        virtual int GenerateDefaultCommands(Message::List& commands) = 0;
+        // When this method is called you should have it generate commands to your Global Vector Driver (e.g. Set Global Vector).
+        virtual int GenerateCommands(const Jaus::SetGlobalWaypoint& desiredDestination) = 0;
+        // Method called when there are no waypoints to travel to (lets you send stop commands, etc.)
+        virtual int GenerateDefaultCommands() = 0;
         // Method checks to see if the waypoint destination has been acheived.
         virtual bool IsWaypointAchieved(const Jaus::SetGlobalWaypoint& desiredDestination) = 0;
         // Initialize the waypoint driver

@@ -134,7 +134,7 @@ int JTCPClient::Send(const Jaus::Stream& msg)
     int result = 0;
     mTransportMutex.Enter();
     mSendStream.SetLength((unsigned int)(gNetworkHeader.size()));
-    mSendStream.SetWritePos(gNetworkHeader.size());
+    mSendStream.SetWritePos((unsigned int)gNetworkHeader.size());
     mSendStream.Write(msg);
     result = mTCP.Send(mSendStream);
     mTransportMutex.Leave();

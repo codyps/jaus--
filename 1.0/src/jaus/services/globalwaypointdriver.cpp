@@ -719,23 +719,9 @@ void GlobalWaypointDriver::GlobalWaypointDriverThread(void *args)
 {   
     GlobalWaypointDriver* driver = (GlobalWaypointDriver*)(args);
     Jaus::SetGlobalWaypoint globalWaypoint;
-    Message::List commands;
-    Message::List::iterator toSend;
 
     while(driver && !driver->mGlobalWaypointDriverThread.QuitThreadFlag())
     {
-        // Delete commands.
-        if(commands.size() > 0)
-        {
-            for(toSend = commands.begin();
-                toSend != commands.end();
-                toSend++)
-            {
-                delete *toSend;
-            }
-            commands.clear();
-        }
-
 		//std::cout << driver->GetTravelSpeed() << "   ";
 		//std::cout << driver->mWaypointList.size() << "   ";
 		//std::cout << driver->IsGlobalPoseSubscriptionReady() << "   ";
@@ -761,24 +747,12 @@ void GlobalWaypointDriver::GlobalWaypointDriverThread(void *args)
                 //if this is true, it means that we just removed the last waypoint from the list.
                 if(driver->mWaypointList.empty() == true)
                 {
-                    driver->GenerateDefaultCommands(commands);
+                    driver->GenerateDefaultCommands();
                 }
                 else
                 {
-                    driver->GenerateCommands(driver->GetCurrentDesiredGlobalWaypoint(), commands);
+                    driver->GenerateCommands(driver->GetCurrentDesiredGlobalWaypoint());
                 }
-
-                // Send commands.
-                for(toSend = commands.begin();
-                    toSend != commands.end();
-                    toSend++)
-                {
-                    // Make sure Source ID is et.
-                    (*toSend)->SetSourceID(driver->GetID());
-                    driver->Send(*toSend);
-                    delete *toSend;
-                }
-                commands.clear();
             }
             else if(driver->GetPrimaryStatus() == Component::Status::Standby)
             {

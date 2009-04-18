@@ -1769,18 +1769,18 @@ Message* MessageCreator::CreateCommandMessage(const UShort code)
     case JAUS_SPOOL_MISSION:
         msg = new SpoolMission();
         break;
-    //case JAUS_RUN_MISSION:
-    //    msg = new RunMission();
-    //    break;
-    //case JAUS_ABORT_MISSION:
-    //    msg = new AbortMission();
-    //    break;
-    //case JAUS_PAUSE_MISSION:
-    //    msg = new PauseMission();
-    //    break;
-    //case JAUS_RESUME_MISSION:
-    //    msg = new ResumeMission();
-    //    break;
+    case JAUS_RUN_MISSION:
+        msg = new RunMission();
+        break;
+    case JAUS_ABORT_MISSION:
+        msg = new AbortMission();
+        break;
+    case JAUS_PAUSE_MISSION:
+        msg = new PauseMission();
+        break;
+    case JAUS_RESUME_MISSION:
+        msg = new ResumeMission();
+        break;
     //case JAUS_REMOVE_MESSAGES:
     //    msg = new RemoveMessages();
     //    break;

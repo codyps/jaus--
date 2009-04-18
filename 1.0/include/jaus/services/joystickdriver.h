@@ -127,7 +127,7 @@ namespace Jaus
         // Destructor.
         ~JoystickDriver();
         // Initialize the joystick interface.
-        int InitializeJoystick(const unsigned int i = UINT_MAX);
+        int InitializeJoystick(const unsigned int i = UINT_MAX, const std::string& calibrationFile = std::string());
         // Initialize joystick interface and configuration from XML file
         int InitializeJoystick(const std::string& settingsXML);
         // Shutsdown the joystick interface.
@@ -207,6 +207,7 @@ namespace Jaus
         bool mTakeCameraControlFlag;      ///<  Take control of camera.
         bool mVectorJoystickFlag;         ///<  Are we controlling a Global Vector Driver, or Primitive Driver?
         CxUtils::Joystick *mpJoystick;    ///<  Joystick interface.
+        std::string mJoyCalibrationFile;  ///<  Joystick calibration file.
         CxUtils::Mutex mJoystickMutex;    ///<  Mutex for thread protection.
         SetWrenchEffort mWrenchEffort;    ///<  Wrench effort to send to primitive driver.
         SetGlobalVector mGlobalVector;    ///<  Set Global Vector command to send to Global Vector Driver.

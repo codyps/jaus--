@@ -84,12 +84,12 @@ int main(int argc, char *argv[])
 			{
 				if(argc > 2)
 				{
-					return MessageCreator::RunTestCase((UShort)(atoi(argv[2])));
+                    int hex = 0;
+                    sscanf(argv[2], "%X", &hex);
+					return MessageCreator::RunTestCase((UShort)hex);
 				}
 			}
 			break;
-        case 5:
-            MissionPlanningMessageExample();
         default:
             cout << "Invalid Value\n";
             break;
@@ -99,9 +99,7 @@ int main(int argc, char *argv[])
     {
         //MessageExample();
         //LargeDataSetExample();
-        //MessageCreatorExample();
-        MissionPlanningMessageExample();
-        
+        MessageCreatorExample();
     }
     return 0;
 }
@@ -388,28 +386,4 @@ int LargeDataSetExample()
 }
 
 
-///  This is to show that you can create a spool mission message using MessageCreator
-///  RunTestCase is called to show the match data from before and after the msg read and write.
-///  each of the methods insided spoolmission and mission classes are tested and working as well.
-
-int MissionPlanningMessageExample()
-{   // use for testing Mission Planning Task Messages functionalities.
-    SpoolMission* msg = NULL;
-    msg = (SpoolMission*)MessageCreator::CreateMessage(JAUS_SPOOL_MISSION);
-
-    msg->SetSourceID(Address(1, 1, 1, 1));
-    msg->SetDestinationID(Address(2, 3, 4, 5));
-
-    msg->Print();
-    
-    msg->RunTestCase();
-    system("Pause");
-    delete msg;
-
-   return 0;
-#if 0
-
-#endif
-    return 0;
-}
     

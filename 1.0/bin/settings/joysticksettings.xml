@@ -64,5 +64,8 @@
             <!-- Button to set Camera Postion to 0 -->
             <ResetCameraPose>1</ResetCameraPose>
         </Buttons>
+        <!-- In Linux you may use jscalibrator to Calibrate your
+             joystick.  This is how you can specify the calibration file to load. -->
+        <CalibrationFile>/home/developer/logitech_extreme_3d</CalibrationFile>
     </JoystickDriverComponent>
 </Jaus>

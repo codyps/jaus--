@@ -87,6 +87,10 @@
 #include "jaus/messages/command/world/createvectorknowledgestoreobjects.h"
 
 #include "jaus/messages/command/planning/spoolmission.h"
+#include "jaus/messages/command/planning/runmission.h"
+#include "jaus/messages/command/planning/pausemission.h"
+#include "jaus/messages/command/planning/abortmission.h"
+#include "jaus/messages/command/planning/resumemission.h"
 
 #endif
 /*  End of File */

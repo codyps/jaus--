@@ -430,4 +430,48 @@ double Attitude::GetHeadingDifferance(const double currentAngle, const double de
 }
 
 
+////////////////////////////////////////////////////////////////////////////////////
+///
+///   \brief Adds a specific angle to a heading/pitch/roll value and
+///   if the resulting addition rolls passed the plus or minus 180, then this
+///   method will wrap around.
+///
+///   \param currentAngle The current angle to add some data to.
+///   \param angleDelta How much to add [-PI/PI].
+///   \param degrees If true, then the input parameters are in degrees and
+///                  the result will be in degrees, otherwise radians.
+///
+///   \return The new angle after adding the angleDelta.
+///
+////////////////////////////////////////////////////////////////////////////////////
+double Attitude::AddAngle(const double currentAngle, const double angleDelta, const bool degrees)
+{
+    double result = currentAngle + angleDelta;
+
+    if(degrees)
+    {
+        if(result > 180)
+        {
+            result -= 360;
+        }
+        else if(result < -180)
+        {
+            result += 360;
+        }
+    }
+    else
+    {
+        if(result > JAUS_PI)
+        {
+            result -= JAUS_TWO_PI;
+        }
+        else if(result < -JAUS_PI)
+        {
+            result += JAUS_TWO_PI;
+        }
+    }
+
+    return result;
+}
+
 /*  End of File */

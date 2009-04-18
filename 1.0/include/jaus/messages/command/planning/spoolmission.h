@@ -100,7 +100,7 @@ namespace Jaus
         AppendFlag GetAppendFlag() const;
         void SetMission(const Mission& mission);
         const Mission* GetMission() const;
-        const Mission* GetMission();
+        Mission* GetMission();
 
         virtual int WriteMessageBody(Stream &msg, const UShort version) const;
         virtual int ReadMessageBody(const Stream &msg, const UShort version);
@@ -111,8 +111,6 @@ namespace Jaus
         virtual Message* Clone() const;
         SpoolMission& operator=(const SpoolMission &msg);
         virtual int RunTestCase() const;
-        void AddTestTaskMessages(const int num, Mission::Task* task) const;
-
     protected:
         AppendFlag mAppendFlag; ///< 0 = Replace current mission, 1 = append to current mission.
         Mission mMission;       ///< contains mission object
