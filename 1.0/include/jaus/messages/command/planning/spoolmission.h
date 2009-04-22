@@ -91,8 +91,7 @@ namespace Jaus
         {
             Replace = 0,
             Append,
-        };        
-
+        }; 
         SpoolMission();
         SpoolMission(const SpoolMission &msg);
         ~SpoolMission();
@@ -110,10 +109,10 @@ namespace Jaus
         virtual UInt GetPresenceVectorMask(const UShort version = JAUS_DEFAULT_VERSION) const;
         virtual Message* Clone() const;
         SpoolMission& operator=(const SpoolMission &msg);
-        virtual int RunTestCase() const;
+        virtual int RunTestCase() const;  ///< Runs test program to show usage.
     protected:
         AppendFlag mAppendFlag; ///< 0 = Replace current mission, 1 = append to current mission.
-        Mission mMission;       ///< contains mission object
+        Mission mMission;       ///< Contains mission object
     };
 }
 

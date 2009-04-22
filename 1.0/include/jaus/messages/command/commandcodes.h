@@ -85,7 +85,8 @@ namespace Jaus
     const UShort JAUS_SET_GLOBAL_WAYPOINT                                  =       0x040C;
     const UShort JAUS_SET_LOCAL_WAYPOINT                                   =       0x040D;
     const UShort JAUS_SET_GLOBAL_PATH_SEGMENT                              =       0x040F;
-    const UShort JAUS_SET_LOCAL_PATH_SEGMENT                               =       0x0410; 
+    const UShort JAUS_SET_LOCAL_PATH_SEGMENT                               =       0x0410;
+    const UShort JAUS_SET_DEVICE_POWER_STATUS                              =       0x0415;
     //  Manipulator Subgroup - Codes 0600-07FF
     const UShort JAUS_SET_JOINT_EFFORTS                                    =       0x0601;
     const UShort JAUS_SET_JOINT_POSITIONS                                  =       0x0602;

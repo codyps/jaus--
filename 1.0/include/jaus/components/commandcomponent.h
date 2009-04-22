@@ -101,7 +101,7 @@ namespace Jaus
         virtual int ProcessDiscoveryEvent(const Platform& subsystem,
                                           const SubscriberComponent::DiscoveryEvents eventType = SubsystemUpdate);
         // Check if the component has control of a component
-        bool HaveComponentControl(const Address& id) const;
+        bool HaveComponentControl(const Address& id, const bool forceCheck = false) const;
         // Get updated configuration data for a subsystem.
         bool QueryConfiguration(const Byte subsystemID);
         // Get a copy of all components being controlled.

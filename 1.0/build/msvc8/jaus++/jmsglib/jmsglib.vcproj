@@ -348,6 +348,10 @@
 						>
 					</File>
 					<File
+						RelativePath="..\..\..\..\src\jaus\messages\common\platform\device.cpp"
+						>
+					</File>
+					<File
 						RelativePath="..\..\..\..\src\jaus\messages\common\platform\globalpose.cpp"
 						>
 					</File>
@@ -480,6 +484,10 @@
 					Name="platform"
 					>
 					<File
+						RelativePath="..\..\..\..\src\jaus\messages\command\platform\setdevicepowerstatus.cpp"
+						>
+					</File>
+					<File
 						RelativePath="..\..\..\..\src\jaus\messages\command\platform\setdiscretedevices.cpp"
 						>
 					</File>
@@ -564,6 +572,30 @@
 					Name="planning"
 					>
 					<File
+						RelativePath="..\..\..\..\src\jaus\messages\command\planning\abortmission.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\..\src\jaus\messages\command\planning\pausemission.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\..\src\jaus\messages\command\planning\removemessages.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\..\src\jaus\messages\command\planning\replacemessages.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\..\src\jaus\messages\command\planning\resumemission.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\..\src\jaus\messages\command\planning\runmission.cpp"
+						>
+					</File>
+					<File
 						RelativePath="..\..\..\..\src\jaus\messages\command\planning\spoolmission.cpp"
 						>
 					</File>
@@ -639,6 +671,10 @@
 				<Filter
 					Name="platform"
 					>
+					<File
+						RelativePath="..\..\..\..\src\jaus\messages\query\platform\querydevicepowerstatus.cpp"
+						>
+					</File>
 					<File
 						RelativePath="..\..\..\..\src\jaus\messages\query\platform\querydiscretedevices.cpp"
 						>
@@ -839,6 +875,10 @@
 				<Filter
 					Name="platform"
 					>
+					<File
+						RelativePath="..\..\..\..\src\jaus\messages\inform\platform\reportdevicepowerstatus.cpp"
+						>
+					</File>
 					<File
 						RelativePath="..\..\..\..\src\jaus\messages\inform\platform\reportdiscretedevices.cpp"
 						>
@@ -1058,6 +1098,10 @@
 						>
 					</File>
 					<File
+						RelativePath="..\..\..\..\include\jaus\messages\common\platform\device.h"
+						>
+					</File>
+					<File
 						RelativePath="..\..\..\..\include\jaus\messages\common\platform\globalpose.h"
 						>
 					</File>
@@ -1198,6 +1242,10 @@
 					Name="platform"
 					>
 					<File
+						RelativePath="..\..\..\..\include\jaus\messages\command\platform\setdevicepowerstatus.h"
+						>
+					</File>
+					<File
 						RelativePath="..\..\..\..\include\jaus\messages\command\platform\setdiscretedevices.h"
 						>
 					</File>
@@ -1282,6 +1330,30 @@
 					Name="planning"
 					>
 					<File
+						RelativePath="..\..\..\..\include\jaus\messages\command\planning\abortmission.h"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\..\include\jaus\messages\command\planning\pausemission.h"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\..\include\jaus\messages\command\planning\removemessages.h"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\..\include\jaus\messages\command\planning\replacemessages.h"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\..\include\jaus\messages\command\planning\resumemission.h"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\..\include\jaus\messages\command\planning\runmission.h"
+						>
+					</File>
+					<File
 						RelativePath="..\..\..\..\include\jaus\messages\command\planning\spoolmission.h"
 						>
 					</File>
@@ -1365,6 +1437,10 @@
 				<Filter
 					Name="platform"
 					>
+					<File
+						RelativePath="..\..\..\..\include\jaus\messages\query\platform\querydevicepowerstatus.h"
+						>
+					</File>
 					<File
 						RelativePath="..\..\..\..\include\jaus\messages\query\platform\querydiscretedevices.h"
 						>
@@ -1657,6 +1733,10 @@
 				<Filter
 					Name="platform"
 					>
+					<File
+						RelativePath="..\..\..\..\include\jaus\messages\inform\platform\reportdevicepowerstatus.h"
+						>
+					</File>
 					<File
 						RelativePath="..\..\..\..\include\jaus\messages\inform\platform\reportdiscretedevices.h"
 						>

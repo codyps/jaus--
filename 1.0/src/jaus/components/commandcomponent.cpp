@@ -53,7 +53,9 @@
 #include "jaus/messages/inform/configuration/reportsubsystemlist.h"
 #include "jaus/messages/inform/core/reportcomponentcontrol.h"
 #include "jaus/messages/inform/core/reportcomponentstatus.h"
+#include <iostream>
 
+using namespace std;
 using namespace Jaus;
 
 
@@ -226,14 +228,14 @@ int CommandComponent::ProcessCommandMessage(const Message* msg, const Byte comma
             {
                 Address::Set::iterator id;
                 bool controlEvent = false;
-                mControlledComponentsMutex.Enter();
+                mControlledComponentsMutex.Lock();
                 id = mControlledComponents.find(command->GetSourceID());
                 if(id != mControlledComponents.end())
                 {
                     controlEvent = true;
                     mControlledComponents.erase(id);
                 }
-                mControlledComponentsMutex.Leave();
+                mControlledComponentsMutex.Unlock();
                 if(controlEvent)
                 {
                     ProcessControlEvent(ControlLost, command->GetSourceID(), command);
@@ -276,9 +278,9 @@ int CommandComponent::RequestComponentControl(const Address& id,
         if(response && response->GetResponseCode() == ConfirmComponentControl::Granted)
         {
             result = JAUS_OK;
-            mControlledComponentsMutex.Enter();
+            mControlledComponentsMutex.Lock();
             mControlledComponents.insert(id);
-            mControlledComponentsMutex.Leave();
+            mControlledComponentsMutex.Unlock();
         }
     }
     return result;
@@ -310,14 +312,14 @@ int CommandComponent::ReleaseComponentControl(const Address& id,
     result = JAUS_OK;
     Address::Set::iterator component;
 
-    mControlledComponentsMutex.Enter();
+    mControlledComponentsMutex.Lock();
     component = mControlledComponents.find(id);
     if(component != mControlledComponents.end())
     {
         mControlledComponents.erase(component);
     }
 
-    mControlledComponentsMutex.Leave();
+    mControlledComponentsMutex.Unlock();
 
     return result;
 }
@@ -460,7 +462,7 @@ int CommandComponent::ReleaseControlOfAllComponents()
     Receipt receipt;
     command.SetSourceID(GetID());
     command.SetAckNack(Header::AckNack::Request);
-    mControlledComponentsMutex.Enter();
+    mControlledComponentsMutex.Lock();
     for(id = mControlledComponents.begin();
         id != mControlledComponents.end(); 
         id++)
@@ -469,7 +471,7 @@ int CommandComponent::ReleaseControlOfAllComponents()
         Send(&command, receipt, JAUS_RELEASE_COMPONENT_CONTROL, 250, 3);
     }
     mControlledComponents.clear();
-    mControlledComponentsMutex.Leave();
+    mControlledComponentsMutex.Unlock();
     return JAUS_OK;
 }
 
@@ -496,7 +498,7 @@ int CommandComponent::ProcessDiscoveryEvent(const Platform& subsystem,
 
     // Go through and remove any components that have
     // been lost.
-    mControlledComponentsMutex.Enter();
+    mControlledComponentsMutex.Lock();
     component = mControlledComponents.begin();
     while(component != mControlledComponents.end())
     {
@@ -519,7 +521,7 @@ int CommandComponent::ProcessDiscoveryEvent(const Platform& subsystem,
         }
         component++;
     }
-    mControlledComponentsMutex.Leave();
+    mControlledComponentsMutex.Unlock();
 
     for(component = lost.begin();
         component != lost.end();
@@ -530,6 +532,7 @@ int CommandComponent::ProcessDiscoveryEvent(const Platform& subsystem,
 
     // See if the component that was controlling us
     // disconnected.
+	/*
     if(GetControllerID().IsValid() && GetControllerID().mSubsystem == subsystem.GetSubsystemID())
     {
         if(subsystem.GetConfiguration()->HaveComponent(GetControllerID()) == false)
@@ -544,7 +547,7 @@ int CommandComponent::ProcessDiscoveryEvent(const Platform& subsystem,
             ProcessControlEvent(ControlReleased, controllerID, NULL);
         }
     }
-
+	*/
     return InformComponent::ProcessDiscoveryEvent(subsystem, eventType);
 }
 
@@ -561,65 +564,46 @@ int CommandComponent::ProcessDiscoveryEvent(const Platform& subsystem,
 ///   it is added to the list of controlled components.
 ///
 ///   \param id The ID of the component to check for control of.
+///   \param forceCheck If true, then a QueryComponentControl message is sent
+///                     to verify control.
 ///
 ///   \return True if component is under this components control, otherwise
 ///           false.
 ///
 ////////////////////////////////////////////////////////////////////////////////////
-bool CommandComponent::HaveComponentControl(const Address& id) const
+bool CommandComponent::HaveComponentControl(const Address& id, const bool forceCheck) const
 {
     bool result = false;
-    Platform platform;
     Address::Set::const_iterator itr;
-    if(GetPlatformInfo(platform, id.mSubsystem))
+
+    mControlledComponentsMutex.Lock();
+
+    itr = mControlledComponents.find(id);
+    if(itr != mControlledComponents.end())
     {
-        mControlledComponentsMutex.Enter();
-        itr = mControlledComponents.find(id);
-        if(itr != mControlledComponents.end())
-        {
-            if(platform.GetConfiguration()->HaveComponent(id))
-            {
-                result = true;
-            }
-            else
-            {
-                QueryComponentControl query;
-                Receipt receipt;
-                query.SetSourceID(GetID());
-                query.SetDestinationID(id);
-                if(Send(&query, receipt, JAUS_REPORT_COMPONENT_CONTROL) == JAUS_OK)
-                {
-                    const Jaus::ReportComponentControl* report = 
-                                dynamic_cast<const Jaus::ReportComponentControl*>(receipt.GetResponseMessage());
-                    if(report && report->GetControllerID() == GetID())
-                    {
-                        result = true;
-                    }
-                }
-            }
-        }
-        
-        mControlledComponentsMutex.Leave();
+        result = true;
     }
-    else
-    {
-        QueryComponentControl query;
+	if(result == false || forceCheck)
+	{
+		QueryComponentControl query;
         Receipt receipt;
         query.SetSourceID(GetID());
         query.SetDestinationID(id);
         if(Send(&query, receipt, JAUS_REPORT_COMPONENT_CONTROL) == JAUS_OK)
         {
-            const ReportComponentControl* report = dynamic_cast<const ReportComponentControl*>(receipt.GetResponseMessage());
+            const Jaus::ReportComponentControl* report = 
+                        dynamic_cast<const Jaus::ReportComponentControl*>(receipt.GetResponseMessage());
             if(report && report->GetControllerID() == GetID())
             {
                 result = true;
+				// Add to set of controlled components for future use.
+				((Address::Set* )(&mControlledComponents))->insert(id);
             }
         }
-    }
+	}
 
     if(result == false)
     {
-        mControlledComponentsMutex.Enter();
         Address::Set::iterator rm;
         Address::Set* controlled = (Address::Set*)(&mControlledComponents);
         rm = controlled->find(id);
@@ -627,8 +611,11 @@ bool CommandComponent::HaveComponentControl(const Address& id) const
         {
             controlled->erase(rm);
         }
-        mControlledComponentsMutex.Leave();
+        
     }
+
+	mControlledComponentsMutex.Unlock();
+
     return result;
 }
 
@@ -679,9 +666,9 @@ bool CommandComponent::QueryConfiguration(const Byte subsystemID)
 Address::Set CommandComponent::GetControlledComponents() const
 {
     Address::Set list;
-    mControlledComponentsMutex.Enter();
+    mControlledComponentsMutex.Lock();
     list = mControlledComponents;
-    mControlledComponentsMutex.Leave();
+    mControlledComponentsMutex.Unlock();
     return list;
 }
 

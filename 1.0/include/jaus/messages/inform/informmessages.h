@@ -76,7 +76,7 @@
 #include "jaus/messages/inform/platform/reportpathsegmentcount.h"
 #include "jaus/messages/inform/platform/reportglobalpathsegment.h"
 #include "jaus/messages/inform/platform/reportlocalpathsegment.h"
-
+#include "jaus/messages/inform/platform/reportdevicepowerstatus.h"
 
 #include "jaus/messages/inform/environment/reportimage.h"
 #include "jaus/messages/inform/environment/reportcameraformatoptions.h"
@@ -86,5 +86,6 @@
 #include "jaus/messages/inform/environment/reportrelativeobjectposition.h"    //Added 8/20/2008
 #include "jaus/messages/inform/environment/reportcameracapabilities.h"        //Added 8/20/2008
 #include "jaus/messages/inform/environment/reportwaterdepth.h"                //Added 4/03/2009
+
 #endif
 /*  End of File */

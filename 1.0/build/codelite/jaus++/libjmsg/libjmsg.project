@@ -17,6 +17,7 @@
         <File Name="../../../../src/jaus/messages/common/platform/globalpose.cpp"/>
         <File Name="../../../../src/jaus/messages/common/platform/globalposition.cpp"/>
         <File Name="../../../../src/jaus/messages/common/platform/platform.cpp"/>
+        <File Name="../../../../src/jaus/messages/common/platform/device.cpp"/>
       </VirtualDirectory>
       <VirtualDirectory Name="world">
         <File Name="../../../../src/jaus/messages/common/world/object.cpp"/>
@@ -73,10 +74,17 @@
         <File Name="../../../../src/jaus/messages/command/platform/setlocalwaypoint.cpp"/>
         <File Name="../../../../src/jaus/messages/command/platform/settravelspeed.cpp"/>
         <File Name="../../../../src/jaus/messages/command/platform/setwrencheffort.cpp"/>
+        <File Name="../../../../src/jaus/messages/command/platform/setdevicepowerstatus.cpp"/>
       </VirtualDirectory>
       <VirtualDirectory Name="world"/>
       <VirtualDirectory Name="planning">
         <File Name="../../../../src/jaus/messages/command/planning/spoolmission.cpp"/>
+        <File Name="../../../../src/jaus/messages/command/planning/abortmission.cpp"/>
+        <File Name="../../../../src/jaus/messages/command/planning/pausemission.cpp"/>
+        <File Name="../../../../src/jaus/messages/command/planning/removemessages.cpp"/>
+        <File Name="../../../../src/jaus/messages/command/planning/replacemessages.cpp"/>
+        <File Name="../../../../src/jaus/messages/command/planning/resumemission.cpp"/>
+        <File Name="../../../../src/jaus/messages/command/planning/runmission.cpp"/>
       </VirtualDirectory>
     </VirtualDirectory>
     <VirtualDirectory Name="inform">
@@ -128,6 +136,7 @@
         <File Name="../../../../src/jaus/messages/inform/platform/reportvelocitystate.cpp"/>
         <File Name="../../../../src/jaus/messages/inform/platform/reportwaypointcount.cpp"/>
         <File Name="../../../../src/jaus/messages/inform/platform/reportwrencheffort.cpp"/>
+        <File Name="../../../../src/jaus/messages/inform/platform/reportdevicepowerstatus.cpp"/>
       </VirtualDirectory>
     </VirtualDirectory>
     <VirtualDirectory Name="query">
@@ -178,6 +187,7 @@
         <File Name="../../../../src/jaus/messages/query/platform/querywaypointcount.cpp"/>
         <File Name="../../../../src/jaus/messages/query/platform/querywrencheffort.cpp"/>
         <File Name="../../../../src/jaus/messages/query/environment/querywaterdepth.cpp"/>
+        <File Name="../../../../src/jaus/messages/query/platform/querydevicepowerstatus.cpp"/>
       </VirtualDirectory>
     </VirtualDirectory>
     <VirtualDirectory Name="experimental">
@@ -220,6 +230,7 @@
         <File Name="../../../../include/jaus/messages/common/platform/globalpose.h"/>
         <File Name="../../../../include/jaus/messages/common/platform/globalposition.h"/>
         <File Name="../../../../include/jaus/messages/common/platform/platform.h"/>
+        <File Name="../../../../include/jaus/messages/common/platform/device.h"/>
       </VirtualDirectory>
       <VirtualDirectory Name="world">
         <File Name="../../../../include/jaus/messages/common/world/object.h"/>
@@ -276,6 +287,7 @@
         <File Name="../../../../include/jaus/messages/command/platform/setlocalwaypoint.h"/>
         <File Name="../../../../include/jaus/messages/command/platform/settravelspeed.h"/>
         <File Name="../../../../include/jaus/messages/command/platform/setwrencheffort.h"/>
+        <File Name="../../../../include/jaus/messages/command/platform/setdevicepowerstatus.h"/>
       </VirtualDirectory>
       <VirtualDirectory Name="world">
         <File Name="../../../../include/jaus/messages/command/world/createvectorknowledgestoreobjects.h"/>
@@ -284,6 +296,12 @@
       <File Name="../../../../include/jaus/messages/command/commandmessages.h"/>
       <VirtualDirectory Name="planning">
         <File Name="../../../../include/jaus/messages/command/planning/spoolmission.h"/>
+        <File Name="../../../../include/jaus/messages/command/planning/abortmission.h"/>
+        <File Name="../../../../include/jaus/messages/command/planning/pausemission.h"/>
+        <File Name="../../../../include/jaus/messages/command/planning/removemessages.h"/>
+        <File Name="../../../../include/jaus/messages/command/planning/replacemessages.h"/>
+        <File Name="../../../../include/jaus/messages/command/planning/resumemission.h"/>
+        <File Name="../../../../include/jaus/messages/command/planning/runmission.h"/>
       </VirtualDirectory>
     </VirtualDirectory>
     <VirtualDirectory Name="inform">
@@ -336,6 +354,7 @@
         <File Name="../../../../include/jaus/messages/inform/platform/reportvelocitystate.h"/>
         <File Name="../../../../include/jaus/messages/inform/platform/reportwaypointcount.h"/>
         <File Name="../../../../include/jaus/messages/inform/platform/reportwrencheffort.h"/>
+        <File Name="../../../../include/jaus/messages/inform/platform/reportdevicepowerstatus.h"/>
       </VirtualDirectory>
       <File Name="../../../../include/jaus/messages/inform/acknackmessage.h"/>
       <File Name="../../../../include/jaus/messages/inform/informcodes.h"/>
@@ -389,6 +408,7 @@
         <File Name="../../../../include/jaus/messages/query/platform/queryvelocitystate.h"/>
         <File Name="../../../../include/jaus/messages/query/platform/querywaypointcount.h"/>
         <File Name="../../../../include/jaus/messages/query/platform/querywrencheffort.h"/>
+        <File Name="../../../../include/jaus/messages/query/platform/querydevicepowerstatus.h"/>
       </VirtualDirectory>
       <File Name="../../../../include/jaus/messages/query/querycodes.h"/>
       <File Name="../../../../include/jaus/messages/query/querymessages.h"/>

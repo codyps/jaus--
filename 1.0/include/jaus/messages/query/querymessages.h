@@ -73,6 +73,7 @@
 #include "jaus/messages/query/platform/querypathsegmentcount.h"
 #include "jaus/messages/query/platform/queryglobalpathsegment.h"
 #include "jaus/messages/query/platform/querylocalpathsegment.h"
+#include "jaus/messages/query/platform/querydevicepowerstatus.h"
 
 #include "jaus/messages/query/environment/queryimage.h"
 #include "jaus/messages/query/environment/querycameraformatoptions.h"

@@ -1721,6 +1721,9 @@ Message* MessageCreator::CreateCommandMessage(const UShort code)
     case JAUS_SET_LOCAL_PATH_SEGMENT:
         msg = new SetLocalPathSegment();
         break;
+    case JAUS_SET_DEVICE_POWER_STATUS:
+        msg = new SetDevicePowerStatus();
+        break;
     //  Manipulator Subgroup
     //case JAUS_SET_JOINT_EFFORTS:
     //    msg = new SetJointEfforts();
@@ -1781,12 +1784,12 @@ Message* MessageCreator::CreateCommandMessage(const UShort code)
     case JAUS_RESUME_MISSION:
         msg = new ResumeMission();
         break;
-    //case JAUS_REMOVE_MESSAGES:
-    //    msg = new RemoveMessages();
-    //    break;
-    //case JAUS_REPLACE_MESSAGES:
-    //    msg = new ReplaceMessages();
-    //    break;
+    case JAUS_REMOVE_MESSAGES:
+        msg = new RemoveMessages();
+        break;
+    case JAUS_REPLACE_MESSAGES:
+        msg = new ReplaceMessages();
+        break;
     //  COULD NOT FIND MESSAGE!
     default:
         msg = NULL;
@@ -1888,6 +1891,9 @@ Message* MessageCreator::CreateQueryMessage(const UShort code)
          break;
     case JAUS_QUERY_LOCAL_PATH_SEGMENT:
          msg = new QueryLocalPathSegment();
+         break;
+    case JAUS_QUERY_DEVICE_POWER_STATUS:
+         msg = new QueryDevicePowerStatus();
          break;
     //// Manipulator Messages:
     //case JAUS_QUERY_MANIPULATOR_SPECIFICATIONS:
@@ -2057,6 +2063,9 @@ Message* MessageCreator::CreateInformMessage(const UShort code)
         break;
      case JAUS_REPORT_LOCAL_PATH_SEGMENT:
         msg = new ReportLocalPathSegment();
+        break;
+     case JAUS_REPORT_DEVICE_POWER_STATUS:
+        msg = new ReportDevicePowerStatus();
         break;
     //// Manipulator Subgroup
     //case JAUS_REPORT_JOINT_EFFORTS:

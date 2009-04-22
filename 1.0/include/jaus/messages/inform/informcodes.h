@@ -91,6 +91,7 @@ namespace Jaus
     const UShort JAUS_REPORT_PATH_SEGMENT_COUNT                                 = 0x440E;
     const UShort JAUS_REPORT_GLOBAL_PATH_SEGMENT                                = 0x440F;
     const UShort JAUS_REPORT_LOCAL_PATH_SEGMENT                                 = 0x4410;
+    const UShort JAUS_REPORT_DEVICE_POWER_STATUS                                = 0x4415;
     //  Manipulator Subgroup - Codes 4600-47FF
     const UShort JAUS_REPORT_MANIPULATOR_SPECIFICATIONS                         = 0x4600;
     const UShort JAUS_REPORT_JOINT_EFFORTS                                      = 0x4601;

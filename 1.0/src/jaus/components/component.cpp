@@ -791,6 +791,7 @@ int Component::Standby()
 ////////////////////////////////////////////////////////////////////////////////////
 int Component::Resume()
 {
+	SetPrimaryStatus(Component::Status::Ready);
     return JAUS_OK;
 }
 

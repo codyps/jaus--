@@ -83,6 +83,7 @@
 #include "jaus/messages/command/platform/setlocalwaypoint.h"                  
 #include "jaus/messages/command/platform/setglobalpathsegment.h"              
 #include "jaus/messages/command/platform/setlocalpathsegment.h"               
+#include "jaus/messages/command/platform/setdevicepowerstatus.h"               
 
 #include "jaus/messages/command/world/createvectorknowledgestoreobjects.h"
 
@@ -91,6 +92,8 @@
 #include "jaus/messages/command/planning/pausemission.h"
 #include "jaus/messages/command/planning/abortmission.h"
 #include "jaus/messages/command/planning/resumemission.h"
+#include "jaus/messages/command/planning/removemessages.h"
+#include "jaus/messages/command/planning/replacemessages.h"
 
 #endif
 /*  End of File */

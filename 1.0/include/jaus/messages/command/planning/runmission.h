@@ -70,9 +70,9 @@ namespace Jaus
         virtual UInt GetPresenceVectorMask(const UShort version = JAUS_DEFAULT_VERSION) const;
         virtual Message* Clone() const;
         RunMission& operator=(const RunMission &msg);
-        virtual int RunTestCase() const;
+        virtual int RunTestCase() const;  ///< Runs test program to show usage.
     protected:
-        UShort mMissionID;    ///< mission id of the mission to be executed.
+        UShort mMissionID;    ///< Mission id of the mission to be executed.
     };
 }
 

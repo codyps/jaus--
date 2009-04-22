@@ -72,10 +72,10 @@ namespace Jaus
         virtual UInt GetPresenceVectorMask(const UShort version = JAUS_DEFAULT_VERSION) const;
         virtual Message* Clone() const;
         PauseMission& operator=(const PauseMission &msg);
-        virtual int RunTestCase() const;
+        virtual int RunTestCase() const;  ///< Runs test program to show usage.
     protected:
-        UShort mMissionID;    ///< mission id of the mission to pause.
-        UShort mTaskID;       ///< task id of the task to be pause.
+        UShort mMissionID;    ///< Mission id of the mission to pause.
+        UShort mTaskID;       ///< Task id of the task to be pause.
     };
 }
 

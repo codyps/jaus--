@@ -345,6 +345,7 @@ int GlobalVectorDriver::ProcessCommandMessage(const Message* msg, const Byte com
         // Always run parent process command in case it needs the data too.
         CommandComponent::ProcessCommandMessage(msg, commandAuthority);
     }
+
     return result;
 }
 
@@ -859,7 +860,7 @@ bool GlobalVectorDriver::IsGlobalPoseSubscriptionReady()
     {
         if(mGlobalVectorDriverThread.QuitThreadFlag() == false &&
             HaveEventSubscription(mGlobalPoseSensorID,
-                                 JAUS_REPORT_GLOBAL_POSE) == false)
+                                  JAUS_REPORT_GLOBAL_POSE) == false)
         {
             ready = false;
             Jaus::CreateEventRequest createEvent;
@@ -1075,39 +1076,26 @@ void GlobalVectorDriver::ClearCurrentVector()
 ////////////////////////////////////////////////////////////////////////////////////
 bool GlobalVectorDriver::HaveControlOfPrimitiveDriver()
 {
-    bool ready = true;
-    if(mPrimitiveDriverID.IsValid())
-    {
-        if(HaveComponentControl(mPrimitiveDriverID) == false)
-        {
-            ready = false;
-            //  Request control of primitive driver
-           if(RequestComponentControl(mPrimitiveDriverID) == JAUS_OK)
-           {
-               QueryComponentStatus query;
-               query.SetSourceID(GetID());
-               query.SetDestinationID(mPrimitiveDriverID);
-               Receipt receipt;
-               if(Send(&query, receipt) == JAUS_OK)
-               {
-                   const ReportComponentStatus* report = 
-                       dynamic_cast<const ReportComponentStatus*>(receipt.GetResponseMessage());
-                   if(report && report->GetPrimaryStatusCode() == Component::Status::Standby)
-                   {
-                       Jaus::Resume resume;
-                       resume.SetSourceID(GetID());
-                       resume.SetDestinationID(mPrimitiveDriverID);
-                       Send(&resume);
-                   }
-               }
-               ready = true;
-           }
-        }
-    }
-    else
-    {
-        ready = false;
-    }
+	bool ready = true;
+	if(mPrimitiveDriverID.IsValid())
+	{
+		if(HaveComponentControl(mPrimitiveDriverID, true) == false)
+		{
+			ready = false;
+			//  Request control of primitive driver
+			if(RequestComponentControl(mPrimitiveDriverID) == JAUS_OK)
+			{
+				if(SendResumeCommand(mPrimitiveDriverID, true))
+				{
+					ready = true;
+				}
+			}
+		}
+	}
+	else
+	{
+		ready = false;
+	}
 
     return ready;
 }
@@ -1126,24 +1114,53 @@ void GlobalVectorDriver::GlobalVectorDriverThread(void *args)
 {
     GlobalVectorDriver* driver = (GlobalVectorDriver*)(args);
     SetWrenchEffort wrenchEffort;
+	unsigned int checkResumeTimeMs;
+	checkResumeTimeMs = Time::GetUtcTimeMs();
     while(driver && !driver->mGlobalVectorDriverThread.QuitThreadFlag())
     {
+		/*  Debugging 
+		if(Time::GetUtcTimeMs() - checkResumeTimeMs > 500)
+		{
+			driver->PrintStatus();
+			cout << "Primitive Driver ID: " << driver->mPrimitiveDriverID.ToString() << endl;
+			if(driver->HaveComponentControl(driver->mPrimitiveDriverID, false))
+			{
+				cout << "Have Control of Primitive Driver\n";
+			}
+			checkResumeTimeMs = Time::GetUtcTimeMs();
+		}
+		*/
         // If we are in a ready state, and we have the necessary
         // sensor data required, and control of a primitive driver
         // then generate wrench efforts!
-        if(driver->GetPrimaryStatus() == Component::Status::Ready &&
-            driver->IsGlobalPoseSubscriptionReady() &&
-            driver->IsTravelSpeedSubscriptionReady() &&
-            driver->HaveControlOfPrimitiveDriver() &&
-            driver->HaveDesiredGlobalVector())
+        if(driver->GetPrimaryStatus() == Component::Status::Ready)
         {
-            // Generate the wrench effort to send to the
-            // primitive driver component.
-            driver->GenerateWrench(driver->GetDesiredGlobalVector(), wrenchEffort);
-            wrenchEffort.SetDestinationID(driver->GetPrimitiveDriverID());
-            wrenchEffort.SetSourceID(driver->GetID());
-            // Send the command.
-            driver->Send(&wrenchEffort);
+			
+			if(!driver->HaveControlOfPrimitiveDriver())
+			{
+				continue;
+			}
+			
+			if(!driver->IsGlobalPoseSubscriptionReady())
+			{
+				continue;
+			}
+			
+			if(!driver->IsTravelSpeedSubscriptionReady())
+			{
+				continue;
+			}
+
+			if(driver->HaveDesiredGlobalVector())
+			{
+				// Generate the wrench effort to send to the
+				// primitive driver component.
+				driver->GenerateWrench(driver->GetDesiredGlobalVector(), wrenchEffort);
+				wrenchEffort.SetDestinationID(driver->GetPrimitiveDriverID());
+				wrenchEffort.SetSourceID(driver->GetID());
+				// Send the command.
+				driver->Send(&wrenchEffort);
+			}
         }
         else if(driver->GetPrimaryStatus() != Component::Status::Ready)
         {
@@ -1151,22 +1168,12 @@ void GlobalVectorDriver::GlobalVectorDriverThread(void *args)
             // of all components being commanded and stop
             // any active subscriptions (this will reduce bandwidth).
 
-            /*  Keep events for now, may add this code back in later.
-            if(driver->mGlobalPoseSensorID.IsValid())
-            {
-                driver->CancelEvents(driver->mGlobalPoseSensorID);
-            }
-            if(driver->mVelocityStateSensorID.IsValid())
-            {
-                driver->CancelEvents(driver->mVelocityStateSensorID);
-            }
-            */
-
             if(driver->mPrimitiveDriverID.IsValid() &&
                 driver->HaveComponentControl(driver->mPrimitiveDriverID))
             {
-                driver->ReleaseComponentControl(driver->mPrimitiveDriverID);
-                driver->SendStandbyCommand(driver->mPrimitiveDriverID);
+				//cout << "Sending Standby 1!\n";
+				driver->SendStandbyCommand(driver->mPrimitiveDriverID);
+                driver->ReleaseComponentControl(driver->mPrimitiveDriverID);                
             }
             driver->ClearCurrentVector();
             driver->mGlobalVectorDriverMutex.Enter();
@@ -1177,9 +1184,12 @@ void GlobalVectorDriver::GlobalVectorDriverThread(void *args)
             }
             driver->mGlobalVectorDriverMutex.Leave();
         }
+		
         // Delay refresh based on update rate set.
         Sleep( (unsigned int)(1000.0/driver->mGlobalVectorDriverUpdateRateHz) );
-    }
+    } // While running...
+
+
     // If not in a ready state, then we must release control
     // of all components being commanded and stop
     // any active subscriptions (this will reduce bandwidth).
@@ -1194,6 +1204,7 @@ void GlobalVectorDriver::GlobalVectorDriverThread(void *args)
     if(driver->mPrimitiveDriverID.IsValid() &&
         driver->HaveComponentControl(driver->mPrimitiveDriverID))
     {
+		//cout << "Sending Standby 2!\n";
         driver->SendStandbyCommand(driver->mPrimitiveDriverID);
         driver->ReleaseComponentControl(driver->mPrimitiveDriverID);
     }

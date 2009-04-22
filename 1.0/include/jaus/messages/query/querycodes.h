@@ -91,6 +91,7 @@ namespace Jaus
     const UShort JAUS_QUERY_PATH_SEGMENT_COUNT                             =   0x240E;
     const UShort JAUS_QUERY_GLOBAL_PATH_SEGMENT                            =   0x240F;
     const UShort JAUS_QUERY_LOCAL_PATH_SEGMENT                             =   0x2410;
+    const UShort JAUS_QUERY_DEVICE_POWER_STATUS                            =   0x2415;
     //  Manipulator Subgroup - Codes 4001-41FF                                       
     const UShort JAUS_QUERY_MANIPULATOR_SPECIFICATIONS                     =   0x2600;
     const UShort JAUS_QUERY_JOINT_EFFORTS                                  =   0x2601;

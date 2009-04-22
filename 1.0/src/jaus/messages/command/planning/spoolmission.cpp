@@ -42,6 +42,7 @@
 #include "jaus/messages/command/commandmessages.h"
 #include "jaus/messages/messagecreator.h"
 
+#include <stdlib.h>
 #include <iostream>
 #include <jaus/messages/errorcodes.h> 
 
