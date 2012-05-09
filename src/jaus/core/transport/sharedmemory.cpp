@@ -41,7 +41,10 @@
 #include <boost/thread.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/date_time.hpp>
-#include <boost/interprocess/permissions.hpp>
+
+//#include <boost/interprocess/permissions.hpp>
+#include <boost/exception/errinfo_type_info_name.hpp>
+
 #include <boost/interprocess/shared_memory_object.hpp>
 #include <boost/interprocess/mapped_region.hpp>
 #include <boost/interprocess/sync/scoped_lock.hpp>
@@ -474,7 +477,15 @@ bool SharedMemory::SendPacket(const Packet& packet,
         }
         else
         {
-            throw boost::interprocess::interprocess_exception("Shared Memory Full");
+            //throw boost::interprocess::interprocess_exception("Shared Memory Full");
+            //boost::errinfo_type_info_name error(std::string("Shared Memory Full"));
+            //error.value() = "Shared Memory Full";
+            //throw boost::interprocess::interprocess_exception(error);
+
+            //throw std::exception("Shared Memory Full");
+
+            std::cout << "Shared Memory Full" << std::endl;
+            return false;
         }
     }
     catch(boost::interprocess::interprocess_exception &ex)
